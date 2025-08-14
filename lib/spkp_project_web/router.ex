@@ -28,7 +28,11 @@ defmodule SpkpProjectWeb.Router do
 
   scope "/", SpkpProjectWeb do
     pipe_through :browser
+
+    live "/", HomepageLive
+    live "/mengenaikami", MengenaiKamiLive
     live "/program", ProgramKursusLive
+    live "/hubungi", HubungiLive
 
     live "/dashboard", UserDashboardLive
   end

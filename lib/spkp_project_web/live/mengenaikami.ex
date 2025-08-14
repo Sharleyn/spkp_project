@@ -1,3 +1,13 @@
+defmodule SpkpProjectWeb.HomeLive do
+  use SpkpProjectWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    {:ok, socket}
+  end
+
+
+  def render(assigns) do
+    ~H"""
 <head>
   <style>
     body {
@@ -57,15 +67,15 @@ html {
 <!-- Bar navigasi -->
 <div class="bg-[#09033F] shadow py-2">
   <div class="max-w-7xl mx-auto flex space-x-2">
-    <a href={~p"/"} 
+    <a href={~p"/"}
        class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
       Laman Utama
     </a>
-    <a href={~p"/mengenaikami"} 
+    <a href={~p"/mengenaikami"}
        class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
       Mengenai Kami
     </a>
-    <a href={~p"/program"} 
+    <a href={~p"/program"}
        class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
       Program
     </a>
@@ -180,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
       <div class="flex items-center justify-between gap-6">
-  
+
   <!-- Alamat -->
   <div class="flex items-center gap-4">
     <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6">
@@ -225,3 +235,8 @@ document.addEventListener("DOMContentLoaded", function () {
 </section>
 
 </div>
+
+"""
+
+      end
+    end
