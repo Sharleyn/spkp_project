@@ -21,6 +21,16 @@ defmodule SpkpProjectWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/mengenaikami", PageController, :mengenaikami
+    get "/hubungi", PageController, :hubungi
+
+  end
+
+  scope "/", SpkpProjectWeb do
+    pipe_through :browser
+    live "/program", ProgramKursusLive
+
+    live "/dashboard", UserDashboardLive
   end
 
   # Other scopes may use custom stacks.
