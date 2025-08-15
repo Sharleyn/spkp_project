@@ -17,13 +17,20 @@ defmodule SpkpProjectWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", SpkpProjectWeb do
+  scope "/", TryalProjekWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
-    get "/mengenaikami", PageController, :mengenaikami
-    get "/hubungi", PageController, :hubungi
+    # Root route → terus ke Laman Utama
+    live "/", LamanUtamaLive
 
+    # Kalau nak route /lamanutama kekal
+    live "/lamanutama", LamanUtamaLive
+
+    live "/mengenaikami", MengenaiKamiLive
+
+    live "/program", ProgramKursusLive
+
+    live "/dashboard", UserDashboardLive
   end
 
   scope "/", SpkpProjectWeb do

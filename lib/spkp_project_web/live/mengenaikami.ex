@@ -236,6 +236,5 @@ document.addEventListener("DOMContentLoaded", function () {
 </div>
 
 """
-
       end
     end
