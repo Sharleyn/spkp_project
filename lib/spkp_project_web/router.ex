@@ -17,7 +17,7 @@ defmodule SpkpProjectWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", TryalProjekWeb do
+  scope "/", SpkpProjectWeb do
     pipe_through :browser
 
     # Root route → terus ke Laman Utama
