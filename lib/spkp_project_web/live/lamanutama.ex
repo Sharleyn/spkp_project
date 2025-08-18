@@ -29,6 +29,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
   def mount(_params, _session, socket) do
     if connected?(socket) do
       schedule_gallery_slide()
+      schedule_slide()
     end
 
     {:ok,
@@ -39,17 +40,32 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
      |> assign(:gallery_index, 0)}
   end
 
+  defp schedule_slide do
+    # Auto tukar setiap 3 saat
+    Process.send_after(self(), :next_slide, 3000)
+  end
+
+  def handle_info(:next_slide, socket) do
+    schedule_slide() # set semula supaya terus loop
+    total = length(socket.assigns.slides)
+    new_index = rem(socket.assigns.current_index + 1, total)
+
+    {:noreply, assign(socket, :current_index, new_index)}
+  end
+
   # Manual slider utama
   def handle_event("goto_slide", %{"index" => idx}, socket) do
     {:noreply, assign(socket, :current_index, String.to_integer(idx))}
   end
 
   def handle_event("next_slide", _params, socket) do
+    schedule_slide()
     new_index = rem(socket.assigns.current_index + 1, length(socket.assigns.slides))
     {:noreply, assign(socket, :current_index, new_index)}
   end
 
   def handle_event("prev_slide", _params, socket) do
+    schedule_slide()
     new_index = rem(socket.assigns.current_index - 1 + length(socket.assigns.slides), length(socket.assigns.slides))
     {:noreply, assign(socket, :current_index, new_index)}
   end
@@ -207,15 +223,25 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
       </section>
 
       <!-- Galeri Auto-Slider -->
-      <section class="max-w-7xl mx-auto px-4 mt-10">
-        <h5 class="bg-[#09033F] text-xl text-white font-bold text-center px-6 py-2 mb-6">GALERI</h5>
+         <section class="max-w-7xl mx-auto px-4 mt-10">
+          <h5 class="bg-[#09033F] text-xl text-white font-bold text-center px-6 py-2 mb-6">GALERI</h5>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 transition-all duration-500">
-          <%= for img <- Enum.at(Enum.chunk_every(@gallery, 4), @gallery_index) || [] do %>
-            <img src={img} alt="Galeri" class="rounded-lg shadow"/>
-          <% end %>
-        </div>
-      </section>
+           <div class="relative h-[200px] overflow-hidden">
+              <%= for {chunk, i} <- Enum.with_index(Enum.chunk_every(@gallery, 4)) do %>
+              <div class={["absolute inset-0 grid grid-cols-1 md:grid-cols-4 gap-6 transition-opacity duration-700 ease-in-out",
+                 if i == @gallery_index do
+                      "opacity-100 z-10"
+                 else
+                      "opacity-0 z-0"
+                 end]}>
+
+                <%= for img <- chunk do %>
+                    <img src={img} alt="Galeri" class="rounded-lg object-cover"/>
+                <% end %>
+              </div>
+              <% end %>
+            </div>
+        </section>
 
       <!-- Footer -->
        <section id="hubungi">
@@ -291,5 +317,6 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     <% end %>
     </div>
     """
+
   end
 end
