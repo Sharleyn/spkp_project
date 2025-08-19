@@ -5,9 +5,11 @@ defmodule SpkpProject.Accounts.User do
   schema "users" do
     field :email, :string
     field :password, :string, virtual: true, redact: true
+    field :password_confirmation, :string, virtual: true
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+    field :full_name, :string
     field :role, :string
 
     timestamps(type: :utc_datetime)
@@ -38,17 +40,17 @@ defmodule SpkpProject.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :role])
-    |> validate_required([:email, :password])
-    |> put_change(:role, Map.get(attrs, "role", "user"))
+    |> cast(attrs, [:email, :password, :full_name, :password_confirmation])
     |> validate_email(opts)
     |> validate_password(opts)
+    |> validate_full_name(opts)
+    |> validate_password_confirmation(opts)
   end
 
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])
-    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "Masukkan email anda")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
   end
@@ -56,12 +58,21 @@ defmodule SpkpProject.Accounts.User do
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])
-    |> validate_length(:password, min: 12, max: 72)
-    # Examples of additional password validation:
-    # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
-    # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_length(:password, min: 12, max: 72, message: "Masukkan kata laluan")
+  end
+
+  defp validate_password_confirmation(changeset, opts) do
+    changeset
+    |> validate_required([:password_confirmation])
+    |> validate_length(:password_confirmation, min: 12, max: 72, message: "Kata laluan tidak sepadan")
+    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan") # <-- ini penting
     |> maybe_hash_password(opts)
+  end
+
+  defp validate_full_name(changeset, opts) do
+    changeset
+    |> validate_required([:full_name])
+    |> validate_length(:full_name, min: 5, max: 160, message: "Isikan nama penuh anda")
   end
 
   defp maybe_hash_password(changeset, opts) do
@@ -119,7 +130,7 @@ defmodule SpkpProject.Accounts.User do
   def password_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:password])
-    |> validate_confirmation(:password, message: "does not match password")
+    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
     |> validate_password(opts)
   end
 
