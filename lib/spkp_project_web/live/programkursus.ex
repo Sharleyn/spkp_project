@@ -1,6 +1,41 @@
 defmodule SpkpProjectWeb.ProgramKursusLive do
   use SpkpProjectWeb, :live_view
 
+  def mount(_params, _session, socket) do
+    # Data statik contoh
+    long_courses = [
+      %{
+        id: 1,
+        title: "Diploma Pengurusan Perniagaan",
+        description: "Program komprehensif selama 2 tahun untuk mempersiapkan pelajar dalam bidang perniagaan.",
+        start: "01-09-2025",
+        end: "31-08-2027"
+      },
+      %{
+        id: 2,
+        title: "Diploma Sains Komputer",
+        description: "Fokus pada pembangunan perisian, pangkalan data, dan rangkaian komputer.",
+        start: "01-09-2025",
+        end: "31-08-2027"
+      }
+    ]
+
+    short_courses = [
+      %{
+        id: 3,
+        title: "Kursus Kemahiran Digital",
+        description: "Kursus 2 minggu untuk meningkatkan kemahiran teknologi maklumat.",
+        start: "15-09-2025",
+        end: "30-09-2025"
+      }
+    ]
+
+    {:ok,
+     socket
+     |> assign(:long_courses, long_courses)
+     |> assign(:short_courses, short_courses)}
+  end
+
   def render(assigns) do
     ~H"""
 

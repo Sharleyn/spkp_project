@@ -139,7 +139,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
         <div class="max-w-7xl mx-auto flex space-x-2">
           <a href={~p"/"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Laman Utama</a>
           <a href={~p"/mengenaikami"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Mengenai Kami</a>
-          <a href={~p"/program"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Program</a>
+          <a href={~p"/programkursus"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Program</a>
           <a href="/#hubungi" class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Hubungi</a>
         </div>
       </div>

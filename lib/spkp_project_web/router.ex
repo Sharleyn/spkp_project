@@ -3,6 +3,7 @@ defmodule SpkpProjectWeb.Router do
 
   import SpkpProjectWeb.UserAuth
   alias SpkpProjectWeb.PageLive
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -17,31 +18,18 @@ defmodule SpkpProjectWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", TryalProjekWeb do
+  scope "/", SpkpProjectWeb do
     pipe_through :browser
 
-    # Root route → terus ke Laman Utama
     live "/", LamanUtamaLive
 
-    # Kalau nak route /lamanutama kekal
     live "/lamanutama", LamanUtamaLive
 
     live "/mengenaikami", MengenaiKamiLive
 
-    live "/program", ProgramKursusLive
+    live "/programkursus", ProgramKursusLive
 
-    live "/dashboard", UserDashboardLive
-  end
-
-  scope "/", SpkpProjectWeb do
-    pipe_through :browser
-
-    live "/", HomepageLive
-    live "/mengenaikami", MengenaiKamiLive
-    live "/program", ProgramKursusLive
     live "/hubungi", HubungiLive
-
-    live "/dashboard", UserDashboardLive
   end
 
   # Other scopes may use custom stacks.
@@ -75,7 +63,7 @@ defmodule SpkpProjectWeb.Router do
       on_mount: [{SpkpProjectWeb.UserAuth, :redirect_if_user_is_authenticated}] do
       live "/users/register", UserRegistrationLive, :new
       live "/users/log_in", UserLoginLive, :new
-      live "/users/reset_password", UserForgotPasswordLive, :new
+      live "/users/forgot_password", UserForgotPasswordLive, :new
       live "/users/reset_password/:token", UserResetPasswordLive, :edit
     end
 
@@ -87,6 +75,7 @@ defmodule SpkpProjectWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{SpkpProjectWeb.UserAuth, :ensure_authenticated}] do
+      live "/userdashboard", UserDashboardLive
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
       live "/admin", PageLive, :admin
@@ -97,7 +86,7 @@ defmodule SpkpProjectWeb.Router do
   scope "/", SpkpProjectWeb do
     pipe_through [:browser]
 
-    delete "/users/log_out", UserSessionController, :delete
+    delete "/halamanutama", UserSessionController, :delete
 
     live_session :current_user,
       on_mount: [{SpkpProjectWeb.UserAuth, :mount_current_user}] do
