@@ -56,7 +56,7 @@ defmodule SpkpProjectWeb.UserSettingsLive do
           <.input field={@password_form[:password_confirmation]} type="password" label="Pengesahan Kata Laluan Baru" required />
 
           <:actions>
-            <div class="relative w-full flex justify-center items-center">
+            <div class="mt-6 relative w-full flex justify-center items-center">
                 <!-- Button Simpan (absolutely left) -->
                   <button type="submit" class="absolute left-0 px-4 py-2 font-medium bg-blue-500 text-white rounded-lg hover:bg-blue-700">
                        Simpan Kata Laluan
