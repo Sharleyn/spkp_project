@@ -73,6 +73,10 @@ defmodule SpkpProjectWeb.Router do
   scope "/", SpkpProjectWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    live "/userprofile", UserProfileLive, :index
+    live "/senaraikursususer", UserCoursesLive, :index
+    live "/permohonanuser", PermohonanUserLive, :index
+
     live_session :require_authenticated_user,
       on_mount: [{SpkpProjectWeb.UserAuth, :ensure_authenticated}] do
       live "/userdashboard", UserDashboardLive

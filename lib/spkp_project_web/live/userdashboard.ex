@@ -5,45 +5,33 @@ defmodule SpkpProjectWeb.UserDashboardLive do
 
   @impl true
   # 'mount' digunakan untuk menetapkan data awal (initial state)
-  def mount(_params, _session, socket) do
-    # Data contoh (mock data) untuk dashboard
-    current_user = socket.assigns.current_user
-    assigns = %{
-      current_user_name: current_user.full_name,
-      sidebar_open: false,
-      user_menu_open: false,
-      active_applications_count: 3,
-      available_courses_count: 3,
-      completed_courses_count: 0,
-      recent_applications: [
-        %{name: "Kursus Komputer Asas", date: "2025-01-24", status: "Diterima", status_class: "bg-green-100 text-green-600"},
-        %{name: "Kursus Bahasa Inggeris", date: "2025-02-17", status: "Dalam Proses", status_class: "bg-yellow-100 text-yellow-600"},
-        %{name: "Kursus Kemahiran Digital", date: "2025-02-21", status: "Ditolak", status_class: "bg-red-100 text-red-600"},
-      ],
-      available_courses: [
-        %{name: "Kursus Komputer Asas", duration: "4 minggu", slots: "15 tempat"},
-        %{name: "Kursus Bahasa Inggeris", duration: "2 minggu", slots: "8 tempat"},
-        %{name: "Kursus Kemahiran Digital", duration: "3 minggu", slots: "20 tempat"},
-      ]
-    }
-    socket = assign(socket, assigns)
-
-    # Menetapkan handler untuk toggle sidebar di mobile
-    socket = assign(socket, sidebar_open: false)
-
-    {:ok, socket}
-  end
-
-  def mount(_params, _session, socket) do
-    socket =
-      socket
-      |> assign(:sidebar_open, false)
-      |> assign(:user_menu_open, false)   # 👈 ini wajib
-
-    {:ok, socket}
-  end
-
   @impl true
+def mount(_params, _session, socket) do
+  current_user = socket.assigns.current_user
+
+  socket =
+    socket
+    |> assign(:current_user_name, current_user.full_name)
+    |> assign(:sidebar_open, true)
+    |> assign(:user_menu_open, false)
+    |> assign(:active_applications_count, 3)
+    |> assign(:available_courses_count, 3)
+    |> assign(:completed_courses_count, 0)
+    |> assign(:recent_applications, [
+      %{name: "Kursus Komputer Asas", date: "2025-01-24", status: "Diterima", status_class: "bg-green-100 text-green-600"},
+      %{name: "Kursus Bahasa Inggeris", date: "2025-02-17", status: "Dalam Proses", status_class: "bg-yellow-100 text-yellow-600"},
+      %{name: "Kursus Kemahiran Digital", date: "2025-02-21", status: "Ditolak", status_class: "bg-red-100 text-red-600"}
+    ])
+    |> assign(:available_courses, [
+      %{name: "Kursus Komputer Asas", duration: "4 minggu", slots: "15 tempat"},
+      %{name: "Kursus Bahasa Inggeris", duration: "2 minggu", slots: "8 tempat"},
+      %{name: "Kursus Kemahiran Digital", duration: "3 minggu", slots: "20 tempat"}
+    ])
+
+  {:ok, socket}
+end
+
+
   def handle_event("logout", _params, socket) do
     {:noreply,
      socket
@@ -55,17 +43,17 @@ defmodule SpkpProjectWeb.UserDashboardLive do
   # ========== EVENTS ==========
 
     def handle_event("toggle_sidebar", _params, socket) do
-      {:noreply, update(socket, :sidebar_open, &(!&1))}
+      {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
     end
 
     def handle_event("toggle_user_menu", _params, socket) do
-        {:noreply, update(socket, :user_menu_open, &(!&1))}
+      {:noreply, update(socket, :user_menu_open, &(!&1))}
     end
-
 
     def handle_event("close_user_menu", _params, socket) do
       {:noreply, assign(socket, :user_menu_open, false)}
     end
+
 
   # 'render' berfungsi sebagai template HTML LiveView
   # ========== RENDER ==========
@@ -74,61 +62,67 @@ defmodule SpkpProjectWeb.UserDashboardLive do
       ~H"""
       <div class="bg-white-100 min-h-screen antialiased text-gray-800">
 
-        <!-- Sidebar -->
-        <aside
-          class={
-            "fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
-            (if @sidebar_open, do: "translate-x-0", else: "-translate-x-full md:translate-x-0") <>
-            " bg-[#191970] text-white"
-          }
-        >
+      <!-- Burger Button -->
+            <button class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
+               phx-click="toggle_sidebar">
+                   <img src={~p"/images/burger2.png"} alt="Burger Icon" class="w-6 h-6" />
+           </button>
+
+         <!-- Sidebar -->
+              <aside
+                   class={"fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
+                           (if @sidebar_open, do: "translate-x-0", else: "-translate-x-full") <>
+                            " bg-[#191970] text-white" }>
+
           <!-- Brand -->
-          <div class="mb-10 w-full">
-            <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
-            <div class="text-xs text-center font-bold text-indigo-200">Sistem Permohonan Kursus & Pengurusan</div>
-          </div>
-                <nav class="w-full flex-grow">
-                    <ul class="space-y-4">
-                        <li>
-                             <a href="#" class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                             <img src={~p"/images/right.png"} alt="Laman Utama" class="w-5 h-5" />
-                             <span>Laman Utama</span>
-                             </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                                <img src={~p"/images/right.png"} alt="Profil Pengguna" class="w-5 h-5" />
-                                <span>Profil Pengguna</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                                <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" />
-                                <span>Senarai Kursus</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                                <img src={~p"/images/right.png"} alt="Permohonan Saya" class="w-5 h-5" />
-                                <span>Permohonan Saya</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <button class="md:hidden p-2 rounded-lg text-white absolute top-4 right-4 focus:outline-none" phx-click="toggle_sidebar">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </aside>
+               <div class="mt-4 mb-10 w-full">
+               <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
+               <div class="text-xs text-center font-bold text-indigo-200">
+                    Sistem Permohonan Kursus & Pengurusan
+               </div>
+            </div>
+
+          <!-- Menu -->
+              <nav class="w-full flex-grow">
+                <ul class="space-y-4">
+                  <li>
+                      <.link navigate={~p"/userdashboard"}
+                           class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                           <img src={~p"/images/right.png"} alt="Laman Utama" class="w-5 h-5" />
+                            <span>Laman Utama</span>
+                      </.link>
+                  </li>
+                <li>
+                      <.link navigate={~p"/userprofile"}
+                            class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                        <img src={~p"/images/right.png"} alt="Profil Pengguna" class="w-5 h-5" />
+                            <span>Profil Saya</span>
+                      </.link>
+                   </li>
+                <li>
+                      <.link navigate={~p"/senaraikursususer"}
+                           class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                       <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" />
+                           <span>Senarai Kursus</span>
+                      </.link>
+                    </li>
+                <li>
+                      <.link navigate={~p"/permohonanuser"}
+                          class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                       <img src={~p"/images/right.png"} alt="Permohonan Saya" class="w-5 h-5" />
+                           <span>Permohonan Saya</span>
+                    </.link>
+                 </li>
+              </ul>
+            </nav>
+          </aside>
 
             <!-- Main content area -->
             <div class="flex-grow md:ml-64 p-6 transition-all duration-300 ease-in-out">
-                <button class="md:hidden p-2 rounded-lg text-gray-800 focus:outline-none fixed top-4 left-4 z-40 bg-white shadow-md" phx-click="toggle_sidebar">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
 
                 <!-- Top Header Bar -->
                 <header class="flex justify-end items-center mb-6">
-                        <div class="relative"
+                        <div class="relative">
 
                 <!-- Button User -->
                      <button
@@ -139,7 +133,7 @@ defmodule SpkpProjectWeb.UserDashboardLive do
                                       <img src={~p"/images/kotak - dropdown.png"} alt="Dropdown" />
                      </button>
 
-                     <!-- Dropdown Menu -->
+              <!-- Dropdown Menu -->
                      <%= if @user_menu_open do %>
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-10">
                               <!-- Setting -->
@@ -158,88 +152,89 @@ defmodule SpkpProjectWeb.UserDashboardLive do
                     </div>
                 </header>
 
-                <!-- Dashboard Content -->
+            <!-- Dashboard Content -->
                 <main>
                     <h2 class="text-2xl font-semibold mb-1">Selamat Datang, <%= @current_user_name %></h2>
                     <p class="text-gray-500 mb-6">Urus Permohonan Kursus Dan Lihat Perkembangan Anda Di Sini</p>
 
                     <!-- Summary Cards Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-3xl shadow-lg flex items-center justify-between">
+                        <div class="bg-orange-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm">Permohonan Aktif</p>
+                                <p class="text-orange-700 text-sm font-medium">Permohonan Aktif</p>
                                 <h3 class="text-3xl font-bold mt-1"><%= @active_applications_count %></h3>
                             </div>
-                            <div class="p-3 bg-indigo-100 rounded-full text-indigo-600">
-                                <i data-lucide="file-text" class="w-8 h-8"></i>
-                            </div>
+                                <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
                         </div>
-                        <div class="bg-white p-6 rounded-3xl shadow-lg flex items-center justify-between">
+                        <div class="bg-green-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm">Kursus Tersedia</p>
+                                <p class="text-green-700 text-sm font-medium">Kursus Tersedia</p>
                                 <h3 class="text-3xl font-bold mt-1"><%= @available_courses_count %></h3>
                             </div>
-                            <div class="p-3 bg-green-100 rounded-full text-green-600">
-                                <i data-lucide="book" class="w-8 h-8"></i>
-                            </div>
+                                <img src={~p"/images/book.png"} alt="Book Icon" class="w-10 h-10" />
                         </div>
-                        <div class="bg-white p-6 rounded-3xl shadow-lg flex items-center justify-between">
+                        <div class="bg-blue-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm">Kursus Selesai</p>
+                                <p class="text-blue-700 text-sm font-medium">Kursus Selesai</p>
                                 <h3 class="text-3xl font-bold mt-1"><%= @completed_courses_count %></h3>
                             </div>
-                            <div class="p-3 bg-yellow-100 rounded-full text-yellow-600">
-                                <i data-lucide="award" class="w-8 h-8"></i>
-                            </div>
+                                <img src={~p"/images/certificate.png"} alt="Certificate Icon" class="w-10 h-10" />
                         </div>
                     </div>
 
-                    <!-- Status Profil and Permohonan Terkini Section -->
+            <!-- Status Profil and Permohonan Terkini Section -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-3xl shadow-lg">
-                            <h4 class="flex items-center text-lg font-semibold mb-4 text-gray-700">
-                                <i data-lucide="circle-user" class="mr-2"></i>
+                        <div class="bg-sky-50 p-6 rounded-3xl shadow-lg">
+                            <h4 class="flex justify-center px-8 mt-6 items-center text-lg font-semibold mb-4 text-black-700">
+                                <img src={~p"/images/tableuser.png"} alt="Certificate Icon" class="w-10 h-10 mr-2" />
                                 Status Profil
                             </h4>
-                            <p class="text-gray-500 mb-4">Lengkapkan Profil Untuk Permohonan Yang Lebih Baik</p>
-                            <a href="#" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition-colors duration-200">
-                                <i data-lucide="pencil" class="inline-block mr-2 w-4 h-4"></i>
+                            <p class="text-gray-600 text-center font-medium px-10 mb-4">Lengkapkan Profil Untuk Permohonan Yang Lebih Baik</p>
+                            <div class="flex mt-10 justify-center">
+
+                            <.link navigate={~p"/userprofile"} class="inline-flex items-center bg-blue-700 bg-opacity-80 text-white px-12 py-2 rounded-full font-medium hover:bg-[#43C6DB] transition-colors duration-200">
+                                <img src={~p"/images/userprofile.png"} alt="userprofile Icon" class="w-4 h-4 mr-2" />
                                 Kemaskini Profil
-                            </a>
+                            </.link>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-3xl shadow-lg">
-                            <h4 class="flex items-center text-lg font-semibold mb-4 text-gray-700">
-                                <i data-lucide="file-text" class="mr-2"></i>
+
+                        <div class="bg-[#C8C4DF] bg-opacity-20 p-6 rounded-3xl shadow-lg">
+                            <h4 class="flex items-center text-lg font-bold gap-4 mb-4 text-gray-700">
+                                <img src={~p"/images/bookclock.png"} alt="Bookclock Icon" class="w-8 h-8" />
                                 Permohonan Terkini
                             </h4>
-                            <p class="text-gray-500 mb-4">Status Permohonan Kursus Anda</p>
+                            <p class="text-gray-700 font-medium mb-4"> Status Permohonan Kursus Anda </p>
                             <div class="space-y-4">
                                 <%= for app <- @recent_applications do %>
-                                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                                    <div class="flex items-center justify-between p-4 bg-[#C8C4DF] bg-opacity-50 rounded-2xl">
                                         <div>
                                             <p class="font-medium"><%= app.name %></p>
-                                            <p class="text-xs text-gray-400">Tarikh Mohon: <%= app.date %></p>
+                                            <p class="text-xs text-gray-500">Tarikh Mohon: <%= app.date %></p>
                                         </div>
                                         <span class={"text-xs font-semibold px-2 py-1 rounded-full #{app.status_class}"}><%= app.status %></span>
                                     </div>
                                 <% end %>
                             </div>
                             <div class="mt-6 text-center">
-                                <a href="#" class="inline-block text-blue-600 font-medium hover:text-blue-800 transition-colors duration-200">Lihat Semua Permohonan</a>
-                            </div>
+                                 <.link navigate={~p"/permohonanuser"}
+                                      class="inline-block border border-violet-500 text-black-600 px-6 py-2 rounded-lg font-medium hover:bg-[#C8C4DF] bg-opacity-80 hover:text-black transition-colors duration-200">
+                                         Lihat Semua Permohonan
+                                 </.link>
+                             </div>
                         </div>
                     </div>
 
                     <!-- Kursus Tersedia Section -->
-                    <div class="bg-white p-6 rounded-3xl shadow-lg">
-                        <h4 class="flex items-center text-lg font-semibold mb-4 text-gray-700">
-                            <i data-lucide="book" class="mr-2"></i>
+                    <div class="bg-indigo-50 p-6 rounded-3xl shadow-lg">
+                        <h4 class="flex items-center text-lg font-bold mb-4 gap-4 text-gray-700">
+                            <img src={~p"/images/book.png"} alt="Book Icon" class="w-10 h-10" />
                             Kursus Tersedia
                         </h4>
-                        <p class="text-gray-500 mb-4">Kursus Yang Boleh Anda Mohon</p>
+                        <p class="text-gray-700 font-medium mb-4">Kursus Yang Boleh Anda Mohon</p>
                         <div class="space-y-4">
                             <%= for course <- @available_courses do %>
-                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                                <div class="flex items-center justify-between p-4 bg-white rounded-2xl">
                                     <div>
                                         <p class="font-medium"><%= course.name %></p>
                                         <p class="text-xs text-gray-400"><%= course.duration %> &bull; <%= course.slots %></p>
@@ -249,7 +244,10 @@ defmodule SpkpProjectWeb.UserDashboardLive do
                             <% end %>
                         </div>
                         <div class="mt-6 text-center">
-                            <a href="#" class="inline-block text-blue-600 font-medium hover:text-blue-800 transition-colors duration-200">Lihat Semua Kursus</a>
+                            <.link navigate={~p"/senaraikursususer"}
+                                      class="inline-block border border-violet-500 text-black-600 px-6 py-2 rounded-lg font-medium hover:bg-[#C8C4DF] bg-opacity-30 hover:text-black transition-colors duration-200">
+                                         Lihat Semua Kursus
+                                 </.link>
                         </div>
                     </div>
                 </main>
