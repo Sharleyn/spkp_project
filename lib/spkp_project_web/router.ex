@@ -32,6 +32,25 @@ defmodule SpkpProjectWeb.Router do
     live "/hubungi", HubungiLive
   end
 
+  scope "/admin", SpkpProjectWeb do
+    pipe_through :browser
+
+    live "/dashboard", AdminDashboardLive
+    live "/permohonan", PermohonanLive
+    live "/tetapan", TetapanLive
+
+    live "/kursus/senarai", KursusSenaraiLive
+    live "/kursus/tambah", KursusTambahLive
+    live "/kursus/kategori", KursusKategoriLive
+
+    live "/peserta/senaraipeserta", SenaraiPesertaLive
+
+    live "/elaunpekerja/senaraituntutan", SenaraiTuntutanLive
+    live "/elaunpekerja/buattuntutanbaru", BuatTuntutanBaruLive
+    live "/elaunpekerja/senaraipekerja", SenaraiPekerjaLive
+
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", SpkpProjectWeb do
   #   pipe_through :api
