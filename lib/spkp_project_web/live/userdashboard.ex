@@ -31,6 +31,15 @@ def mount(_params, _session, socket) do
   {:ok, socket}
 end
 
+   # Hook untuk inject current_path dan sidebar_open
+    def on_mount(:default, _params, _session, socket) do
+    {:cont,
+       socket
+       |> assign(:current_path, socket.host_uri.path)
+       |> assign_new(:sidebar_open, fn -> true end)  # default sidebar terbuka
+  }
+end
+
 
   def handle_event("logout", _params, socket) do
     {:noreply,

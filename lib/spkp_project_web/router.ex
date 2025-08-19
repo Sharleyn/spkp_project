@@ -73,10 +73,6 @@ defmodule SpkpProjectWeb.Router do
   scope "/", SpkpProjectWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live "/userprofile", UserProfileLive, :index
-    live "/senaraikursususer", UserCoursesLive, :index
-    live "/permohonanuser", PermohonanUserLive, :index
-
     live_session :require_authenticated_user,
       on_mount: [{SpkpProjectWeb.UserAuth, :ensure_authenticated}] do
       live "/userdashboard", UserDashboardLive
@@ -85,6 +81,21 @@ defmodule SpkpProjectWeb.Router do
       live "/admin", PageLive, :admin
       live "/user", PageLive, :user
     end
+  end
+
+  scope "/", SpkpProjectWeb do
+    live_session :default,
+  on_mount: [{TryalProjekWeb.UserOnMount, :default}] do
+
+  end
+    scope "/", TryalProjekWeb do
+      pipe_through [:browser, :require_authenticated_user]
+
+      live "/userdashboard", UserDashboardLive, :index
+      live "/userprofile", UserProfileLive, :index
+      live "/senaraikursususer", SenaraiKursusLive, :index
+      live "/permohonanuser", PermohonanLive, :index
+  end
   end
 
   scope "/", SpkpProjectWeb do
