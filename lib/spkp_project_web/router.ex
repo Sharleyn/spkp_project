@@ -102,6 +102,15 @@ defmodule SpkpProjectWeb.Router do
     end
   end
 
+    scope "/", SpkpProjectWeb do
+      pipe_through [:browser, :require_authenticated_user]
+
+      live "/userdashboard", UserDashboardLive, :index
+      live "/userprofile", UserProfileLive, :index
+      live "/senaraikursususer", SenaraiKursusLive, :index
+      live "/permohonanuser", PermohonanUserLive, :index
+  end
+
   scope "/", SpkpProjectWeb do
     pipe_through [:browser]
 
