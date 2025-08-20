@@ -127,7 +127,8 @@ end
           </aside>
 
             <!-- Main content area -->
-            <div class="flex-grow md:ml-64 p-6 transition-all duration-300 ease-in-out">
+            <div class={"flex-grow p-6 transition-all duration-300 ease-in-out " <>
+                         (if @sidebar_open, do: "md:ml-64", else: "md:ml-0 mx-auto")}>
 
                 <!-- Top Header Bar -->
                 <header class="flex justify-end items-center mb-6">
