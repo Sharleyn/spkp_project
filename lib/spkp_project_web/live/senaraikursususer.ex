@@ -1,4 +1,4 @@
-defmodule SpkpProjectWeb.UserCoursesLive do
+defmodule SpkpProjectWeb.SenaraiKursusLive do
   use SpkpProjectWeb, :live_view
 
   def mount(_params, _session, socket) do

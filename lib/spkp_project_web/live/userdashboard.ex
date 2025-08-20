@@ -74,7 +74,7 @@ end
       <!-- Burger Button -->
             <button class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
                phx-click="toggle_sidebar">
-                   <img src={~p"/images/burger2.png"} alt="Burger Icon" class="w-6 h-6" />
+                   <img src={~p"/images/burger3.png"} alt="Burger Icon" class="w-6 h-6" />
            </button>
 
          <!-- Sidebar -->
