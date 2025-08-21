@@ -5,7 +5,6 @@ defmodule SpkpProjectWeb.UserDashboardLive do
 
   @impl true
   # 'mount' digunakan untuk menetapkan data awal (initial state)
-  @impl true
 def mount(_params, _session, socket) do
   current_user = socket.assigns.current_user
 

@@ -356,4 +356,48 @@ defmodule SpkpProject.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  ## User Profile Management
+
+  alias SpkpProject.Accounts.UserProfile
+
+  @doc """
+  Gets a user profile by user ID.
+  """
+  def get_user_profile_by_user_id(user_id) do
+    Repo.get_by(UserProfile, user_id: user_id)
+  end
+
+  @doc """
+  Creates or updates a user profile.
+  """
+  def create_or_update_user_profile(attrs) do
+    case get_user_profile_by_user_id(attrs["user_id"]) do
+      nil ->
+        %UserProfile{}
+        |> UserProfile.changeset(attrs)
+        |> Repo.insert()
+
+      existing_profile ->
+        existing_profile
+        |> UserProfile.changeset(attrs)
+        |> Repo.update()
+    end
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking user profile changes.
+  """
+  def change_user_profile(%UserProfile{} = user_profile, attrs \\ %{}) do
+    UserProfile.changeset(user_profile, attrs)
+  end
+
+  @doc """
+  Updates a user.
+  """
+  def update_user(%User{} = user, attrs) do
+    user
+    |> User.update_changeset(attrs)
+    |> Repo.update()
+  end
 end

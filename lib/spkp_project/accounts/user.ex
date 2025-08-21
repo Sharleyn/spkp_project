@@ -170,4 +170,14 @@ defmodule SpkpProject.Accounts.User do
       add_error(changeset, :current_password, "is not valid")
     end
   end
+
+  @doc """
+  A user changeset for updating user information (excluding password).
+  """
+  def update_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :full_name])
+    |> validate_email(validate_email: false)
+    |> validate_full_name(validate_email: false)
+  end
 end
