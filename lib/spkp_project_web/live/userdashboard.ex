@@ -62,6 +62,16 @@ end
       {:noreply, assign(socket, :user_menu_open, false)}
     end
 
+    defp nav_class(current, expected) do
+      base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
+
+      if current == expected do
+        base <> " bg-indigo-700 text-white"  # aktif
+      else
+        base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
+      end
+    end
+
 
   # 'render' berfungsi sebagai template HTML LiveView
   # ========== RENDER ==========
@@ -95,32 +105,39 @@ end
                 <ul class="space-y-4">
                   <li>
                       <.link navigate={~p"/userdashboard"}
-                           class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                           <img src={~p"/images/right.png"} alt="Laman Utama" class="w-5 h-5" />
-                            <span>Laman Utama</span>
-                      </.link>
-                  </li>
-                <li>
-                      <.link navigate={~p"/userprofile"}
-                            class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                        <img src={~p"/images/right.png"} alt="Profil Pengguna" class="w-5 h-5" />
-                            <span>Profil Saya</span>
-                      </.link>
-                   </li>
-                <li>
-                      <.link navigate={~p"/senaraikursususer"}
-                           class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                       <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" />
-                           <span>Senarai Kursus</span>
-                      </.link>
-                    </li>
-                <li>
-                      <.link navigate={~p"/permohonanuser"}
-                          class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                       <img src={~p"/images/right.png"} alt="Permohonan Saya" class="w-5 h-5" />
-                           <span>Permohonan Saya</span>
-                    </.link>
-                 </li>
+                   class={nav_class(@live_action, :dashboard)}
+                   aria-current={if @live_action == :dashboard, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Laman Utama" class="w-5 h-5" />
+              <span>Laman Utama</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/userprofile"}
+                   class={nav_class(@live_action, :profile)}
+                   aria-current={if @live_action == :profile, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Profil Saya" class="w-5 h-5" />
+              <span>Profil Saya</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/senaraikursususer"}
+                   class={nav_class(@live_action, :courses)}
+                   aria-current={if @live_action == :courses, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" />
+              <span>Senarai Kursus</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/permohonanuser"}
+                   class={nav_class(@live_action, :applications)}
+                   aria-current={if @live_action == :applications, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Permohonan Saya" class="w-5 h-5" />
+              <span>Permohonan Saya</span>
+            </.link>
+          </li>
               </ul>
             </nav>
           </aside>

@@ -4,6 +4,10 @@ defmodule SpkpProjectWeb.UserProfileLive do
   alias SpkpProject.Accounts
   alias SpkpProject.Accounts.UserProfile
 
+  import Phoenix.LiveView
+  import Phoenix.LiveView.Helpers
+  import Phoenix.Component
+
   on_mount {SpkpProjectWeb.UserAuth, :ensure_authenticated}
 
   @gender_options ["Lelaki", "Perempuan"]
@@ -50,36 +54,43 @@ defmodule SpkpProjectWeb.UserProfileLive do
       |> assign(:sidebar_open, true)
       |> assign(:user_menu_open, false)
 
+      # ✅ Tambah sini untuk file upload
+      |> allow_upload(:ic_attachment,
+           accept: ~w(.pdf .jpg .jpeg),
+           max_entries: 1,
+           max_file_size: 10_000_000  #10MB
+         )
+
     {:ok, socket}
   end
 
-  # Handle save untuk profile user
   @impl true
   def handle_event("save_profile", %{"user_profile" => profile_params}, socket) do
     params = Map.put(profile_params, "user_id", socket.assigns.current_user.id)
 
-    case Accounts.create_or_update_user_profile(params) do
+    # Proses upload IC (kalau ada)
+    uploaded_files =
+      consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, entry ->
+        filename = "#{System.system_time(:second)}_#{entry.client_name}"
+        dest = Path.join(["priv/static/uploads", filename])
+        File.cp!(path, dest)
+        {:ok, "/uploads/#{filename}"} # path untuk DB
+      end)
+
+    ic_path = List.first(uploaded_files)
+    params = if ic_path, do: Map.put(params, "ic_attachment", ic_path), else: params
+
+    # Simpan atau update profile
+    profile = Accounts.get_user_profile_by_user_id(socket.assigns.current_user.id) || %UserProfile{}
+    case Accounts.create_or_update_user_profile(params, profile) do
       {:ok, _profile} ->
-        {:noreply, put_flash(socket, :info, "Profil berjaya dikemaskini")}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Profil berjaya dikemaskini")
+         |> push_navigate(to: ~p"/userprofile")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :profile_changeset, changeset)}
-    end
-  end
-
-  # Handle save untuk info user (contoh email, full_name)
-  def handle_event("save_user", %{"user" => user_params}, socket) do
-    user = socket.assigns.current_user
-
-    case Accounts.update_user(user, user_params) do
-      {:ok, _user} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Maklumat akaun berjaya dikemaskini")
-         |> push_navigate(to: ~p"/userdashboard")}
-
-      {:error, changeset} ->
-        {:noreply, assign(socket, :user_changeset, changeset)}
     end
   end
 
@@ -101,6 +112,16 @@ defmodule SpkpProjectWeb.UserProfileLive do
      socket
      |> put_flash(:info, "Anda telah log keluar.")
      |> redirect(to: ~p"/lamanutama")}
+  end
+
+  defp nav_class(current, expected) do
+    base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
+
+    if current == expected do
+      base <> " bg-indigo-700 text-white"  # aktif
+    else
+      base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
+    end
   end
 
   @impl true
@@ -130,25 +151,40 @@ defmodule SpkpProjectWeb.UserProfileLive do
         <nav class="w-full flex-grow">
           <ul class="space-y-4">
             <li>
-                <.link navigate={~p"/userdashboard"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                  <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" /> <span>Laman Utama</span>
-                </.link>
-              </li>
-            <li>
-                <.link navigate={~p"/userprofile"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                  <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" /> <span>Profil Saya</span>
-                </.link>
-              </li>
-            <li>
-                <.link navigate={~p"/senaraikursususer"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                   <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" /> <span>Senarai Kursus</span>
-                </.link>
-              </li>
-            <li>
-                <.link navigate={~p"/permohonanuser"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                  <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" /> <span>Permohonan Saya</span>
-                </.link>
-              </li>
+                <.link navigate={~p"/userdashboard"}
+                   class={nav_class(@live_action, :dashboard)}
+                   aria-current={if @live_action == :dashboard, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Laman Utama" class="w-5 h-5" />
+              <span>Laman Utama</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/userprofile"}
+                   class={nav_class(@live_action, :profile)}
+                   aria-current={if @live_action == :profile, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Profil Saya" class="w-5 h-5" />
+              <span>Profil Saya</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/senaraikursususer"}
+                   class={nav_class(@live_action, :courses)}
+                   aria-current={if @live_action == :courses, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" />
+              <span>Senarai Kursus</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/permohonanuser"}
+                   class={nav_class(@live_action, :applications)}
+                   aria-current={if @live_action == :applications, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Permohonan Saya" class="w-5 h-5" />
+              <span>Permohonan Saya</span>
+            </.link>
+          </li>
           </ul>
         </nav>
       </aside>
@@ -189,7 +225,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
                     </div>
                 </header>
 
-      <!-- Main Content -->
+       <!-- Main Content -->
         <h1 class="text-2xl font-bold mb-2">Profil Pengguna</h1>
         <p class="text-gray-600 mb-6">Kemaskini Maklumat Peribadi Anda Untuk Permohonan Kursus</p>
 
@@ -209,7 +245,10 @@ defmodule SpkpProjectWeb.UserProfileLive do
           <!-- Maklumat Asas -->
         <.form :let={f} for={@profile_changeset} as={:user_profile} phx-submit="save_profile" class="space-y-6 mb-6">
             <div class="border rounded-xl p-4">
-                <h3 class="font-semibold mb-4">📋 Maklumat Asas</h3>
+                <h3 class="flex items-center font-semibold mb-4 space-x-2">
+                    <img src={~p"/images/carbonuser.png"} alt="Profile Pengguna" class="w-5 h-5" />
+                         <span>Maklumat Asas</span>
+                  </h3>
              <div class="grid grid-cols-2 gap-4">
                <!-- Dari user -->
                   <.input field={f[:full_name]} type="text" label="Nama Penuh" />
@@ -224,7 +263,10 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
          <!-- Maklumat Perhubungan -->
               <div class="border rounded-xl p-4">
-                   <h3 class="font-semibold mb-4">📞 Maklumat Perhubungan</h3>
+                   <h3 class="flex items-center font-semibold mb-4 space-x-2">
+                    <img src={~p"/images/phonelinear.png"} alt="Maklumat Perhubungan" class="w-5 h-5" />
+                         <span>Maklumat Perhubungan</span>
+                  </h3>
                        <.input field={f[:phone_number]} type="text" label="Telefon" />
                        <.input field={f[:address]} type="textarea" label="Alamat" placeholder="Masukkan alamat lengkap" />
                        <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
@@ -232,35 +274,44 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
         <!-- Pendidikan -->
              <div class="border rounded-xl p-4">
-                  <h3 class="font-semibold mb-4">🎓 Pendidikan</h3>
+                  <h3 class="flex items-center font-semibold mb-4 space-x-2">
+                    <img src={~p"/images/bookeducation.png"} alt="Pendidikan" class="w-5 h-5" />
+                         <span>Pendidikan</span>
+                  </h3>
                       <.input field={f[:education]} type="select" label="Tahap Pendidikan" options={@education_options} prompt="Sila pilih tahap pendidikan anda" />
             </div>
 
-        <!-- Lampiran Tambahan -->
-             <div class="border rounded-xl p-4">
-                  <h3 class="font-semibold mb-4">📎 Lampiran Tambahan</h3>
-                      <div class="space-y-4">
-               <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                         Salinan Kad Pengenalan
-                  </label>
-                <div class="flex items-center justify-center w-full">
-                  <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                      <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                      </svg>
-                      <p class="mb-2 text-sm text-gray-500">
-                        <span class="font-semibold">Klik untuk upload</span> atau drag and drop
-                      </p>
-                      <p class="text-xs text-gray-500">PDF, JPG, JPEG (MAX. 10MB)</p>
-                    </div>
-                    <input type="file" class="hidden" accept=".pdf,.jpg,.jpeg" />
-                  </label>
+            <!-- Lampiran Tambahan -->
+                 <div class="border rounded-xl p-4 mt-4">
+                      <h3 class="flex items-center font-semibold mb-4 space-x-2">
+                          <img src={~p"/images/icons_user.png"} class="w-5 h-5" />
+                          <span>Lampiran Kad Pengenalan</span>
+                      </h3>
+
+                 <!-- Input upload -->
+                      <.live_file_input upload={@uploads.ic_attachment}
+                        class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" />
+
+                 <!-- Senarai fail yang sedang upload -->
+                      <%= for entry <- @uploads.ic_attachment.entries do %>
+                          <div class="mt-2 text-sm text-gray-600">
+                             Uploading <%= entry.client_name %>... <%= entry.progress %>%
+                         </div>
+                    <% end %>
+                  </div>
+
+            <!-- Preview jika ada -->
+                <%= if @profile_form.data.ic_attachment do %>
+                 <div class="mt-2">
+                      <%= if String.ends_with?(@profile_form.data.ic_attachment, [".jpg", ".jpeg", ".png"]) do %>
+                          <img src={@profile_form.data.ic_attachment} class="w-32 h-auto border rounded" />
+                       <% else %>
+                     <a href={@profile_form.data.ic_attachment} target="_blank" class="text-blue-600 underline">
+                        Lihat fail semasa
+                     </a>
+                 <% end %>
                 </div>
-              </div>
-            </div>
-          </div>
+               <% end %>
 
          <!-- Button -->
               <div class="flex justify-center">
