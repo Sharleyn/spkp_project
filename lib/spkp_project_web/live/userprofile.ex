@@ -6,6 +6,8 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
   on_mount {SpkpProjectWeb.UserAuth, :ensure_authenticated}
 
+  @gender_options ["Lelaki", "Perempuan"]
+
   @education_options [
     {"SPM", "SPM"},
     {"STPM", "STPM"},
@@ -13,15 +15,13 @@ defmodule SpkpProjectWeb.UserProfileLive do
     {"Ijazah Sarjana Muda", "Ijazah Sarjana Muda"},
     {"Ijazah Sarjana", "Ijazah Sarjana"},
     {"PhD", "PhD"},
-    {"Sijil Kemahiran", "Sijil Kemahiran"}
-  ]
+    {"Sijil Kemahiran", "Sijil Kemahiran"}]
 
   @district_options [
     "Beaufort", "Beluran", "Keningau", "Kota Belud", "Kota Kinabalu", "Kota Marudu",
     "Kuala Penyu", "Kudat", "Kunak", "Lahad Datu", "Nabawan", "Papar", "Penampang",
     "Pitas", "Putatan", "Ranau", "Sandakan", "Semporna", "Sipitang", "Tambunan",
-    "Tawau", "Tenom", "Tongod", "Tuaran"
-  ]
+    "Tawau", "Tenom", "Tongod", "Tuaran"]
 
   @impl true
   def mount(_params, _session, socket) do
@@ -44,6 +44,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
       |> assign(:profile_changeset, profile_changeset)
       |> assign(:user_form, to_form(user_changeset))
       |> assign(:profile_form, to_form(profile_changeset))
+      |> assign(:gender_options, @gender_options)
       |> assign(:education_options, @education_options)
       |> assign(:district_options, @district_options)
       |> assign(:sidebar_open, true)
@@ -105,7 +106,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="bg-white-100 min-h-screen antialiased text-gray-800">
+      <div class="bg-white-100 min-h-screen antialiased text-gray-800">
       <!-- Burger Button -->
       <button class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
          phx-click="toggle_sidebar">
@@ -128,78 +129,121 @@ defmodule SpkpProjectWeb.UserProfileLive do
         <!-- Menu -->
         <nav class="w-full flex-grow">
           <ul class="space-y-4">
-            <li><.link navigate={~p"/userdashboard"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200"><span>Laman Utama</span></.link></li>
-            <li><.link navigate={~p"/userprofile"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200"><span>Profil Saya</span></.link></li>
-            <li><.link navigate={~p"/senaraikursususer"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200"><span>Senarai Kursus</span></.link></li>
-            <li><.link navigate={~p"/permohonanuser"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200"><span>Permohonan Saya</span></.link></li>
+            <li>
+                <.link navigate={~p"/userdashboard"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                  <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" /> <span>Laman Utama</span>
+                </.link>
+              </li>
+            <li>
+                <.link navigate={~p"/userprofile"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                  <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" /> <span>Profil Saya</span>
+                </.link>
+              </li>
+            <li>
+                <.link navigate={~p"/senaraikursususer"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                   <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" /> <span>Senarai Kursus</span>
+                </.link>
+              </li>
+            <li>
+                <.link navigate={~p"/permohonanuser"} class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
+                  <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" /> <span>Permohonan Saya</span>
+                </.link>
+              </li>
           </ul>
         </nav>
       </aside>
 
+      <!-- Main content area -->
+            <div class={"flex-grow p-6 transition-all duration-300 ease-in-out " <>
+                         (if @sidebar_open, do: "md:ml-64", else: "md:ml-0 mx-auto")}>
+
+           <!-- Top Header Bar -->
+                <header class="flex justify-end items-center mb-6">
+                        <div class="relative">
+
+                <!-- Button User -->
+                     <button
+                            phx-click="toggle_user_menu"
+                                class="flex items-center space-x-2 p-2 hover:bg-indigo-100 rounded-lg gap-6 transition-colors duration-200 focus:outline-none">
+                                      <img src={~p"/images/tableuser.png"} alt="User" class="w-8 h-8 rounded-full border border-gray-300" />
+                                      <span class="font-medium"><%= @current_user_name %></span>
+                                      <img src={~p"/images/kotak - dropdown.png"} alt="Dropdown" />
+                     </button>
+
+              <!-- Dropdown Menu -->
+                     <%= if @user_menu_open do %>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-10">
+                              <!-- Setting -->
+                              <.link navigate={~p"/users/settings"}
+                                 class="block px-4 py-2 text-sm text-black-700 hover:bg-gray-100 rounded-t-xl">
+                                     Tetapan
+                              </.link>
+
+                              <!-- Logout -->
+                              <.link href={~p"/halamanutama"} method="delete"
+                                class="block w-full text-left px-4 py-2 text-sm text-black-700 hover:bg-gray-100 rounded-b-xl">
+                                     Log Keluar
+                              </.link>
+                        </div>
+                      <% end %>
+                    </div>
+                </header>
+
       <!-- Main Content -->
-      <div class="p-6 ml-64">
         <h1 class="text-2xl font-bold mb-2">Profil Pengguna</h1>
         <p class="text-gray-600 mb-6">Kemaskini Maklumat Peribadi Anda Untuk Permohonan Kursus</p>
 
         <!-- Profile Pengguna Section -->
         <div class="border rounded-xl p-6 mb-6 bg-gray-50">
-          <h3 class="font-semibold mb-4 text-lg">👤 Profil Pengguna</h3>
+          <h3 class="font-semibold mb-4 text-center text-lg">Profil Pengguna</h3>
           <div class="text-center">
-            <div class="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <svg class="w-10 h-10 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-              </svg>
+            <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <img src={~p"/images/icons user.png"} alt="Profile Pengguna" class="w-30 h-30" />
             </div>
             <h4 class="text-xl font-semibold"><%= @current_user.full_name %></h4>
             <p class="text-gray-600"><%= @current_user.email %></p>
           </div>
         </div>
 
-        <!-- Maklumat Asas Section -->
-        <.form :let={f} for={@user_changeset} as={:user} phx-submit="save_user" class="space-y-6 mb-6">
-          <div class="border rounded-xl p-4">
-            <h3 class="font-semibold mb-4">📋 Maklumat Asas</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <.input field={f[:full_name]} type="text" label="Nama Penuh" />
-              <.input field={f[:email]} type="email" label="Email" />
-            </div>
-          </div>
-        </.form>
-
-        <!-- User Profile Form -->
-        <.form :let={f} for={@profile_changeset} as={:user_profile} phx-submit="save_profile" class="space-y-6">
+        <!-- Main Content -->
           <!-- Maklumat Asas -->
-          <div class="border rounded-xl p-4">
-            <h3 class="font-semibold mb-4">📋 Maklumat Asas</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
-              <.input field={f[:age]} type="number" label="Umur" />
-              <.input field={f[:gender]} type="select" label="Jantina" options={["Lelaki", "Perempuan"]} />
+        <.form :let={f} for={@profile_changeset} as={:user_profile} phx-submit="save_profile" class="space-y-6 mb-6">
+            <div class="border rounded-xl p-4">
+                <h3 class="font-semibold mb-4">📋 Maklumat Asas</h3>
+             <div class="grid grid-cols-2 gap-4">
+               <!-- Dari user -->
+                  <.input field={f[:full_name]} type="text" label="Nama Penuh" />
+                  <.input field={f[:email]} type="email" label="Email" />
+
+               <!-- Dari profile -->
+                  <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
+                  <.input field={f[:age]} type="number" label="Umur" />
+                  <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
             </div>
           </div>
 
-          <!-- Maklumat Perhubungan -->
-          <div class="border rounded-xl p-4">
-            <h3 class="font-semibold mb-4">📞 Maklumat Perhubungan</h3>
-            <.input field={f[:phone_number]} type="text" label="Telefon" />
-            <.input field={f[:address]} type="textarea" label="Alamat" placeholder="Masukkan alamat lengkap" />
-            <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
-          </div>
+         <!-- Maklumat Perhubungan -->
+              <div class="border rounded-xl p-4">
+                   <h3 class="font-semibold mb-4">📞 Maklumat Perhubungan</h3>
+                       <.input field={f[:phone_number]} type="text" label="Telefon" />
+                       <.input field={f[:address]} type="textarea" label="Alamat" placeholder="Masukkan alamat lengkap" />
+                       <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
+             </div>
 
-          <!-- Pendidikan -->
-          <div class="border rounded-xl p-4">
-            <h3 class="font-semibold mb-4">🎓 Pendidikan</h3>
-            <.input field={f[:education]} type="select" label="Tahap Pendidikan" options={@education_options} prompt="Sila pilih tahap pendidikan anda" />
-          </div>
+        <!-- Pendidikan -->
+             <div class="border rounded-xl p-4">
+                  <h3 class="font-semibold mb-4">🎓 Pendidikan</h3>
+                      <.input field={f[:education]} type="select" label="Tahap Pendidikan" options={@education_options} prompt="Sila pilih tahap pendidikan anda" />
+            </div>
 
-          <!-- Lampiran Tambahan -->
-          <div class="border rounded-xl p-4">
-            <h3 class="font-semibold mb-4">📎 Lampiran Tambahan</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Salinan Kad Pengenalan
-                </label>
+        <!-- Lampiran Tambahan -->
+             <div class="border rounded-xl p-4">
+                  <h3 class="font-semibold mb-4">📎 Lampiran Tambahan</h3>
+                      <div class="space-y-4">
+               <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                         Salinan Kad Pengenalan
+                  </label>
                 <div class="flex items-center justify-center w-full">
                   <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
@@ -218,15 +262,15 @@ defmodule SpkpProjectWeb.UserProfileLive do
             </div>
           </div>
 
-          <!-- Button -->
-          <div class="flex justify-center">
-            <.button class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
-              💾 Simpan Profil
-            </.button>
-          </div>
+         <!-- Button -->
+              <div class="flex justify-center">
+                   <.button class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
+                     💾 Simpan Profil
+                 </.button>
+              </div>
         </.form>
       </div>
-    </div>
+     </div>
     """
   end
 end
