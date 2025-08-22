@@ -262,20 +262,88 @@ defmodule SpkpProjectWeb.UserProfileLive do
         <!-- Main Content -->
           <!-- Maklumat Asas -->
         <.form :let={f} for={@profile_form} as={:user_profile} phx-submit="save_profile">
-          <.input field={f[:full_name]} type="text" label="Nama Penuh" />
-          <.input field={f[:email]} type="email" label="Email" />
-          <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
-          <.input field={f[:age]} type="number" label="Umur" />
-          <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
-          <.input field={f[:phone_number]} type="text" label="Telefon" />
-          <.input field={f[:address]} type="textarea" label="Alamat" />
-          <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
-          <.input field={f[:education]} type="select" label="Pendidikan" options={@education_options} />
 
-          <.live_file_input upload={@uploads.ic_attachment} />
+        <!-- Maklumat Asas -->
+          <div class="border rounded-xl p-4">
+           <h3 class="flex items-center font-semibold mb-4 space-x-2">
+              <img src={~p"/images/carbonuser.png"} alt="Profile Pengguna" class="w-5 h-5" />
+                   <span>Maklumat Asas</span>
+           </h3>
+           <div class="grid grid-cols-2 gap-4">
+              <.input field={f[:full_name]} type="text" label="Nama Penuh" />
+              <.input field={f[:email]} type="email" label="Email" />
+              <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
+              <.input field={f[:age]} type="number" label="Umur" />
+              <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
+             </div>
+          </div>
+
+        <!-- Maklumat Perhubungan -->
+              <div class="border rounded-xl mt-4 p-4">
+                   <h3 class="flex items-center font-semibold mb-4 space-x-2">
+                    <img src={~p"/images/phonelinear.png"} alt="Maklumat Perhubungan" class="w-5 h-5" />
+                         <span>Maklumat Perhubungan</span>
+                  </h3>
+
+                       <.input field={f[:phone_number]} type="text" label="Telefon" />
+                       <.input field={f[:address]} type="textarea" label="Alamat" />
+                       <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
+          </div>
+
+        <!-- Pendidikan -->
+             <div class="border rounded-xl mt-4 p-4">
+                  <h3 class="flex items-center font-semibold mb-4 space-x-2">
+                    <img src={~p"/images/bookeducation.png"} alt="Pendidikan" class="w-5 h-5" />
+                         <span>Pendidikan</span>
+                  </h3>
+
+                   <.input field={f[:education]} type="select" label="Pendidikan" options={@education_options} />
+            </div>
+
+          <!-- Lampiran Tambahan -->
+               <div class="border rounded-xl p-4 mt-4">
+                    <h3 class="flex items-center font-semibold mb-4 space-x-2">
+                        <img src={~p"/images/upload.png"} class="w-5 h-5" />
+                             <span>Lampiran Tambahan</span>
+                     </h3>
+
+               <!-- Label -->
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">
+                           Salinan Kad Pengenalan
+                    </label>
+
+               <!-- Input Upload -->
+                    <.live_file_input
+                           upload={@uploads.ic_attachment}
+                           class="block w-full text-sm text-gray-700 border border-gray-300
+                           rounded-lg cursor-pointer bg-gray-50 focus:outline-none" />
+
+               <!-- Senarai fail yang sedang diupload -->
+                    <%= for entry <- @uploads.ic_attachment.entries do %>
+                        <div class="mt-2 text-sm text-gray-600">
+                        Uploading <%= entry.client_name %>... <%= entry.progress %>%
+                       </div>
+                     <% end %>
+
+               <!-- Preview fail selepas save -->
+                    <%= if @profile_form.data.ic_attachment do %>
+                          <div class="mt-4">
+                              <p class="text-sm font-medium text-gray-700 mb-2">Fail Semasa:</p>
+                                 <%= if String.ends_with?(@profile_form.data.ic_attachment, [".jpg", ".jpeg", ".png"]) do %>
+                                 <img src={@profile_form.data.ic_attachment} class="w-32 h-auto border rounded shadow-sm" />
+                                <% else %>
+                               <a href={@profile_form.data.ic_attachment}
+                                  target="_blank"
+                                  class="text-blue-600 underline">
+                                  Lihat fail semasa
+                              </a>
+                            <% end %>
+                         </div>
+                      <% end %>
+                    </div>
 
           <!-- Button -->
-          <div class="flex justify-center">
+          <div class="flex justify-center mt-8">
             <.button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
               💾 Simpan Profil
             </.button>
