@@ -56,7 +56,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
       # ✅ Tambah sini untuk file upload
       |> allow_upload(:ic_attachment,
-           accept: ~w(.pdf .jpg .jpeg),
+           accept: ~w(.pdf .jpg .jpeg .png),
            max_entries: 1,
            max_file_size: 10_000_000  #10MB
          )
@@ -64,25 +64,44 @@ defmodule SpkpProjectWeb.UserProfileLive do
     {:ok, socket}
   end
 
-  @impl true
+  # Save User (nama & email)
+  def handle_event("save_user", %{"user" => user_params}, socket) do
+    case Accounts.update_user(socket.assigns.current_user, user_params) do
+      {:ok, _user} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Maklumat pengguna berjaya dikemaskini.")
+         |> push_navigate(to: ~p"/userprofile")}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply,
+         socket
+         |> assign(:user_changeset, changeset)
+         |> assign(:user_form, to_form(changeset, action: :insert))}
+    end
+  end
+
+  # Save UserProfile
   def handle_event("save_profile", %{"user_profile" => profile_params}, socket) do
     params = Map.put(profile_params, "user_id", socket.assigns.current_user.id)
 
-    # Proses upload IC (kalau ada)
+    # Pastikan folder upload wujud
+    uploads_dir = Path.join(["priv/static/uploads"])
+    File.mkdir_p!(uploads_dir)
+
+    # Upload file IC
     uploaded_files =
       consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, entry ->
         filename = "#{System.system_time(:second)}_#{entry.client_name}"
-        dest = Path.join(["priv/static/uploads", filename])
+        dest = Path.join([uploads_dir, filename])
         File.cp!(path, dest)
-        {:ok, "/uploads/#{filename}"} # path untuk DB
+        {:ok, "/uploads/#{filename}"}
       end)
 
     ic_path = List.first(uploaded_files)
     params = if ic_path, do: Map.put(params, "ic_attachment", ic_path), else: params
 
-    # Simpan atau update profile
-    profile = Accounts.get_user_profile_by_user_id(socket.assigns.current_user.id) || %UserProfile{}
-    case Accounts.create_or_update_user_profile(params, profile) do
+    case Accounts.create_or_update_user_profile(params) do
       {:ok, _profile} ->
         {:noreply,
          socket
@@ -90,7 +109,10 @@ defmodule SpkpProjectWeb.UserProfileLive do
          |> push_navigate(to: ~p"/userprofile")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :profile_changeset, changeset)}
+        {:noreply,
+         socket
+         |> assign(:profile_changeset, changeset)
+         |> assign(:profile_form, to_form(changeset, action: :insert))}
     end
   end
 
@@ -243,7 +265,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
         <!-- Main Content -->
           <!-- Maklumat Asas -->
-        <.form :let={f} for={@profile_changeset} as={:user_profile} phx-submit="save_profile" class="space-y-6 mb-6">
+        <.form :let={f} for={@profile_form} as={:user_profile} phx-submit="save_profile" class="space-y-6 mb-6">
             <div class="border rounded-xl p-4">
                 <h3 class="flex items-center font-semibold mb-4 space-x-2">
                     <img src={~p"/images/carbonuser.png"} alt="Profile Pengguna" class="w-5 h-5" />
@@ -284,11 +306,14 @@ defmodule SpkpProjectWeb.UserProfileLive do
             <!-- Lampiran Tambahan -->
                  <div class="border rounded-xl p-4 mt-4">
                       <h3 class="flex items-center font-semibold mb-4 space-x-2">
-                          <img src={~p"/images/icons_user.png"} class="w-5 h-5" />
-                          <span>Lampiran Kad Pengenalan</span>
+                          <img src={~p"/images/upload.png"} class="w-5 h-5" />
+                          <span>Lampiran Tambahan</span>
                       </h3>
 
                  <!-- Input upload -->
+                      <h3 class="flex items-center text-sm font-semibold mb-4 space-x-2">
+                          <span>Salinan Kad Pengenalan</span>
+                      </h3>
                       <.live_file_input upload={@uploads.ic_attachment}
                         class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" />
 
@@ -315,7 +340,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
          <!-- Button -->
               <div class="flex justify-center">
-                   <.button class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
+                   <.button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
                      💾 Simpan Profil
                  </.button>
               </div>

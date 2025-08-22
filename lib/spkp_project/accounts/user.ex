@@ -12,6 +12,8 @@ defmodule SpkpProject.Accounts.User do
     field :full_name, :string
     field :role, :string
 
+    has_one :user_profile, SpkpProject.Accounts.UserProfile
+
     timestamps(type: :utc_datetime)
   end
 
@@ -41,10 +43,12 @@ defmodule SpkpProject.Accounts.User do
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :password, :full_name, :password_confirmation])
+    |> cast_assoc(:user_profile, with: &SpkpProject.Accounts.UserProfile.changeset/2)
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_full_name(opts)
     |> validate_password_confirmation(opts)
+    |> redirect(to: Routes.user_profile_path(conn, :profile))
   end
 
   defp validate_email(changeset, opts) do

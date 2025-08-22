@@ -18,6 +18,7 @@ defmodule SpkpProject.Accounts.UserToken do
     field :context, :string
     field :sent_to, :string
     belongs_to :user, SpkpProject.Accounts.User
+    has_one :user_profile, SpkpProject.Accounts.UserProfile
 
     timestamps(type: :utc_datetime, updated_at: false)
   end

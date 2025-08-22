@@ -25,6 +25,12 @@ defmodule SpkpProjectWeb.Endpoint do
     gzip: false,
     only: SpkpProjectWeb.static_paths()
 
+  # Serve uploaded files
+  plug Plug.Static,
+    at: "/uploads",
+    from: {:spkp_project, "priv/static/uploads"},
+    gzip: false
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

@@ -94,21 +94,17 @@ defmodule SpkpProjectWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{SpkpProjectWeb.UserAuth, :ensure_authenticated}] do
-      live "/userdashboard", UserDashboardLive, :dashboard
-      live "/users/settings", UserSettingsLive, :edit
-      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
-      live "/admin", PageLive, :admin
-      live "/user", PageLive, :user
-    end
-  end
 
-    scope "/", SpkpProjectWeb do
-      pipe_through [:browser, :require_authenticated_user]
-
+      # User dashboard & profile
       live "/userdashboard", UserDashboardLive, :dashboard
       live "/userprofile", UserProfileLive, :profile
       live "/senaraikursususer", SenaraiKursusLive, :courses
       live "/permohonanuser", PermohonanUserLive, :applications
+
+      # User settings
+      live "/users/settings", UserSettingsLive, :edit
+      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+    end
   end
 
   scope "/", SpkpProjectWeb do
