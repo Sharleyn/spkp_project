@@ -397,9 +397,33 @@ defmodule SpkpProject.Accounts do
 
   # Fungsi untuk update user + user_profile
   def update_user_profile(%User{} = user, attrs) do
-    user
-    |> change_user_profile(attrs)
-    |> Repo.update()
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:user, User.update_changeset(user, %{
+      full_name: attrs["full_name"],
+      email: attrs["email"]
+    }))
+    |> Ecto.Multi.run(:profile, fn repo, %{user: updated_user} ->
+      case get_user_profile_by_user_id(updated_user.id) do
+        nil ->
+          # Create new profile
+          %UserProfile{}
+          |> UserProfile.changeset(Map.put(attrs, "user_id", updated_user.id))
+          |> repo.insert()
+
+        profile ->
+          # Update existing profile
+          profile
+          |> UserProfile.changeset(Map.put(attrs, "user_id", updated_user.id))
+          |> repo.update()
+      end
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user, profile: _profile}} -> {:ok, user}
+      {:error, :user, changeset, _} -> {:error, changeset}
+      {:error, :profile, changeset, _} -> {:error, changeset}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """

@@ -5,7 +5,6 @@ defmodule SpkpProjectWeb.UserProfileLive do
   alias SpkpProject.Accounts.UserProfile
 
   import Phoenix.LiveView
-  import Phoenix.LiveView.Helpers
   import Phoenix.Component
 
   on_mount {SpkpProjectWeb.UserAuth, :ensure_authenticated}
@@ -34,7 +33,20 @@ defmodule SpkpProjectWeb.UserProfileLive do
     # Ambil existing profile atau buat baru
     profile = Accounts.get_user_profile_by_user_id(current_user.id) || %UserProfile{}
 
-    profile_changeset = UserProfile.changeset(%UserProfile{}, %{})
+    # Buat changeset dengan data yang sedia ada
+    profile_changeset = UserProfile.changeset(profile, %{
+      full_name: current_user.full_name,
+      email: current_user.email,
+      user_id: current_user.id,
+      ic: profile.ic,
+      age: profile.age,
+      gender: profile.gender,
+      phone_number: profile.phone_number,
+      address: profile.address,
+      district: profile.district,
+      education: profile.education,
+      ic_attachment: profile.ic_attachment
+    })
 
     {:ok,
      socket
@@ -44,13 +56,14 @@ defmodule SpkpProjectWeb.UserProfileLive do
      |> assign(:profile_form, to_form(profile_changeset))
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
-     |> assign(:gender_options, @gender_options)        # ✅ assign ke socket
-     |> assign(:education_options, @education_options)  # assign yang lain juga
+     |> assign(:gender_options, @gender_options)
+     |> assign(:education_options, @education_options)
      |> assign(:district_options, @district_options)
      |> allow_upload(:ic_attachment, accept: ~w(.pdf .jpg .jpeg .png), max_entries: 1)}
   end
 
   # Save User (nama & email)
+  @impl true
   def handle_event("save_profile", %{"user_profile" => profile_params}, socket) do
     # Tambah user_id ke params supaya hubungan has_one / belongs_to wujud
     params = Map.put(profile_params, "user_id", socket.assigns.current_user.id)
@@ -69,36 +82,49 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
     # Panggil Accounts.update_user_profile (update User + Profile)
     case Accounts.update_user_profile(socket.assigns.current_user, params) do
-      {:ok, _user} ->
-        changeset = Accounts.change_user_profile(socket.assigns.current_user)
+      {:ok, updated_user} ->
+        # Reload profile untuk form
+        profile = Accounts.get_user_profile_by_user_id(updated_user.id) || %UserProfile{}
+        profile_changeset = UserProfile.changeset(profile, %{
+          full_name: updated_user.full_name,
+          email: updated_user.email,
+          user_id: updated_user.id
+        })
+
         {:noreply,
          socket
          |> put_flash(:info, "Profil berjaya disimpan!")
-         |> assign(:changeset, changeset)
-         |> assign(:form, to_form(changeset))}
+         |> assign(:current_user, updated_user)
+         |> assign(:current_user_name, updated_user.full_name)
+         |> assign(:profile_changeset, profile_changeset)
+         |> assign(:profile_form, to_form(profile_changeset))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply,
          socket
          |> put_flash(:error, "Profil gagal disimpan. Sila semak input anda.")
-         |> assign(:changeset, changeset)
-         |> assign(:form, to_form(changeset))}
+         |> assign(:profile_changeset, changeset)
+         |> assign(:profile_form, to_form(changeset))}
     end
   end
 
   # Events UI lain
+  @impl true
   def handle_event("toggle_sidebar", _params, socket) do
     {:noreply, update(socket, :sidebar_open, &(!&1))}
   end
 
+  @impl true
   def handle_event("toggle_user_menu", _params, socket) do
     {:noreply, update(socket, :user_menu_open, &(!&1))}
   end
 
+  @impl true
   def handle_event("close_user_menu", _params, socket) do
     {:noreply, assign(socket, :user_menu_open, false)}
   end
 
+  @impl true
   def handle_event("logout", _params, socket) do
     {:noreply,
      socket
@@ -236,24 +262,24 @@ defmodule SpkpProjectWeb.UserProfileLive do
         <!-- Main Content -->
           <!-- Maklumat Asas -->
         <.form :let={f} for={@profile_form} as={:user_profile} phx-submit="save_profile">
-  <.input field={f[:full_name]} type="text" label="Nama Penuh" />
-  <.input field={f[:email]} type="email" label="Email" />
-  <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
-  <.input field={f[:age]} type="number" label="Umur" />
-  <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
-  <.input field={f[:phone_number]} type="text" label="Telefon" />
-  <.input field={f[:address]} type="textarea" label="Alamat" />
-  <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
-  <.input field={f[:education]} type="select" label="Pendidikan" options={@education_options} />
+          <.input field={f[:full_name]} type="text" label="Nama Penuh" />
+          <.input field={f[:email]} type="email" label="Email" />
+          <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
+          <.input field={f[:age]} type="number" label="Umur" />
+          <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
+          <.input field={f[:phone_number]} type="text" label="Telefon" />
+          <.input field={f[:address]} type="textarea" label="Alamat" />
+          <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
+          <.input field={f[:education]} type="select" label="Pendidikan" options={@education_options} />
 
-  <.live_file_input upload={@uploads.ic_attachment} />
+          <.live_file_input upload={@uploads.ic_attachment} />
 
-  <!-- Button -->
-              <div class="flex justify-center">
-                   <.button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
-                     💾 Simpan Profil
-                 </.button>
-              </div>
+          <!-- Button -->
+          <div class="flex justify-center">
+            <.button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
+              💾 Simpan Profil
+            </.button>
+          </div>
         </.form>
       </div>
      </div>
