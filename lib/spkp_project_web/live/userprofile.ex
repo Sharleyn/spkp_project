@@ -31,88 +31,58 @@ defmodule SpkpProjectWeb.UserProfileLive do
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
 
-    # Get existing user profile or create new one
-    profile = case Accounts.get_user_profile_by_user_id(current_user.id) do
-      nil -> %UserProfile{}
-      existing_profile -> existing_profile
-    end
+    # Ambil existing profile atau buat baru
+    profile = Accounts.get_user_profile_by_user_id(current_user.id) || %UserProfile{}
 
-    user_changeset = Accounts.change_user_registration(current_user)
-    profile_changeset = UserProfile.changeset(profile, %{})
+    profile_changeset = UserProfile.changeset(%UserProfile{}, %{})
 
-    socket =
-      socket
-      |> assign(:current_user, current_user)
-      |> assign(:current_user_name, current_user.full_name)
-      |> assign(:user_changeset, user_changeset)
-      |> assign(:profile_changeset, profile_changeset)
-      |> assign(:user_form, to_form(user_changeset))
-      |> assign(:profile_form, to_form(profile_changeset))
-      |> assign(:gender_options, @gender_options)
-      |> assign(:education_options, @education_options)
-      |> assign(:district_options, @district_options)
-      |> assign(:sidebar_open, true)
-      |> assign(:user_menu_open, false)
-
-      # ✅ Tambah sini untuk file upload
-      |> allow_upload(:ic_attachment,
-           accept: ~w(.pdf .jpg .jpeg .png),
-           max_entries: 1,
-           max_file_size: 10_000_000  #10MB
-         )
-
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign(:current_user, current_user)
+     |> assign(:current_user_name, current_user.full_name)
+     |> assign(:profile_changeset, profile_changeset)
+     |> assign(:profile_form, to_form(profile_changeset))
+     |> assign(:sidebar_open, true)
+     |> assign(:user_menu_open, false)
+     |> assign(:gender_options, @gender_options)        # ✅ assign ke socket
+     |> assign(:education_options, @education_options)  # assign yang lain juga
+     |> assign(:district_options, @district_options)
+     |> allow_upload(:ic_attachment, accept: ~w(.pdf .jpg .jpeg .png), max_entries: 1)}
   end
 
   # Save User (nama & email)
-  def handle_event("save_user", %{"user" => user_params}, socket) do
-    case Accounts.update_user(socket.assigns.current_user, user_params) do
-      {:ok, _user} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Maklumat pengguna berjaya dikemaskini.")
-         |> push_navigate(to: ~p"/userprofile")}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply,
-         socket
-         |> assign(:user_changeset, changeset)
-         |> assign(:user_form, to_form(changeset, action: :insert))}
-    end
-  end
-
-  # Save UserProfile
   def handle_event("save_profile", %{"user_profile" => profile_params}, socket) do
+    # Tambah user_id ke params supaya hubungan has_one / belongs_to wujud
     params = Map.put(profile_params, "user_id", socket.assigns.current_user.id)
 
-    # Pastikan folder upload wujud
-    uploads_dir = Path.join(["priv/static/uploads"])
-    File.mkdir_p!(uploads_dir)
-
-    # Upload file IC
+    # Handle upload fail IC
     uploaded_files =
       consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, entry ->
         filename = "#{System.system_time(:second)}_#{entry.client_name}"
-        dest = Path.join([uploads_dir, filename])
+        dest = Path.join(["priv/static/uploads", filename])
         File.cp!(path, dest)
         {:ok, "/uploads/#{filename}"}
       end)
 
-    ic_path = List.first(uploaded_files)
-    params = if ic_path, do: Map.put(params, "ic_attachment", ic_path), else: params
+    # Tambah path IC jika ada
+    params = if uploaded_files != [], do: Map.put(params, "ic_attachment", List.first(uploaded_files)), else: params
 
-    case Accounts.create_or_update_user_profile(params) do
-      {:ok, _profile} ->
+    # Panggil Accounts.update_user_profile (update User + Profile)
+    case Accounts.update_user_profile(socket.assigns.current_user, params) do
+      {:ok, _user} ->
+        changeset = Accounts.change_user_profile(socket.assigns.current_user)
         {:noreply,
          socket
-         |> put_flash(:info, "Profil berjaya dikemaskini")
-         |> push_navigate(to: ~p"/userprofile")}
+         |> put_flash(:info, "Profil berjaya disimpan!")
+         |> assign(:changeset, changeset)
+         |> assign(:form, to_form(changeset))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply,
          socket
-         |> assign(:profile_changeset, changeset)
-         |> assign(:profile_form, to_form(changeset, action: :insert))}
+         |> put_flash(:error, "Profil gagal disimpan. Sila semak input anda.")
+         |> assign(:changeset, changeset)
+         |> assign(:form, to_form(changeset))}
     end
   end
 
@@ -265,80 +235,20 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
         <!-- Main Content -->
           <!-- Maklumat Asas -->
-        <.form :let={f} for={@profile_form} as={:user_profile} phx-submit="save_profile" class="space-y-6 mb-6">
-            <div class="border rounded-xl p-4">
-                <h3 class="flex items-center font-semibold mb-4 space-x-2">
-                    <img src={~p"/images/carbonuser.png"} alt="Profile Pengguna" class="w-5 h-5" />
-                         <span>Maklumat Asas</span>
-                  </h3>
-             <div class="grid grid-cols-2 gap-4">
-               <!-- Dari user -->
-                  <.input field={f[:full_name]} type="text" label="Nama Penuh" />
-                  <.input field={f[:email]} type="email" label="Email" />
+        <.form :let={f} for={@profile_form} as={:user_profile} phx-submit="save_profile">
+  <.input field={f[:full_name]} type="text" label="Nama Penuh" />
+  <.input field={f[:email]} type="email" label="Email" />
+  <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
+  <.input field={f[:age]} type="number" label="Umur" />
+  <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
+  <.input field={f[:phone_number]} type="text" label="Telefon" />
+  <.input field={f[:address]} type="textarea" label="Alamat" />
+  <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
+  <.input field={f[:education]} type="select" label="Pendidikan" options={@education_options} />
 
-               <!-- Dari profile -->
-                  <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
-                  <.input field={f[:age]} type="number" label="Umur" />
-                  <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
-            </div>
-          </div>
+  <.live_file_input upload={@uploads.ic_attachment} />
 
-         <!-- Maklumat Perhubungan -->
-              <div class="border rounded-xl p-4">
-                   <h3 class="flex items-center font-semibold mb-4 space-x-2">
-                    <img src={~p"/images/phonelinear.png"} alt="Maklumat Perhubungan" class="w-5 h-5" />
-                         <span>Maklumat Perhubungan</span>
-                  </h3>
-                       <.input field={f[:phone_number]} type="text" label="Telefon" />
-                       <.input field={f[:address]} type="textarea" label="Alamat" placeholder="Masukkan alamat lengkap" />
-                       <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
-             </div>
-
-        <!-- Pendidikan -->
-             <div class="border rounded-xl p-4">
-                  <h3 class="flex items-center font-semibold mb-4 space-x-2">
-                    <img src={~p"/images/bookeducation.png"} alt="Pendidikan" class="w-5 h-5" />
-                         <span>Pendidikan</span>
-                  </h3>
-                      <.input field={f[:education]} type="select" label="Tahap Pendidikan" options={@education_options} prompt="Sila pilih tahap pendidikan anda" />
-            </div>
-
-            <!-- Lampiran Tambahan -->
-                 <div class="border rounded-xl p-4 mt-4">
-                      <h3 class="flex items-center font-semibold mb-4 space-x-2">
-                          <img src={~p"/images/upload.png"} class="w-5 h-5" />
-                          <span>Lampiran Tambahan</span>
-                      </h3>
-
-                 <!-- Input upload -->
-                      <h3 class="flex items-center text-sm font-semibold mb-4 space-x-2">
-                          <span>Salinan Kad Pengenalan</span>
-                      </h3>
-                      <.live_file_input upload={@uploads.ic_attachment}
-                        class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" />
-
-                 <!-- Senarai fail yang sedang upload -->
-                      <%= for entry <- @uploads.ic_attachment.entries do %>
-                          <div class="mt-2 text-sm text-gray-600">
-                             Uploading <%= entry.client_name %>... <%= entry.progress %>%
-                         </div>
-                    <% end %>
-                  </div>
-
-            <!-- Preview jika ada -->
-                <%= if @profile_form.data.ic_attachment do %>
-                 <div class="mt-2">
-                      <%= if String.ends_with?(@profile_form.data.ic_attachment, [".jpg", ".jpeg", ".png"]) do %>
-                          <img src={@profile_form.data.ic_attachment} class="w-32 h-auto border rounded" />
-                       <% else %>
-                     <a href={@profile_form.data.ic_attachment} target="_blank" class="text-blue-600 underline">
-                        Lihat fail semasa
-                     </a>
-                 <% end %>
-                </div>
-               <% end %>
-
-         <!-- Button -->
+  <!-- Button -->
               <div class="flex justify-center">
                    <.button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
                      💾 Simpan Profil

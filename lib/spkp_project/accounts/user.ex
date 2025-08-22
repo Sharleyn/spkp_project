@@ -48,7 +48,6 @@ defmodule SpkpProject.Accounts.User do
     |> validate_password(opts)
     |> validate_full_name(opts)
     |> validate_password_confirmation(opts)
-    |> redirect(to: Routes.user_profile_path(conn, :profile))
   end
 
   defp validate_email(changeset, opts) do

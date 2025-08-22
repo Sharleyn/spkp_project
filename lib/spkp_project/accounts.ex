@@ -372,14 +372,14 @@ defmodule SpkpProject.Accounts do
   Creates or updates a user profile.
   """
   def create_or_update_user_profile(attrs) do
-    case get_user_profile_by_user_id(attrs["user_id"]) do
+    case Repo.get_by(UserProfile, user_id: attrs["user_id"]) do
       nil ->
         %UserProfile{}
         |> UserProfile.changeset(attrs)
         |> Repo.insert()
 
-      existing_profile ->
-        existing_profile
+      profile ->
+        profile
         |> UserProfile.changeset(attrs)
         |> Repo.update()
     end
@@ -388,8 +388,18 @@ defmodule SpkpProject.Accounts do
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking user profile changes.
   """
-  def change_user_profile(%UserProfile{} = user_profile, attrs \\ %{}) do
-    UserProfile.changeset(user_profile, attrs)
+  # Fungsi untuk buat changeset gabungan user + profile
+  def change_user_profile(%User{} = user, attrs \\ %{}) do
+    user
+    |> Ecto.Changeset.cast(attrs, [:full_name, :email])
+    |> Ecto.Changeset.cast_assoc(:user_profile, with: &UserProfile.changeset/2)
+  end
+
+  # Fungsi untuk update user + user_profile
+  def update_user_profile(%User{} = user, attrs) do
+    user
+    |> change_user_profile(attrs)
+    |> Repo.update()
   end
 
   @doc """
