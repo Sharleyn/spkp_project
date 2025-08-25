@@ -1,21 +1,20 @@
 defmodule SpkpProjectWeb.KursussLive.FormComponent do
   use SpkpProjectWeb, :live_component
-
   alias SpkpProject.Kursus
 
-    @impl true
+  @impl true
   def mount(socket) do
     {:ok,
-    allow_upload(socket, :gambar_anjuran,
-      accept: ~w(.jpg .jpeg .png),
-      max_entries: 1
-    )
-    |> allow_upload(:gambar_kursus,
-      accept: ~w(.jpg .jpeg .png),
-      max_entries: 1
-    )}
+     socket
+     |> allow_upload(:gambar_anjuran,
+       accept: ~w(.jpg .jpeg .png),
+       max_entries: 1
+     )
+     |> allow_upload(:gambar_kursus,
+       accept: ~w(.jpg .jpeg .png),
+       max_entries: 1
+     )}
   end
-
 
   @impl true
   def render(assigns) do
@@ -23,7 +22,7 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
     <div>
       <.header>
         {@title}
-        <:subtitle>Use this form to manage kursuss records in your database.</:subtitle>
+        <:subtitle>Isi maklumat kursus.</:subtitle>
       </.header>
 
       <.simple_form
@@ -39,15 +38,15 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
         <.input field={@form[:tempat]} type="text" label="Tempat" />
 
         <.input
-        field={@form[:status_kursus]}
-        type="select"
-        label="Status Kursus"
-        prompt="-- Pilih status --"
-        options={[
-          {"Aktif", "Aktif"},
-          {"Akan Datang", "Akan Datang"},
-          {"Tamat", "Tamat"}
-        ]}
+          field={@form[:status_kursus]}
+          type="select"
+          label="Status Kursus"
+          prompt="-- Pilih status --"
+          options={[
+            {"Aktif", "Aktif"},
+            {"Akan Datang", "Akan Datang"},
+            {"Tamat", "Tamat"}
+          ]}
         />
 
         <.input
@@ -58,7 +57,6 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
           options={Enum.map(@kursus_kategori, &{&1.kategori, &1.id})}
         />
 
-
         <.input field={@form[:had_umur]} type="number" label="Had umur" />
 
         <.input
@@ -68,25 +66,28 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
           prompt="-- Pilih anjuran --"
           options={[
             {"JPSM", "JPSM"},
-            {"KBS", "KBS"},
+            {"KBS", "KBS"}
           ]}
         />
-
-
 
         <!-- Upload Gambar Anjuran -->
         <div class="mb-4">
           <label class="block font-semibold mb-2">Gambar Anjuran</label>
 
-          <div class="mb-2 text-sm text-gray-600">
-            <%= for entry <- @uploads.gambar_anjuran.entries do %>
-              <div>
-                <span><%= entry.client_name %></span>
-                <span class="text-gray-400">(<%= entry.progress %>%)</span>
-              </div>
-            <% end %>
-          </div>
+          <!-- Preview sebelum submit -->
+          <%= for entry <- @uploads.gambar_anjuran.entries do %>
+            <div class="mb-2">
+              <.live_img_preview entry={entry} class="w-32 h-32 rounded-lg border" />
+              <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+            </div>
+          <% end %>
 
+          <!-- Gambar lama bila edit -->
+          <%= if @kursuss.gambar_anjuran && @uploads.gambar_anjuran.entries == [] do %>
+            <img src={@kursuss.gambar_anjuran} class="w-32 h-32 rounded-lg border" />
+          <% end %>
+
+          <!-- Input upload -->
           <.live_file_input upload={@uploads.gambar_anjuran} />
         </div>
 
@@ -94,22 +95,24 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
         <div class="mb-4">
           <label class="block font-semibold mb-2">Gambar Kursus</label>
 
-          <!-- Senarai file dipilih -->
-          <div class="mb-2 text-sm text-gray-600">
-            <%= for entry <- @uploads.gambar_kursus.entries do %>
-              <div>
-                <span><%= entry.client_name %></span>
-                <span class="text-gray-400">(<%= entry.progress %>%)</span>
-              </div>
-            <% end %>
-          </div>
+          <!-- Preview sebelum submit -->
+          <%= for entry <- @uploads.gambar_kursus.entries do %>
+            <div class="mb-2">
+              <.live_img_preview entry={entry} class="w-32 h-32 rounded-lg border" />
+              <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+            </div>
+          <% end %>
+
+          <!-- Gambar lama bila edit -->
+          <%= if @kursuss.gambar_kursus && @uploads.gambar_kursus.entries == [] do %>
+            <img src={@kursuss.gambar_kursus} class="w-32 h-32 rounded-lg border" />
+          <% end %>
 
           <!-- Input upload -->
           <.live_file_input upload={@uploads.gambar_kursus} />
         </div>
 
-        <.input field={@form[:syarat_penyertaan]} type="text" label="Syarat penyertaan" />
-
+        <.input field={@form[:syarat_penyertaan]} type="textarea" label="Syarat penyertaan" />
         <.input
           field={@form[:syarat_pendidikan]}
           type="select"
@@ -120,12 +123,13 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
             {"DIPLOMA", "DIPLOMA"},
             {"DEGREE", "DEGREE"},
             {"MASTER", "MASTER"},
-            {"PHD", "PHD"},
+            {"PHD", "PHD"}
           ]}
         />
 
         <.input field={@form[:kuota]} type="number" label="Kuota" />
         <.input field={@form[:tarikh_tutup]} type="date" label="Tarikh tutup" />
+
         <:actions>
           <.button phx-disable-with="Saving...">Simpan</.button>
         </:actions>
@@ -147,7 +151,6 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
      end)}
   end
 
-
   @impl true
   def handle_event("validate", %{"kursuss" => kursuss_params}, socket) do
     changeset = Kursus.change_kursuss(socket.assigns.kursuss, kursuss_params)
@@ -159,13 +162,15 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
   end
 
   defp save_kursuss(socket, :edit, kursuss_params) do
+    kursuss_params = save_uploads(socket, kursuss_params)
+
     case Kursus.update_kursuss(socket.assigns.kursuss, kursuss_params) do
       {:ok, kursuss} ->
         notify_parent({:saved, kursuss})
 
         {:noreply,
          socket
-         |> put_flash(:info, "Kursuss updated successfully")
+         |> put_flash(:info, "Kursus berjaya dikemaskini")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -180,10 +185,9 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
       {:ok, kursuss} ->
         notify_parent({:saved, kursuss})
 
-
         {:noreply,
          socket
-         |> put_flash(:info, "Kursuss created successfully")
+         |> put_flash(:info, "Kursus berjaya dicipta")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -191,8 +195,8 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
     end
   end
 
+  # Simpan fail ke priv/static/uploads + guna gambar lama kalau tiada upload baru
   defp save_uploads(socket, params) do
-    # gambar_anjuran
     gambar_anjuran =
       consume_uploaded_entries(socket, :gambar_anjuran, fn %{path: path}, _entry ->
         dest = Path.join(["priv/static/uploads", Path.basename(path)])
@@ -201,7 +205,6 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
       end)
       |> List.first()
 
-    # gambar_kursus
     gambar_kursus =
       consume_uploaded_entries(socket, :gambar_kursus, fn %{path: path}, _entry ->
         dest = Path.join(["priv/static/uploads", Path.basename(path)])
@@ -211,10 +214,16 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
       |> List.first()
 
     params
-    |> Map.put("gambar_anjuran", gambar_anjuran)
-    |> Map.put("gambar_kursus", gambar_kursus)
+    |> maybe_put("gambar_anjuran", gambar_anjuran, socket.assigns.kursuss.gambar_anjuran)
+    |> maybe_put("gambar_kursus", gambar_kursus, socket.assigns.kursuss.gambar_kursus)
   end
 
+  defp maybe_put(params, key, new_val, old_val) do
+    cond do
+      is_binary(new_val) -> Map.put(params, key, new_val) # guna gambar baru
+      true -> Map.put(params, key, old_val)              # kekalkan gambar lama
+    end
+  end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end
