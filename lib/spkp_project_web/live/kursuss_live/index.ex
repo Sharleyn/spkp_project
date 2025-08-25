@@ -18,18 +18,21 @@ defmodule SpkpProjectWeb.KursussLive.Index do
     socket
     |> assign(:page_title, "Edit Kursus")
     |> assign(:kursuss, Kursus.get_kursuss!(id))
+    |> assign(:kursus_kategori, Kursus.list_kursus_kategori())
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "Kursus Baru")
     |> assign(:kursuss, %Kursuss{})
+    |> assign(:kursus_kategori, Kursus.list_kursus_kategori())
   end
 
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Senarai Kursus")
     |> assign(:kursuss, nil)
+    |> assign(:kursus_kategori, [])
   end
 
   @impl true
@@ -49,13 +52,12 @@ defmodule SpkpProjectWeb.KursussLive.Index do
   def render(assigns) do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
-       <!-- Sidebar -->
+      <!-- Sidebar -->
       <.live_component module={SpkpProjectWeb.SidebarComponent} id="sidebar" current_view={@socket.view} />
-
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-    <.header class="bg-white shadow-sm border-b border-gray-200">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
               <div class="flex items-center gap-4">
@@ -100,37 +102,36 @@ defmodule SpkpProjectWeb.KursussLive.Index do
       <:col :let={{_id, kursuss}} label="Syarat penyertaan">{kursuss.syarat_penyertaan}</:col>
       <:col :let={{_id, kursuss}} label="Syarat pendidikan">{kursuss.syarat_pendidikan}</:col>
       <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
-      <:col :let={{_id, kursuss}} label="Tarikh tutup penyertaan">{kursuss.tarikh_tutup}</:col>
+      <:col :let={{_id, kursuss}} label="Tarikh tutup">{kursuss.tarikh_tutup}</:col>
 
-      <:action :let={{_id, kursuss}}>
-        <div class="sr-only">
-          <.link navigate={~p"/admin/kursus/#{kursuss}"}>Show</.link>
-        </div>
-        <.link patch={~p"/admin/kursus/#{kursuss}/edit"}>Edit</.link>
-      </:action>
+          <:action :let={{_id, kursuss}}>
+            <div class="sr-only">
+              <.link navigate={~p"/admin/kursus/#{kursuss}"}>Show</.link>
+            </div>
+            <.link patch={~p"/admin/kursus/#{kursuss}/edit"}>Edit</.link>
+          </:action>
 
-      <:action :let={{id, kursuss}}>
-        <.link
-          phx-click={JS.push("delete", value: %{id: kursuss.id}) |> hide("##{id}")}
-          data-confirm="Are you sure?"
-        >
-          Delete
-        </.link>
-      </:action>
-    </.table>
+          <:action :let={{id, kursuss}}>
+            <.link
+              phx-click={JS.push("delete", value: %{id: kursuss.id}) |> hide("##{id}")}
+              data-confirm="Are you sure?"
+            >
+              Delete
+            </.link>
+          </:action>
+        </.table>
 
-    <.modal :if={@live_action in [:new, :edit]} id="kursuss-modal" show on_cancel={JS.patch(~p"/admin/kursus")}>
-      <.live_component
-        module={SpkpProjectWeb.KursussLive.FormComponent}
-        id={@kursuss.id || :new}
-        title={@page_title}
-        action={@live_action}
-        kursuss={@kursuss}
-        patch={~p"/admin/kursus"}
-      />
-    </.modal>
-
-    </div>
+        <.modal :if={@live_action in [:new, :edit]} id="kursuss-modal" show on_cancel={JS.patch(~p"/admin/kursus")}>
+          <.live_component
+            module={SpkpProjectWeb.KursussLive.FormComponent}
+            id={@kursuss.id || :new}
+            title={@page_title}
+            action={@live_action}
+            kursuss={@kursuss}
+            patch={~p"/admin/kursus"}
+          />
+        </.modal>
+      </div>
     </div>
     """
   end
