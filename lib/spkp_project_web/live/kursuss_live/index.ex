@@ -18,18 +18,21 @@ defmodule SpkpProjectWeb.KursussLive.Index do
     socket
     |> assign(:page_title, "Edit Kursus")
     |> assign(:kursuss, Kursus.get_kursuss!(id))
+    |> assign(:kursus_kategori, Kursus.list_kursus_kategori())
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Kursus")
     |> assign(:kursuss, %Kursuss{})
+    |> assign(:kursus_kategori, Kursus.list_kursus_kategori())
   end
 
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Kursus")
     |> assign(:kursuss, nil)
+    |> assign(:kursus_kategori, [])
   end
 
   @impl true
@@ -49,13 +52,12 @@ defmodule SpkpProjectWeb.KursussLive.Index do
   def render(assigns) do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
-       <!-- Sidebar -->
+      <!-- Sidebar -->
       <.live_component module={SpkpProjectWeb.SidebarComponent} id="sidebar" current_view={@socket.view} />
-
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-    <.header class="bg-white shadow-sm border-b border-gray-200">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
               <div class="flex items-center gap-4">
@@ -83,54 +85,68 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           </.link>
         </div>
 
-    <.table
-      id="kursus"
-      rows={@streams.kursus}
-      row_click={fn {_id, kursuss} -> JS.navigate(~p"/admin/kursus/#{kursuss}") end}
-    >
-      <:col :let={{_id, kursuss}} label="Nama kursus">{kursuss.nama_kursus}</:col>
-      <:col :let={{_id, kursuss}} label="Tarikh mula">{kursuss.tarikh_mula}</:col>
-      <:col :let={{_id, kursuss}} label="Tarikh akhir">{kursuss.tarikh_akhir}</:col>
-      <:col :let={{_id, kursuss}} label="Tempat">{kursuss.tempat}</:col>
-      <:col :let={{_id, kursuss}} label="Status kursus">{kursuss.status_kursus}</:col>
-      <:col :let={{_id, kursuss}} label="Had umur">{kursuss.had_umur}</:col>
-      <:col :let={{_id, kursuss}} label="Anjuran">{kursuss.anjuran}</:col>
-      <:col :let={{_id, kursuss}} label="Gambar anjuran">{kursuss.gambar_anjuran}</:col>
-      <:col :let={{_id, kursuss}} label="Gambar kursus">{kursuss.gambar_kursus}</:col>
-      <:col :let={{_id, kursuss}} label="Syarat penyertaan">{kursuss.syarat_penyertaan}</:col>
-      <:col :let={{_id, kursuss}} label="Syarat pendidikan">{kursuss.syarat_pendidikan}</:col>
-      <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
-      <:col :let={{_id, kursuss}} label="Tarikh tutup">{kursuss.tarikh_tutup}</:col>
-
-      <:action :let={{_id, kursuss}}>
-        <div class="sr-only">
-          <.link navigate={~p"/admin/kursus/#{kursuss}"}>Show</.link>
-        </div>
-        <.link patch={~p"/admin/kursus/#{kursuss}/edit"}>Edit</.link>
-      </:action>
-
-      <:action :let={{id, kursuss}}>
-        <.link
-          phx-click={JS.push("delete", value: %{id: kursuss.id}) |> hide("##{id}")}
-          data-confirm="Are you sure?"
+        <!-- Table -->
+        <.table
+          id="kursus"
+          rows={@streams.kursus}
+          row_click={fn {_id, kursuss} -> JS.navigate(~p"/admin/kursus/#{kursuss}") end}
         >
-          Delete
-        </.link>
-      </:action>
-    </.table>
+          <:col :let={{_id, kursuss}} label="Nama kursus">{kursuss.nama_kursus}</:col>
+          <:col :let={{_id, kursuss}} label="Tarikh mula">{kursuss.tarikh_mula}</:col>
+          <:col :let={{_id, kursuss}} label="Tarikh akhir">{kursuss.tarikh_akhir}</:col>
+          <:col :let={{_id, kursuss}} label="Status kursus">{kursuss.status_kursus}</:col>
+          <:col :let={{_id, kursuss}} label="Anjuran">{kursuss.anjuran}</:col>
+          <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
 
-    <.modal :if={@live_action in [:new, :edit]} id="kursuss-modal" show on_cancel={JS.patch(~p"/admin/kursus")}>
-      <.live_component
-        module={SpkpProjectWeb.KursussLive.FormComponent}
-        id={@kursuss.id || :new}
-        title={@page_title}
-        action={@live_action}
-        kursuss={@kursuss}
-        patch={~p"/admin/kursus"}
-      />
-    </.modal>
+          <!-- Kolum gambar -->
+          <:col :let={{_id, kursuss}} label="Gambar Anjuran">
+            <div class="flex gap-2">
+              <%= if kursuss.gambar_anjuran do %>
+                <img src={kursuss.gambar_anjuran} alt="Gambar Anjuran" class="w-16 h-16 rounded-lg object-cover border" />
+              <% else %>
+                <span class="text-gray-400 text-xs">Tiada anjuran</span>
+              <% end %>
+              </div>
+          </:col>
 
-    </div>
+          <:col :let={{_id, kursuss}} label="Gambar Kursus">
+            <div class="flex gap-2">
+              <%= if kursuss.gambar_kursus do %>
+                <img src={kursuss.gambar_kursus} alt="Gambar Kursus" class="w-16 h-16 rounded-lg object-cover border" />
+              <% else %>
+                <span class="text-gray-400 text-xs">Tiada kursus</span>
+              <% end %>
+            </div>
+          </:col>
+
+          <:action :let={{_id, kursuss}}>
+            <div class="sr-only">
+              <.link navigate={~p"/admin/kursus/#{kursuss}"}>Show</.link>
+            </div>
+            <.link patch={~p"/admin/kursus/#{kursuss}/edit"}>Edit</.link>
+          </:action>
+
+          <:action :let={{id, kursuss}}>
+            <.link
+              phx-click={JS.push("delete", value: %{id: kursuss.id}) |> hide("##{id}")}
+              data-confirm="Are you sure?"
+            >
+              Delete
+            </.link>
+          </:action>
+        </.table>
+
+        <.modal :if={@live_action in [:new, :edit]} id="kursuss-modal" show on_cancel={JS.patch(~p"/admin/kursus")}>
+          <.live_component
+            module={SpkpProjectWeb.KursussLive.FormComponent}
+            id={@kursuss.id || :new}
+            title={@page_title}
+            action={@live_action}
+            kursuss={@kursuss}
+            patch={~p"/admin/kursus"}
+          />
+        </.modal>
+      </div>
     </div>
     """
   end

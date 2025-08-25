@@ -113,9 +113,10 @@ defmodule SpkpProject.Kursus do
       [%Kursuss{}, ...]
 
   """
-  def list_kursus do
-    Repo.all(Kursuss)
-  end
+def list_kursus do
+  Repo.all(Kursuss) |> Repo.preload(:kursus_kategori)
+end
+
 
   @doc """
   Gets a single kursuss.

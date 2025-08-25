@@ -1,6 +1,5 @@
 defmodule SpkpProjectWeb.KursussLive.Show do
   use SpkpProjectWeb, :live_view
-
   alias SpkpProject.Kursus
 
   @impl true
@@ -23,8 +22,8 @@ defmodule SpkpProjectWeb.KursussLive.Show do
   def render(assigns) do
     ~H"""
     <.header>
-      Kursus {@kursuss.id}
-      <:subtitle>This is a kursus record from your database.</:subtitle>
+      {@kursuss.nama_kursus}
+      <:subtitle>Maklumat penuh kursus ini.</:subtitle>
       <:actions>
         <.link patch={~p"/admin/kursus/#{@kursuss}/show/edit"} phx-click={JS.push_focus()}>
           <.button>Edit kursus</.button>
@@ -40,15 +39,30 @@ defmodule SpkpProjectWeb.KursussLive.Show do
       <:item title="Status kursus">{@kursuss.status_kursus}</:item>
       <:item title="Had umur">{@kursuss.had_umur}</:item>
       <:item title="Anjuran">{@kursuss.anjuran}</:item>
-      <:item title="Gambar anjuran">{@kursuss.gambar_anjuran}</:item>
-      <:item title="Gambar kursus">{@kursuss.gambar_kursus}</:item>
+
+      <:item title="Gambar anjuran">
+        <%= if @kursuss.gambar_anjuran do %>
+          <img src={@kursuss.gambar_anjuran} alt="Gambar anjuran" class="w-40 h-40 rounded-lg border" />
+        <% else %>
+          <span class="text-gray-400">Tiada gambar</span>
+        <% end %>
+      </:item>
+
+      <:item title="Gambar kursus">
+        <%= if @kursuss.gambar_kursus do %>
+          <img src={@kursuss.gambar_kursus} alt="Gambar kursus" class="w-40 h-40 rounded-lg border" />
+        <% else %>
+          <span class="text-gray-400">Tiada gambar</span>
+        <% end %>
+      </:item>
+
       <:item title="Syarat penyertaan">{@kursuss.syarat_penyertaan}</:item>
       <:item title="Syarat pendidikan">{@kursuss.syarat_pendidikan}</:item>
       <:item title="Kuota">{@kursuss.kuota}</:item>
       <:item title="Tarikh tutup">{@kursuss.tarikh_tutup}</:item>
     </.list>
 
-    <.back navigate={~p"/admin/kursus"}>Back to kursus</.back>
+    <.back navigate={~p"/admin/kursus"}>Kembali ke senarai kursus</.back>
 
     <.modal :if={@live_action == :edit} id="kursuss-modal" show on_cancel={JS.patch(~p"/admin/kursus/#{@kursuss}")}>
       <.live_component
