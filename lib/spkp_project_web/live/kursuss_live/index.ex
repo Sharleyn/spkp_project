@@ -99,14 +99,18 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
 
           <!-- Kolum gambar -->
-          <:col :let={{_id, kursuss}} label="Gambar">
+          <:col :let={{_id, kursuss}} label="Gambar Anjuran">
             <div class="flex gap-2">
               <%= if kursuss.gambar_anjuran do %>
                 <img src={kursuss.gambar_anjuran} alt="Gambar Anjuran" class="w-16 h-16 rounded-lg object-cover border" />
               <% else %>
                 <span class="text-gray-400 text-xs">Tiada anjuran</span>
               <% end %>
+              </div>
+          </:col>
 
+          <:col :let={{_id, kursuss}} label="Gambar Kursus">
+            <div class="flex gap-2">
               <%= if kursuss.gambar_kursus do %>
                 <img src={kursuss.gambar_kursus} alt="Gambar Kursus" class="w-16 h-16 rounded-lg object-cover border" />
               <% else %>
