@@ -23,14 +23,14 @@ defmodule SpkpProjectWeb.KursussLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Kursus")
+    |> assign(:page_title, "Kursus Baru")
     |> assign(:kursuss, %Kursuss{})
     |> assign(:kursus_kategori, Kursus.list_kursus_kategori())
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Kursus")
+    |> assign(:page_title, "Senarai Kursus")
     |> assign(:kursuss, nil)
     |> assign(:kursus_kategori, [])
   end
@@ -85,39 +85,24 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           </.link>
         </div>
 
-        <!-- Table -->
-        <.table
-          id="kursus"
-          rows={@streams.kursus}
-          row_click={fn {_id, kursuss} -> JS.navigate(~p"/admin/kursus/#{kursuss}") end}
-        >
-          <:col :let={{_id, kursuss}} label="Nama kursus">{kursuss.nama_kursus}</:col>
-          <:col :let={{_id, kursuss}} label="Tarikh mula">{kursuss.tarikh_mula}</:col>
-          <:col :let={{_id, kursuss}} label="Tarikh akhir">{kursuss.tarikh_akhir}</:col>
-          <:col :let={{_id, kursuss}} label="Status kursus">{kursuss.status_kursus}</:col>
-          <:col :let={{_id, kursuss}} label="Anjuran">{kursuss.anjuran}</:col>
-          <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
-
-          <!-- Kolum gambar -->
-          <:col :let={{_id, kursuss}} label="Gambar Anjuran">
-            <div class="flex gap-2">
-              <%= if kursuss.gambar_anjuran do %>
-                <img src={kursuss.gambar_anjuran} alt="Gambar Anjuran" class="w-16 h-16 rounded-lg object-cover border" />
-              <% else %>
-                <span class="text-gray-400 text-xs">Tiada anjuran</span>
-              <% end %>
-              </div>
-          </:col>
-
-          <:col :let={{_id, kursuss}} label="Gambar Kursus">
-            <div class="flex gap-2">
-              <%= if kursuss.gambar_kursus do %>
-                <img src={kursuss.gambar_kursus} alt="Gambar Kursus" class="w-16 h-16 rounded-lg object-cover border" />
-              <% else %>
-                <span class="text-gray-400 text-xs">Tiada kursus</span>
-              <% end %>
-            </div>
-          </:col>
+    <.table
+      id="kursus"
+      rows={@streams.kursus}
+      row_click={fn {_id, kursuss} -> JS.navigate(~p"/admin/kursus/#{kursuss}") end}
+    >
+      <:col :let={{_id, kursuss}} label="Nama kursus">{kursuss.nama_kursus}</:col>
+      <:col :let={{_id, kursuss}} label="Tarikh mula">{kursuss.tarikh_mula}</:col>
+      <:col :let={{_id, kursuss}} label="Tarikh akhir">{kursuss.tarikh_akhir}</:col>
+      <:col :let={{_id, kursuss}} label="Tempat">{kursuss.tempat}</:col>
+      <:col :let={{_id, kursuss}} label="Status kursus">{kursuss.status_kursus}</:col>
+      <:col :let={{_id, kursuss}} label="Had umur">{kursuss.had_umur}</:col>
+      <:col :let={{_id, kursuss}} label="Anjuran">{kursuss.anjuran}</:col>
+      <:col :let={{_id, kursuss}} label="Gambar anjuran">{kursuss.gambar_anjuran}</:col>
+      <:col :let={{_id, kursuss}} label="Gambar kursus">{kursuss.gambar_kursus}</:col>
+      <:col :let={{_id, kursuss}} label="Syarat penyertaan">{kursuss.syarat_penyertaan}</:col>
+      <:col :let={{_id, kursuss}} label="Syarat pendidikan">{kursuss.syarat_pendidikan}</:col>
+      <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
+      <:col :let={{_id, kursuss}} label="Tarikh tutup">{kursuss.tarikh_tutup}</:col>
 
           <:action :let={{_id, kursuss}}>
             <div class="sr-only">

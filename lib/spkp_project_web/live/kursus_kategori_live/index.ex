@@ -22,13 +22,13 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Kursus kategori")
+    |> assign(:page_title, "Kursus Kategori Baru")
     |> assign(:kursus_kategori, %KursusKategori{})
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Kursus kategori")
+    |> assign(:page_title, "Senarai Kursus kategori")
     |> assign(:kursus_kategori, nil)
   end
 
@@ -65,7 +65,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
             </div>
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
-              <button class="text-gray-600 hover:text-gray-800">Logout</button>
+              <button class="text-gray-600 hover:text-gray-800">Log Keluar</button>
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
@@ -100,9 +100,9 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
       <:action :let={{id, kursus_kategori}}>
         <.link
           phx-click={JS.push("delete", value: %{id: kursus_kategori.id}) |> hide("##{id}")}
-          data-confirm="Are you sure?"
+          data-confirm="Adakah anda pasti?"
         >
-          Delete
+          Padam
         </.link>
       </:action>
     </.table>
