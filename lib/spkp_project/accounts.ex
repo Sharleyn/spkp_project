@@ -397,6 +397,9 @@ defmodule SpkpProject.Accounts do
 
   # Fungsi untuk update user + user_profile
   def update_user_profile(%User{} = user, attrs) do
+
+    IO.inspect(attrs, label: "ATTRS MASUK UPDATE USER PROFILE")
+
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, User.update_changeset(user, %{
       full_name: attrs["full_name"],

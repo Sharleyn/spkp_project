@@ -59,37 +59,57 @@ defmodule SpkpProjectWeb.UserProfileLive do
      |> assign(:gender_options, @gender_options)
      |> assign(:education_options, @education_options)
      |> assign(:district_options, @district_options)
-     |> allow_upload(:ic_attachment, accept: ~w(.pdf .jpg .jpeg .png), max_entries: 1)}
+     |> allow_upload(:ic_attachment, accept: ~w(.pdf .jpg .jpeg .png), max_entries: 1, max_file_size: 1_000_000)}
   end
 
   # Save User (nama & email)
-  @impl true
   def handle_event("save_profile", %{"user_profile" => profile_params}, socket) do
-    # Tambah user_id ke params supaya hubungan has_one / belongs_to wujud
-    params = Map.put(profile_params, "user_id", socket.assigns.current_user.id)
+    IO.inspect(profile_params, label: "PROFILE PARAMS ASAL")
 
-    # Handle upload fail IC
+    # consume file upload
     uploaded_files =
-      consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, entry ->
-        filename = "#{System.system_time(:second)}_#{entry.client_name}"
-        dest = Path.join(["priv/static/uploads", filename])
+      consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, _entry ->
+        dest = Path.join("priv/static/uploads", Path.basename(path))
+
+        IO.inspect(path, label: "TEMP PATH")
+        IO.inspect(dest, label: "DESTINATION PATH")
+
+        # Pastikan directory uploads wujud
+        File.mkdir_p!("priv/static/uploads")
+
         File.cp!(path, dest)
-        {:ok, "/uploads/#{filename}"}
+        {:ok, "/uploads/#{Path.basename(dest)}"}
       end)
 
-    # Tambah path IC jika ada
-    params = if uploaded_files != [], do: Map.put(params, "ic_attachment", List.first(uploaded_files)), else: params
+    # gabungkan semua params sekali
+    final_params =
+      profile_params
+      |> Map.put("user_id", socket.assigns.current_user.id)
+      |> Map.put("ic_attachment", List.first(uploaded_files))
 
-    # Panggil Accounts.update_user_profile (update User + Profile)
-    case Accounts.update_user_profile(socket.assigns.current_user, params) do
+    IO.inspect(uploaded_files, label: "UPLOADED FILES")
+    IO.inspect(final_params, label: "FINAL PARAMS")
+
+    case Accounts.update_user_profile(socket.assigns.current_user, final_params) do
       {:ok, updated_user} ->
-        # Reload profile untuk form
+        # dapatkan semula profile terkini (kalau ada)
         profile = Accounts.get_user_profile_by_user_id(updated_user.id) || %UserProfile{}
-        profile_changeset = UserProfile.changeset(profile, %{
-          full_name: updated_user.full_name,
-          email: updated_user.email,
-          user_id: updated_user.id
-        })
+
+        # bina changeset baru untuk form
+        profile_changeset =
+          UserProfile.changeset(profile, %{
+            full_name: updated_user.full_name,
+            email: updated_user.email,
+            user_id: updated_user.id,
+            ic: profile.ic,
+            age: profile.age,
+            gender: profile.gender,
+            phone_number: profile.phone_number,
+            address: profile.address,
+            district: profile.district,
+            education: profile.education,
+            ic_attachment: profile.ic_attachment
+          })
 
         {:noreply,
          socket
@@ -100,6 +120,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
          |> assign(:profile_form, to_form(profile_changeset))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
+        IO.inspect(changeset.errors, label: "CHANGESET ERRORS")
         {:noreply,
          socket
          |> put_flash(:error, "Profil gagal disimpan. Sila semak input anda.")
@@ -261,7 +282,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
         <!-- Main Content -->
           <!-- Maklumat Asas -->
-        <.form :let={f} for={@profile_form} as={:user_profile} phx-submit="save_profile">
+        <.form :let={f} for={@profile_form} as={:user_profile} phx-submit="save_profile" multipart >
 
         <!-- Maklumat Asas -->
           <div class="border rounded-xl p-4">
@@ -307,40 +328,10 @@ defmodule SpkpProjectWeb.UserProfileLive do
                              <span>Lampiran Tambahan</span>
                      </h3>
 
-               <!-- Label -->
-                    <label class="block text-sm font-semibold mb-2 text-gray-700">
-                           Salinan Kad Pengenalan
-                    </label>
-
                <!-- Input Upload -->
-                    <.live_file_input
-                           upload={@uploads.ic_attachment}
-                           class="block w-full text-sm text-gray-700 border border-gray-300
-                           rounded-lg cursor-pointer bg-gray-50 focus:outline-none" />
-
-               <!-- Senarai fail yang sedang diupload -->
-                    <%= for entry <- @uploads.ic_attachment.entries do %>
-                        <div class="mt-2 text-sm text-gray-600">
-                        Uploading <%= entry.client_name %>... <%= entry.progress %>%
-                       </div>
-                     <% end %>
-
-               <!-- Preview fail selepas save -->
-                    <%= if @profile_form.data.ic_attachment do %>
-                          <div class="mt-4">
-                              <p class="text-sm font-medium text-gray-700 mb-2">Fail Semasa:</p>
-                                 <%= if String.ends_with?(@profile_form.data.ic_attachment, [".jpg", ".jpeg", ".png"]) do %>
-                                 <img src={@profile_form.data.ic_attachment} class="w-32 h-auto border rounded shadow-sm" />
-                                <% else %>
-                               <a href={@profile_form.data.ic_attachment}
-                                  target="_blank"
-                                  class="text-blue-600 underline">
-                                  Lihat fail semasa
-                              </a>
-                            <% end %>
-                         </div>
-                      <% end %>
-                    </div>
+                    <.input field={f[:ic_attachment]} type="file" label="Salinan Kad Pengenalan"
+                      class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" />
+                  </div>
 
           <!-- Button -->
           <div class="flex justify-center mt-8">

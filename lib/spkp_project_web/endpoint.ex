@@ -32,6 +32,10 @@ defmodule SpkpProjectWeb.Endpoint do
     from: Path.expand("./priv/static/uploads"),
     gzip: false
 
+  # Pastikan uploads directory wujud
+  # Ini akan dijalankan setiap kali endpoint start
+  File.mkdir_p!("priv/static/uploads")
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
