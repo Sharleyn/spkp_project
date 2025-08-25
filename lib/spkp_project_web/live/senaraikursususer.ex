@@ -6,7 +6,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     courses = [
       %{id: 1, title: "Kursus Elixir & Phoenix", status: "Disahkan"},
       %{id: 2, title: "Kursus Tailwind CSS", status: "Dalam Proses"},
-      %{id: 3, title: "Kursus UX Design", status: "Ditolak"}
+
     ]
 
     {:ok, assign(socket, :courses, courses)}
