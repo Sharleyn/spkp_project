@@ -9,7 +9,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.FormComponent do
     <div>
       <.header>
         {@title}
-        <:subtitle>Use this form to manage kursus_kategori records in your database.</:subtitle>
+        <:subtitle>Gunakan borang ini untuk menguruskan rekod Kursus Kategori dalam pangkalan data anda.</:subtitle>
       </.header>
 
       <.simple_form
@@ -21,7 +21,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.FormComponent do
       >
         <.input field={@form[:kategori]} type="text" label="Kategori" />
         <:actions>
-          <.button phx-disable-with="Saving...">Save Kursus kategori</.button>
+          <.button phx-disable-with="Saving...">Simpan Kursus kategori</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -55,7 +55,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Kursus kategori updated successfully")
+         |> put_flash(:info, "Kursus Kategori Berjaya Di Kemaskini")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -70,7 +70,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Kursus kategori created successfully")
+         |> put_flash(:info, "Kursus Kategori Berjaya Di Cipta")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->

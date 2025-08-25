@@ -45,7 +45,7 @@ defmodule SpkpProjectWeb.KursussLive.Show do
       <:item title="Syarat penyertaan">{@kursuss.syarat_penyertaan}</:item>
       <:item title="Syarat pendidikan">{@kursuss.syarat_pendidikan}</:item>
       <:item title="Kuota">{@kursuss.kuota}</:item>
-      <:item title="Tarikh tutup">{@kursuss.tarikh_tutup}</:item>
+      <:item title="Tarikh tutup penyertaan">{@kursuss.tarikh_tutup}</:item>
     </.list>
 
     <.back navigate={~p"/admin/kursus"}>Back to kursus</.back>

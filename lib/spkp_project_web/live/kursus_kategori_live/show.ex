@@ -24,10 +24,10 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Show do
     ~H"""
     <.header>
       Kursus kategori {@kursus_kategori.id}
-      <:subtitle>This is a kursus_kategori record from your database.</:subtitle>
+      <:subtitle>Ini adalah rekod Kursus Kategori daripada pangkalan data anda.</:subtitle>
       <:actions>
         <.link patch={~p"/admin/kursus_kategori/#{@kursus_kategori}/show/edit"} phx-click={JS.push_focus()}>
-          <.button>Edit kursus_kategori</.button>
+          <.button>Edit Kursus Kategori</.button>
         </.link>
       </:actions>
     </.header>
@@ -36,7 +36,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Show do
       <:item title="Kategori">{@kursus_kategori.kategori}</:item>
     </.list>
 
-    <.back navigate={~p"/admin/kursus_kategori"}>Back to kursus_kategori</.back>
+    <.back navigate={~p"/admin/kursus_kategori"}>Kembali ke Kursus Kategori</.back>
 
     <.modal :if={@live_action == :edit} id="kursus_kategori-modal" show on_cancel={JS.patch(~p"/admin/kursus_kategori/#{@kursus_kategori}")}>
       <.live_component

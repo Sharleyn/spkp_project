@@ -9,7 +9,7 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
     <div>
       <.header>
         {@title}
-        <:subtitle>Use this form to manage kursuss records in your database.</:subtitle>
+        <:subtitle>Gunakan borang ini untuk menguruskan rekod kursus dalam pangkalan data anda.</:subtitle>
       </.header>
 
       <.simple_form
@@ -31,9 +31,9 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
         <.input field={@form[:syarat_penyertaan]} type="text" label="Syarat penyertaan" />
         <.input field={@form[:syarat_pendidikan]} type="text" label="Syarat pendidikan" />
         <.input field={@form[:kuota]} type="number" label="Kuota" />
-        <.input field={@form[:tarikh_tutup]} type="date" label="Tarikh tutup" />
+        <.input field={@form[:tarikh_tutup]} type="date" label="Tarikh tutup penyertaan" />
         <:actions>
-          <.button phx-disable-with="Saving...">Save Kursuss</.button>
+          <.button phx-disable-with="Saving...">Simpan Kursus</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -67,7 +67,7 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Kursuss updated successfully")
+         |> put_flash(:info, "Kursus Berjaya di Kemaskini")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -82,7 +82,7 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Kursuss created successfully")
+         |> put_flash(:info, "Kursus Berjaya di Cipta")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->

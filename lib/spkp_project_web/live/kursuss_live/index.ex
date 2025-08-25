@@ -22,13 +22,13 @@ defmodule SpkpProjectWeb.KursussLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Kursus")
+    |> assign(:page_title, "Kursus Baru")
     |> assign(:kursuss, %Kursuss{})
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Kursus")
+    |> assign(:page_title, "Senarai Kursus")
     |> assign(:kursuss, nil)
   end
 
@@ -100,7 +100,7 @@ defmodule SpkpProjectWeb.KursussLive.Index do
       <:col :let={{_id, kursuss}} label="Syarat penyertaan">{kursuss.syarat_penyertaan}</:col>
       <:col :let={{_id, kursuss}} label="Syarat pendidikan">{kursuss.syarat_pendidikan}</:col>
       <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
-      <:col :let={{_id, kursuss}} label="Tarikh tutup">{kursuss.tarikh_tutup}</:col>
+      <:col :let={{_id, kursuss}} label="Tarikh tutup penyertaan">{kursuss.tarikh_tutup}</:col>
 
       <:action :let={{_id, kursuss}}>
         <div class="sr-only">
