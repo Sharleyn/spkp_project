@@ -7,6 +7,14 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    # Contoh data kursus user (nanti boleh tarik dari DB Reservation/Course)
+    courses = [
+      %{id: 1, title: "Kursus Elixir & Phoenix", status: "Disahkan"},
+      %{id: 2, title: "Kursus Tailwind CSS", status: "Dalam Proses"},
+
+    ]
+
+    {:ok, assign(socket, :courses, courses)}
     socket =
       socket
       |> assign(:sidebar_open, true)
