@@ -24,7 +24,8 @@ defmodule SpkpProjectWeb.Endpoint do
     at: "/",
     from: :spkp_project,
     gzip: false,
-    only: SpkpProjectWeb.static_paths()
+    only: ~w(assets fonts images favicon.ico robots.txt uploads)
+
 
   # Serve uploaded files
     plug Plug.Static,

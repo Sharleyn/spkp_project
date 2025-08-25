@@ -233,6 +233,7 @@ defmodule SpkpProjectWeb.CoreComponents do
       class={[
         "phx-submit-loading:opacity-75 rounded-lg py-2 px-3",
         "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "bg-black hover:bg-gray-900",
         @class
       ]}
       {@rest}
@@ -355,7 +356,7 @@ defmodule SpkpProjectWeb.CoreComponents do
         id={@id}
         name={@name}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 min-h-[6rem]",
+          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 min-h-[12rem] resize-y border-2",
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
@@ -365,6 +366,7 @@ defmodule SpkpProjectWeb.CoreComponents do
     </div>
     """
   end
+
 
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
@@ -473,12 +475,12 @@ defmodule SpkpProjectWeb.CoreComponents do
       end
 
     ~H"""
-    <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-      <table class="w-[40rem] mt-11 sm:w-full">
-        <thead class="text-sm text-left leading-6 text-zinc-500">
+    <div class="overflow-y-auto px-10 py-10 sm:overflow-visible sm:px-20">
+      <table class="w-full mt-2 rounded-lg text-sm">
+        <thead class="bg-gray-100 text-left px-10 text-gray-700">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal">{col[:label]}</th>
-            <th :if={@action != []} class="relative p-0 pb-4">
+            <th :for={col <- @col} class="px-0 py-0 pb-4 pr-6 font-normal">{col[:label]}</th>
+            <th :if={@action != []} class="px-4 py-2 font-normal">
               <span class="sr-only">{gettext("Actions")}</span>
             </th>
           </tr>

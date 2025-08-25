@@ -4,23 +4,26 @@ defmodule SpkpProjectWeb.SidebarComponent do
 
   @impl true
   def update(assigns, socket) do
-    active_menu =
+    current_path = assigns[:current_path] || "/"
+
+    # Tentukan menu mana perlu terbuka
+    open_menu =
       cond do
-        String.starts_with?(assigns.uri_path, "/admin/dashboard") -> "dashboard"
-        String.starts_with?(assigns.uri_path, "/admin/kursus") -> "kursus"
-        String.starts_with?(assigns.uri_path, "/admin/permohonan") -> "permohonan"
-        String.starts_with?(assigns.uri_path, "/admin/peserta") -> "peserta"
-        String.starts_with?(assigns.uri_path, "/admin/elaunpekerja") -> "elaunpekerja"
-        String.starts_with?(assigns.uri_path, "/admin/tetapan") -> "tetapan"
+        String.starts_with?(current_path, "/admin/dashboard") -> "dashboard"
+        String.starts_with?(current_path, "/admin/kursus") -> "kursus"
+        String.starts_with?(current_path, "/admin/peserta") -> "peserta"
+        String.starts_with?(current_path, "/admin/permohonan") -> "permohonan"
+        String.starts_with?(current_path, "/admin/elaunpekerja") -> "elaunpekerja"
+        String.starts_with?(current_path, "/admin/tetapan") -> "tetapan"
         true -> nil
       end
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:active_menu, active_menu)}
+     |> assign(:open_menu, open_menu)
+     |> assign(:active_link, current_path)}
   end
-
 
   @impl true
   def render(assigns) do
@@ -43,7 +46,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
 
         <!-- Dashboard -->
         <.link navigate={~p"/admin/dashboard"}
-          class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 #{if @active_menu == "dashboard", do: "bg-gray-700"}"}>
+          class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 #{if @active_link == "/admin/dashboard", do: "bg-gray-700"}"}>
           Dashboard
         </.link>
 
@@ -52,20 +55,19 @@ defmodule SpkpProjectWeb.SidebarComponent do
           <div phx-click="toggle_menu"
                phx-value-menu="kursus"
                phx-target={@myself}
-               class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @active_menu == "kursus", do: "bg-gray-700"}"}>
+               class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @open_menu == "kursus", do: "bg-gray-700"}"}>
             <span>Kursus</span>
           </div>
 
-          <%= if @active_menu == "kursus" do %>
+          <%= if @open_menu == "kursus" do %>
             <div class="ml-4">
-              <.link navigate={~p"/admin/kursus/senarai"} class="block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm">
-                Senarai Kursus
-              </.link>
-              <.link navigate={~p"/admin/kursus/tambah"} class="block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm">
-                Tambah Kursus
-              </.link>
-              <.link navigate={~p"/admin/kursus/kategori"} class="block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm">
+              <.link navigate={~p"/admin/kursus_kategori"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/kursus_kategori", do: "bg-gray-600 font-bold"}"}>
                 Kategori Kursus
+              </.link>
+              <.link navigate={~p"/admin/kursus"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/kursus", do: "bg-gray-600 font-bold"}"}>
+                Senarai Kursus
               </.link>
             </div>
           <% end %>
@@ -73,7 +75,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
 
         <!-- Permohonan -->
         <.link navigate={~p"/admin/permohonan"}
-          class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 #{if @active_menu == "permohonan", do: "bg-gray-700"}"}>
+          class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 #{if @active_link == "/admin/permohonan", do: "bg-gray-700"}"}>
           Permohonan
         </.link>
 
@@ -82,13 +84,14 @@ defmodule SpkpProjectWeb.SidebarComponent do
           <div phx-click="toggle_menu"
                phx-value-menu="peserta"
                phx-target={@myself}
-               class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @active_menu == "peserta", do: "bg-gray-700"}"}>
+               class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @open_menu == "peserta", do: "bg-gray-700"}"}>
             <span>Peserta</span>
           </div>
 
-          <%= if @active_menu == "peserta" do %>
+          <%= if @open_menu == "peserta" do %>
             <div class="ml-4">
-              <.link navigate={~p"/admin/peserta/senaraipeserta"} class="block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm">
+              <.link navigate={~p"/admin/peserta/senaraipeserta"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/peserta/senaraipeserta", do: "bg-gray-600 font-bold"}"}>
                 Senarai Peserta
               </.link>
             </div>
@@ -100,19 +103,22 @@ defmodule SpkpProjectWeb.SidebarComponent do
           <div phx-click="toggle_menu"
                phx-value-menu="elaunpekerja"
                phx-target={@myself}
-               class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @active_menu == "elaunpekerja", do: "bg-gray-700"}"}>
+               class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @open_menu == "elaunpekerja", do: "bg-gray-700"}"}>
             <span>Elaun Pekerja</span>
           </div>
 
-          <%= if @active_menu == "elaunpekerja" do %>
+          <%= if @open_menu == "elaunpekerja" do %>
             <div class="ml-4">
-              <.link navigate={~p"/admin/elaunpekerja/senaraituntutan"} class="block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm">
+              <.link navigate={~p"/admin/elaunpekerja/senaraituntutan"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaunpekerja/senaraituntutan", do: "bg-gray-600 font-bold"}"}>
                 Senarai Tuntutan
               </.link>
-              <.link navigate={~p"/admin/elaunpekerja/buattuntutanbaru"} class="block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm">
+              <.link navigate={~p"/admin/elaunpekerja/buattuntutanbaru"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaunpekerja/buattuntutanbaru", do: "bg-gray-600 font-bold"}"}>
                 Buat Tuntutan Baru
               </.link>
-              <.link navigate={~p"/admin/elaunpekerja/senaraipekerja"} class="block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm">
+              <.link navigate={~p"/admin/elaunpekerja/senaraipekerja"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaunpekerja/senaraipekerja", do: "bg-gray-600 font-bold"}"}>
                 Senarai Pekerja
               </.link>
             </div>
@@ -120,10 +126,27 @@ defmodule SpkpProjectWeb.SidebarComponent do
         </div>
 
         <!-- Tetapan -->
-        <.link navigate={~p"/admin/tetapan"}
-          class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 #{if @active_menu == "tetapan", do: "bg-gray-700"}"}>
-          Tetapan
-        </.link>
+        <div>
+          <div phx-click="toggle_menu"
+               phx-value-menu="tetapan"
+               phx-target={@myself}
+               class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @open_menu == "tetapan", do: "bg-gray-700"}"}>
+            <span>Tetapan</span>
+          </div>
+
+          <%= if @open_menu == "tetapan" do %>
+            <div class="ml-4">
+              <.link navigate={~p"/admin/tetapan/editprofile"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/tetapan/editprofile", do: "bg-gray-600 font-bold"}"}>
+                Edit Profile
+              </.link>
+              <.link navigate={~p"/admin/tetapan/tukarkatalaluan"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/tetapan/tukarkatalaluan", do: "bg-gray-600 font-bold"}"}>
+                Tukar Kata Laluan
+              </.link>
+            </div>
+          <% end %>
+        </div>
       </nav>
     </div>
     """
@@ -131,7 +154,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
 
   @impl true
   def handle_event("toggle_menu", %{"menu" => menu}, socket) do
-    new_menu = if socket.assigns.active_menu == menu, do: nil, else: menu
-    {:noreply, assign(socket, :active_menu, new_menu)}
+    new_menu = if socket.assigns.open_menu == menu, do: nil, else: menu
+    {:noreply, assign(socket, :open_menu, new_menu)}
   end
 end

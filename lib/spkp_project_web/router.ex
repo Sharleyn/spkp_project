@@ -39,15 +39,29 @@ defmodule SpkpProjectWeb.Router do
     live "/permohonan", PermohonanLive
     live "/tetapan", TetapanLive
 
-    live "/kursus/senarai", KursusSenaraiLive
-    live "/kursus/tambah", KursusTambahLive
-    live "/kursus/kategori", KursusKategoriLive
+    live "/kursus", KursussLive.Index, :index
+    live "/kursus/new", KursussLive.Index, :new
+    live "/kursus/:id/edit", KursussLive.Index, :edit
+
+    live "/kursus/:id", KursussLive.Show, :show
+    live "/kursus/:id/show/edit", KursussLive.Show, :edit
+
+    live "/kursus_kategori", KursusKategoriLive.Index, :index
+    live "/kursus_kategori/new", KursusKategoriLive.Index, :new
+    live "/kursus_kategori/:id/edit", KursusKategoriLive.Index, :edit
+
+    live "/kursus_kategori/:id", KursusKategoriLive.Show, :show
+    live "/kursus_kategori/:id/show/edit", KursusKategoriLive.Show, :edit
+
 
     live "/peserta/senaraipeserta", SenaraiPesertaLive
 
     live "/elaunpekerja/senaraituntutan", SenaraiTuntutanLive
     live "/elaunpekerja/buattuntutanbaru", BuatTuntutanBaruLive
     live "/elaunpekerja/senaraipekerja", SenaraiPekerjaLive
+
+    live "/tetapan/editprofile", EditProfileLive
+    live "/tetapan/tukarkatalaluan", TukarKataLaluanLive
 
   end
 
