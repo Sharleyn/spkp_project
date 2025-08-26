@@ -2,30 +2,30 @@ defmodule SpkpProjectWeb.UserDashboardLive do
   use SpkpProjectWeb, :live_view
 
   alias SpkpProjectWeb.UserDashboardLive
+  alias SpkpProject.Kursus.Kursuss
+  alias SpkpProject.Repo
 
-  @impl true
-  # 'mount' digunakan untuk menetapkan data awal (initial state)
   @impl true
 def mount(_params, _session, socket) do
   current_user = socket.assigns.current_user
+
+  available_courses =
+    SpkpProject.Kursus.list_all_courses()
+    |> Enum.take(3)  # ambil maksimum 3 kursus untuk dashboard
 
   socket =
     socket
     |> assign(:current_user_name, current_user.full_name)
     |> assign(:sidebar_open, true)
     |> assign(:user_menu_open, false)
+    |> assign(:available_courses, available_courses)
     |> assign(:active_applications_count, 3)
-    |> assign(:available_courses_count, 3)
+    |> assign(:available_courses_count, length(available_courses))
     |> assign(:completed_courses_count, 0)
     |> assign(:recent_applications, [
       %{name: "Kursus Komputer Asas", date: "2025-01-24", status: "Diterima", status_class: "bg-green-100 text-green-600"},
       %{name: "Kursus Bahasa Inggeris", date: "2025-02-17", status: "Dalam Proses", status_class: "bg-yellow-100 text-yellow-600"},
       %{name: "Kursus Kemahiran Digital", date: "2025-02-21", status: "Ditolak", status_class: "bg-red-100 text-red-600"}
-    ])
-    |> assign(:available_courses, [
-      %{name: "Kursus Komputer Asas", duration: "4 minggu", slots: "15 tempat"},
-      %{name: "Kursus Bahasa Inggeris", duration: "2 minggu", slots: "8 tempat"},
-      %{name: "Kursus Kemahiran Digital", duration: "3 minggu", slots: "20 tempat"}
     ])
 
   {:ok, socket}
@@ -40,30 +40,6 @@ end
   }
 end
 
-
-  def handle_event("logout", _params, socket) do
-    {:noreply,
-     socket
-     |> put_flash(:info, "Anda telah log keluar.")
-     |> redirect(to: ~p"/lamanutama")}
-  end
-
-  # 'handle_event' digunakan untuk menguruskan interaksi pengguna
-  # ========== EVENTS ==========
-
-    def handle_event("toggle_sidebar", _params, socket) do
-      {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
-    end
-
-    def handle_event("toggle_user_menu", _params, socket) do
-      {:noreply, update(socket, :user_menu_open, &(!&1))}
-    end
-
-    def handle_event("close_user_menu", _params, socket) do
-      {:noreply, assign(socket, :user_menu_open, false)}
-    end
-
-
   # 'render' berfungsi sebagai template HTML LiveView
   # ========== RENDER ==========
     @impl true
@@ -74,7 +50,7 @@ end
       <!-- Burger Button -->
             <button class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
                phx-click="toggle_sidebar">
-                   <img src={~p"/images/burger3.png"} alt="Burger Icon" class="w-6 h-6" />
+                   <i class="fa fa-bars fa-lg text-indigo-300" aria-hidden="true"></i>
            </button>
 
          <!-- Sidebar -->
@@ -235,37 +211,65 @@ end
                         </div>
                     </div>
 
-                    <!-- Kursus Tersedia Section -->
-                    <div class="bg-indigo-50 p-6 rounded-3xl shadow-lg">
-                        <h4 class="flex items-center text-lg font-bold mb-4 gap-4 text-gray-700">
-                            <img src={~p"/images/book.png"} alt="Book Icon" class="w-10 h-10" />
-                            Kursus Tersedia
-                        </h4>
-                        <p class="text-gray-700 font-medium mb-4">Kursus Yang Boleh Anda Mohon</p>
-                        <div class="space-y-4">
-                            <%= for course <- @available_courses do %>
-                                <div class="flex items-center justify-between p-4 bg-white rounded-2xl">
-                                    <div>
-                                        <p class="font-medium"><%= course.name %></p>
-                                        <p class="text-xs text-gray-400"><%= course.duration %> &bull; <%= course.slots %></p>
-                                    </div>
-                                    <a href="#" class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200">MOHON</a>
-                                </div>
-                            <% end %>
-                        </div>
-                        <div class="mt-6 text-center">
-                            <.link navigate={~p"/senaraikursususer"}
-                                      class="inline-block border border-violet-500 text-black-600 px-6 py-2 rounded-lg font-medium hover:bg-[#C8C4DF] bg-opacity-30 hover:text-black transition-colors duration-200">
-                                         Lihat Semua Kursus
-                                 </.link>
-                        </div>
+                    <!-- Kursus Terkini Full Width -->
+                        <div class="mb-8">
+                           <div class="bg-rose-50 p-6 rounded-3xl shadow-lg">
+                              <h4 class="flex items-center text-lg font-bold gap-4 mb-4 text-gray-700">
+                                  <img src={~p"/images/book.png"} alt="Book Icon" class="w-8 h-8" />
+                                    Kursus Terkini
+                            </h4>
+
+                       <div class="space-y-4">
+                         <%= for course <- @available_courses do %>
+                       <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl shadow hover:shadow-md transition-shadow duration-200">
+                       <div>
+                         <p class="font-medium text-gray-800"><%= course.nama_kursus %></p>
+                         <p class="text-xs text-gray-500">
+                            <%= course.tarikh_mula %> - <%= course.tarikh_akhir %> &bull; Kuota: <%= course.kuota %>
+                         </p>
+                       </div>
+                            <.link navigate={~p"/senaraikursususer"} class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200">
+                              Lihat
+                      </.link>
                     </div>
+                  <% end %>
+                </div>
+
+                 <div class="mt-6 text-center">
+                    <.link navigate={~p"/senaraikursususer"} class="inline-block border border-violet-500 text-black-600 px-6 py-2 rounded-lg font-medium hover:bg-[#C8C4DF] bg-opacity-80 hover:text-black transition-colors duration-200">
+                       Lihat Semua Kursus
+                    </.link>
+                 </div>
+               </div>
+             </div>
+
                 </main>
             </div>
         </div>
-        <script>
-            lucide.createIcons();
-        </script>
     """
   end
+
+  @impl true
+  def handle_event("logout", _params, socket) do
+  {:noreply,
+   socket
+   |> put_flash(:info, "Anda telah log keluar.")
+   |> redirect(to: ~p"/lamanutama")}
+end
+
+# 'handle_event' digunakan untuk menguruskan interaksi pengguna
+# ========== EVENTS ==========
+
+  def handle_event("toggle_sidebar", _params, socket) do
+    {:noreply, Phoenix.LiveView.update(socket, :sidebar_open, fn open -> not open end)}
+  end
+
+  def handle_event("toggle_user_menu", _params, socket) do
+    {:noreply, Phoenix.LiveView.update(socket, :user_menu_open, &(!&1))}
+  end
+
+  def handle_event("close_user_menu", _params, socket) do
+    {:noreply, assign(socket, :user_menu_open, false)}
+  end
+
 end

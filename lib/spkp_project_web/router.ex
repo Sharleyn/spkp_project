@@ -113,16 +113,12 @@ defmodule SpkpProjectWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
       live "/admin", PageLive, :admin
       live "/user", PageLive, :user
-    end
-  end
-
-    scope "/", SpkpProjectWeb do
-      pipe_through [:browser, :require_authenticated_user]
 
       live "/userdashboard", UserDashboardLive, :index
       live "/userprofile", UserProfileLive, :index
       live "/senaraikursususer", SenaraiKursusLive, :index
       live "/permohonanuser", PermohonanUserLive, :index
+    end
   end
 
   scope "/", SpkpProjectWeb do
