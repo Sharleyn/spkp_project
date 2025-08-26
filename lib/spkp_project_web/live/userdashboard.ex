@@ -1,7 +1,6 @@
 defmodule SpkpProjectWeb.UserDashboardLive do
   use SpkpProjectWeb, :live_view
 
-  alias SpkpProjectWeb.UserDashboardLive
 
   @impl true
   # 'mount' digunakan untuk menetapkan data awal (initial state)
@@ -30,48 +29,14 @@ def mount(_params, _session, socket) do
   {:ok, socket}
 end
 
-   # Hook untuk inject current_path dan sidebar_open
-    def on_mount(:default, _params, _session, socket) do
-    {:cont,
-       socket
-       |> assign(:current_path, socket.host_uri.path)
-       |> assign_new(:sidebar_open, fn -> true end)  # default sidebar terbuka
-  }
-end
-
-
-  def handle_event("logout", _params, socket) do
-    {:noreply,
+# Hook untuk inject current_path dan sidebar_open
+def on_mount(:default, _params, _session, socket) do
+  {:cont,
      socket
-     |> put_flash(:info, "Anda telah log keluar.")
-     |> redirect(to: ~p"/lamanutama")}
-  end
-
-  # 'handle_event' digunakan untuk menguruskan interaksi pengguna
-  # ========== EVENTS ==========
-
-    def handle_event("toggle_sidebar", _params, socket) do
-      {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
-    end
-
-    def handle_event("toggle_user_menu", _params, socket) do
-      {:noreply, update(socket, :user_menu_open, &(!&1))}
-    end
-
-    def handle_event("close_user_menu", _params, socket) do
-      {:noreply, assign(socket, :user_menu_open, false)}
-    end
-
-    defp nav_class(current, expected) do
-      base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
-
-      if current == expected do
-        base <> " bg-indigo-700 text-white"  # aktif
-      else
-        base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
-      end
-    end
-
+     |> assign(:current_path, socket.host_uri.path)
+     |> assign_new(:sidebar_open, fn -> true end)  # default sidebar terbuka
+}
+end
 
   # 'render' berfungsi sebagai template HTML LiveView
   # ========== RENDER ==========
@@ -180,7 +145,7 @@ end
 
             <!-- Dashboard Content -->
                 <main>
-                    <h2 class="text-2xl font-semibold mb-1">Selamat Datang, <%= @current_user_name %></h2>
+                    <h2 class="text-2xl font-bold mb-1">Selamat Datang, <%= @current_user_name %></h2>
                     <p class="text-gray-500 mb-6">Urus Permohonan Kursus Dan Lihat Perkembangan Anda Di Sini</p>
 
                     <!-- Summary Cards Section -->
@@ -284,4 +249,37 @@ end
         </script>
     """
   end
+
+  @impl true
+  def handle_event("logout", _params, socket) do
+    {:noreply,
+     socket
+     |> put_flash(:info, "Anda telah log keluar.")
+     |> redirect(to: ~p"/lamanutama")}
+  end
+
+  # 'handle_event' digunakan untuk menguruskan interaksi pengguna
+  # ========== EVENTS ==========
+
+    def handle_event("toggle_sidebar", _params, socket) do
+      {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
+    end
+
+    def handle_event("toggle_user_menu", _params, socket) do
+      {:noreply, update(socket, :user_menu_open, &(!&1))}
+    end
+
+    def handle_event("close_user_menu", _params, socket) do
+      {:noreply, assign(socket, :user_menu_open, false)}
+    end
+
+    defp nav_class(current, expected) do
+      base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
+
+      if current == expected do
+        base <> " bg-indigo-700 text-white"  # aktif
+      else
+        base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
+      end
+    end
 end

@@ -2,7 +2,6 @@ defmodule SpkpProjectWeb.Router do
   use SpkpProjectWeb, :router
 
   import SpkpProjectWeb.UserAuth
-  alias SpkpProjectWeb.PageLive
 
   pipeline :browser do
     plug :accepts, ["html"]

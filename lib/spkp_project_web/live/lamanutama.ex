@@ -28,8 +28,8 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      schedule_gallery_slide()
       schedule_slide()
+      schedule_gallery_slide()
     end
 
     {:ok,
@@ -40,17 +40,28 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
      |> assign(:gallery_index, 0)}
   end
 
-  defp schedule_slide do
-    # Auto tukar setiap 3 saat
-    Process.send_after(self(), :next_slide, 3000)
-  end
+  # Auto slide scheduling
+  defp schedule_slide, do: Process.send_after(self(), :next_slide, 3000)
+  defp schedule_gallery_slide, do: Process.send_after(self(), :next_gallery, 3000)
 
-  def handle_info(:next_slide, socket) do
-    schedule_slide() # set semula supaya terus loop
-    total = length(socket.assigns.slides)
-    new_index = rem(socket.assigns.current_index + 1, total)
+  # Gabungkan semua handle_info di sini
+  def handle_info(msg, socket) do
+    case msg do
+      :next_slide ->
+        schedule_slide()
+        total = length(socket.assigns.slides)
+        new_index = rem(socket.assigns.current_index + 1, total)
+        {:noreply, assign(socket, :current_index, new_index)}
 
-    {:noreply, assign(socket, :current_index, new_index)}
+      :next_gallery ->
+        schedule_gallery_slide()
+        total = gallery_total(socket)
+        new_index = rem(socket.assigns.gallery_index + 1, total)
+        {:noreply, assign(socket, :gallery_index, new_index)}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   # Manual slider utama
@@ -70,18 +81,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     {:noreply, assign(socket, :current_index, new_index)}
   end
 
-  # Auto-slide galeri
-  def handle_info(:next_gallery, socket) do
-    schedule_gallery_slide()
-    total = gallery_total(socket)
-    new_index = rem(socket.assigns.gallery_index + 1, total)
-    {:noreply, assign(socket, :gallery_index, new_index)}
-  end
-
-  defp schedule_gallery_slide() do
-    Process.send_after(self(), :next_gallery, 3000) # tukar setiap 3s
-  end
-
+  # Helper untuk galeri
   defp gallery_total(socket) do
     socket.assigns.gallery
     |> Enum.chunk_every(4)

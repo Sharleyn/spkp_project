@@ -58,44 +58,46 @@ defmodule SpkpProjectWeb.UserProfileLive do
      |> assign(:user_menu_open, false)
      |> assign(:gender_options, @gender_options)
      |> assign(:education_options, @education_options)
-     |> assign(:district_options, @district_options)
-     |> allow_upload(:ic_attachment, accept: ~w(.pdf .jpg .jpeg .png), max_entries: 1, max_file_size: 1_000_000)}
+         |> assign(:district_options, @district_options)
+      |> allow_upload(:ic_attachment, accept: ~w(.pdf .jpg .jpeg .png), max_entries: 1, auto_upload: true)}
   end
 
   # Save User (nama & email)
   def handle_event("save_profile", %{"user_profile" => profile_params}, socket) do
-    IO.inspect(profile_params, label: "PROFILE PARAMS ASAL")
+    current_user = socket.assigns.current_user
 
-    # consume file upload
-    uploaded_files =
+    # Consume uploaded file (jika ada)
+    uploaded_ic =
       consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, _entry ->
-        dest = Path.join("priv/static/uploads", Path.basename(path))
+        # pastikan folder wujud
+        uploads_dir = Path.join(["priv/static/uploads"])
+        File.mkdir_p!(uploads_dir)
 
-        IO.inspect(path, label: "TEMP PATH")
-        IO.inspect(dest, label: "DESTINATION PATH")
-
-        # Pastikan directory uploads wujud
-        File.mkdir_p!("priv/static/uploads")
+        filename = Path.basename(path)
+        dest = Path.join(uploads_dir, filename)
 
         File.cp!(path, dest)
-        {:ok, "/uploads/#{Path.basename(dest)}"}
+        {:ok, "/uploads/#{filename}"}
       end)
 
-    # gabungkan semua params sekali
+    # Ambil path uploaded file pertama, kalau ada
+    ic_attachment_path = List.first(uploaded_ic)
+
+    # Ambil existing profile, supaya kalau tiada upload, simpan value lama
+    existing_profile = Accounts.get_user_profile_by_user_id(current_user.id) || %UserProfile{}
+    final_ic_attachment = ic_attachment_path || existing_profile.ic_attachment
+
+    # Gabungkan params untuk update
     final_params =
       profile_params
-      |> Map.put("user_id", socket.assigns.current_user.id)
-      |> Map.put("ic_attachment", List.first(uploaded_files))
+      |> Map.put("user_id", current_user.id)
+      |> Map.put("ic_attachment", final_ic_attachment)
 
-    IO.inspect(uploaded_files, label: "UPLOADED FILES")
-    IO.inspect(final_params, label: "FINAL PARAMS")
-
-    case Accounts.update_user_profile(socket.assigns.current_user, final_params) do
+    # Update user + user_profile
+    case Accounts.update_user_profile(current_user, final_params) do
       {:ok, updated_user} ->
-        # dapatkan semula profile terkini (kalau ada)
+        # Dapatkan semula profile terkini
         profile = Accounts.get_user_profile_by_user_id(updated_user.id) || %UserProfile{}
-
-        # bina changeset baru untuk form
         profile_changeset =
           UserProfile.changeset(profile, %{
             full_name: updated_user.full_name,
@@ -120,7 +122,6 @@ defmodule SpkpProjectWeb.UserProfileLive do
          |> assign(:profile_form, to_form(profile_changeset))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        IO.inspect(changeset.errors, label: "CHANGESET ERRORS")
         {:noreply,
          socket
          |> put_flash(:error, "Profil gagal disimpan. Sila semak input anda.")
@@ -323,13 +324,22 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
           <!-- Lampiran Tambahan -->
                <div class="border rounded-xl p-4 mt-4">
-                    <h3 class="flex items-center font-semibold mb-4 space-x-2">
-                        <img src={~p"/images/upload.png"} class="w-5 h-5" />
-                             <span>Lampiran Tambahan</span>
-                     </h3>
+                  <h3 class="flex items-center font-semibold mb-4 space-x-2">
+                     <img src={~p"/images/upload.png"} class="w-5 h-5" />
+                        <span>Lampiran Tambahan</span>
+                  </h3>
 
-               <!-- Input Upload -->
-                    <.input field={f[:ic_attachment]} type="file" label="Salinan Kad Pengenalan"
+            <!-- Tunjuk gambar sedia ada kalau ada -->
+                 <%= if @profile_changeset.data.ic_attachment do %>
+                   <div class="mb-2">
+                     <p class="text-sm text-gray-500">Gambar/Salinan Kad Pengenalan sedia ada:</p>
+                        <img src={@profile_changeset.data.ic_attachment} alt="IC Attachment" class="w-32 h-32 object-cover rounded-lg border" />
+                   </div>
+                <% end %>
+
+            <!-- Input Upload Baru -->
+                 <label class="block text-sm font-medium text-gray-700">Salinan Kad Pengenalan</label>
+                   <.live_file_input upload={@uploads.ic_attachment}
                       class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" />
                   </div>
 

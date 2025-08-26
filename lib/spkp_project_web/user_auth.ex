@@ -227,7 +227,7 @@ defmodule SpkpProjectWeb.UserAuth do
 
   defp signed_in_path(conn) do
     case conn.assigns.current_user.role do
-      "admin" -> ~p"/admin"
+      "admin" -> ~p"/admin/dashboard"
       "user" -> ~p"/userdashboard"
     end
   end

@@ -58,7 +58,7 @@ defmodule SpkpProject.Accounts.User do
     |> maybe_validate_unique_email(opts)
   end
 
-  defp validate_password(changeset, opts) do
+  defp validate_password(changeset, _opts) do
     changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 12, max: 72, message: "Masukkan kata laluan")
@@ -72,7 +72,7 @@ defmodule SpkpProject.Accounts.User do
     |> maybe_hash_password(opts)
   end
 
-  defp validate_full_name(changeset, opts) do
+  defp validate_full_name(changeset, _opts) do
     changeset
     |> validate_required([:full_name])
     |> validate_length(:full_name, min: 5, max: 160, message: "Isikan nama penuh anda")
@@ -183,4 +183,5 @@ defmodule SpkpProject.Accounts.User do
     |> validate_email(validate_email: false)
     |> validate_full_name(validate_email: false)
   end
+
 end

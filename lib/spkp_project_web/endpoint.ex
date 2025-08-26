@@ -35,7 +35,6 @@ defmodule SpkpProjectWeb.Endpoint do
 
   # Pastikan uploads directory wujud
   # Ini akan dijalankan setiap kali endpoint start
-  File.mkdir_p!("priv/static/uploads")
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
