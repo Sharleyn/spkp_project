@@ -1,9 +1,6 @@
 defmodule SpkpProjectWeb.UserDashboardLive do
   use SpkpProjectWeb, :live_view
 
-  alias SpkpProjectWeb.UserDashboardLive
-  alias SpkpProject.Kursus.Kursuss
-  alias SpkpProject.Repo
 
   @impl true
 def mount(_params, _session, socket) do
@@ -261,11 +258,11 @@ end
 # ========== EVENTS ==========
 
   def handle_event("toggle_sidebar", _params, socket) do
-    {:noreply, Phoenix.LiveView.update(socket, :sidebar_open, fn open -> not open end)}
+    {:noreply, assign(socket, :sidebar_open, !socket.assigns.sidebar_open)}
   end
 
   def handle_event("toggle_user_menu", _params, socket) do
-    {:noreply, Phoenix.LiveView.update(socket, :user_menu_open, &(!&1))}
+    {:noreply, assign(socket, :user_menu_open, !socket.assigns.user_menu_open)}
   end
 
   def handle_event("close_user_menu", _params, socket) do

@@ -41,6 +41,27 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
   }
 end
 
+  def mount(_params, _session, socket) do
+      kursus = Repo.all(Course)
+         jangka_panjang =
+             Enum.filter(kursus, fn k ->
+               Date.diff(k.tarikh_akhir, k.tarikh_mula) > 30
+    end)
+
+         jangka_pendek =
+             Enum.filter(kursus, fn k ->
+             Date.diff(k.tarikh_akhir, k.tarikh_mula) <= 30
+    end)
+
+    {:ok,
+         socket
+          |> assign(:kursus, nil)
+          |> assign(:jangka_panjang, jangka_panjang)
+          |> assign(:jangka_pendek, jangka_pendek)}
+
+  end
+
+
 
   @impl true
   def render(assigns) do
@@ -183,10 +204,9 @@ end
                  <!-- Dropdown Jenis Kursus (Jangkan Panjang / Jangka Pendek) -->
                     <div class="w-full md:w-auto">
                        <select name="type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                         <option value="">Semua Jenis Kursus</option>
-                         <option value="Semua Kursus" selected={@selected_type == "Semua Kursus"}>Semua Kursus</option>
-                         <option value="Kursus Jangka Panjang" selected={@selected_type == "Kursus Jangka Panjang"}>Kursus Jangka Panjang</option>
-                         <option value="Kursus Jangka Pendek" selected={@selected_type == "Kursus Jangka Pendek"}>Kursus Jangka Pendek</option>
+                         <option value="">Semua Kursus</option>
+    <!-- belum siap -->  <option value="Kursus Jangka Panjang" selected={@selected_type == "Kursus Jangka Panjang"}>Kursus Jangka Panjang</option>
+    <!-- belum siap -->  <option value="Kursus Jangka Pendek" selected={@selected_type == "Kursus Jangka Pendek"}>Kursus Jangka Pendek</option>
                       </select>
                     </div>
 
@@ -217,7 +237,6 @@ end
               <div class="flex justify-between items-start mb-1">
                 <div>
                   <h3 class="text-xl font-bold text-gray-800"><%= kursus.nama_kursus %></h3>
-                  <p class="text-sm font-semibold text-gray-600">Anjuran: <%= kursus.anjuran %></p>
                 </div>
                 <img src={kursus.gambar_anjuran} alt="Logo Penganjur"
                      class="w-16 h-16 rounded-full" />
@@ -242,6 +261,15 @@ end
                 <p class="flex items-center gap-2">
                    <i class="fas fa-clipboard" aria-hidden="true"></i>
                    <strong>Status:</strong> <%= kursus.status_kursus %></p>
+
+                <p class="flex items-center gap-2">
+                   <i class="fas fa-clipboard" aria-hidden="true"></i>
+                   <strong>Tajaan:</strong> <%= kursus.anjuran %></p>
+
+                <p class="flex items-center gap-2">
+                   <i class="fas fa-clipboard" aria-hidden="true"></i>
+                   <strong>:</strong> <%= kursus.anjuran %></p>
+
               </div>
 
 
@@ -372,6 +400,10 @@ end
     {:noreply, assign(socket, :page, new_page)}
   end
 
+  def handle_event("pilih_kursus", %{"kursus" => value}, socket) do
+    {:noreply, assign(socket, :kursus, value)}
+    end
+
   # Fungsi filter kursus
   defp filter_courses(search, category, type) do
     query =
@@ -380,7 +412,7 @@ end
         preload: [kursus_kategori: c],
         where: ilike(k.nama_kursus, ^"%#{search}%")
 
-    # tapis ikut kategori kalau ada
+    # tapis ikut kategori (kalau user pilih kategori tertentu)
     query =
       if category != "" do
         from [k, c] in query, where: c.kategori == ^category
@@ -388,12 +420,18 @@ end
         query
       end
 
-    # tapis ikut jenis kalau ada
+    # tapis ikut jenis kursus (computed ikut beza tarikh)
     query =
-      if type != "" do
-        from [k, _c] in query, where: k.jenis_kursus == ^type
-      else
-        query
+      case type do
+        "Kursus Jangka Panjang" ->
+          from [k, _c] in query,
+            where: fragment("? - ? > 30", k.tarikh_akhir, k.tarikh_mula)
+
+        "Kursus Jangka Pendek" ->
+          from [k, _c] in query,
+            where: fragment("? - ? <= 30", k.tarikh_akhir, k.tarikh_mula)
+
+        _ -> query
       end
 
     Repo.all(query)
