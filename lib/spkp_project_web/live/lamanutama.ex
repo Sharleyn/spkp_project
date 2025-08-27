@@ -26,6 +26,8 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     "/images/8.jpg"
   ]
 
+  ## ───── Lifecycle ─────
+
   def mount(_params, _session, socket) do
     if connected?(socket) do
       schedule_gallery_slide()
@@ -40,20 +42,25 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
      |> assign(:gallery_index, 0)}
   end
 
-  defp schedule_slide do
-    # Auto tukar setiap 3 saat
-    Process.send_after(self(), :next_slide, 3000)
-  end
+  ## ───── Handle Info ─────
 
+  # Kumpulkan semua handle_info/2
   def handle_info(:next_slide, socket) do
-    schedule_slide() # set semula supaya terus loop
+    schedule_slide()
     total = length(socket.assigns.slides)
     new_index = rem(socket.assigns.current_index + 1, total)
-
     {:noreply, assign(socket, :current_index, new_index)}
   end
 
-  # Manual slider utama
+  def handle_info(:next_gallery, socket) do
+    schedule_gallery_slide()
+    total = gallery_total(socket)
+    new_index = rem(socket.assigns.gallery_index + 1, total)
+    {:noreply, assign(socket, :gallery_index, new_index)}
+  end
+
+  ## ───── Handle Event ─────
+
   def handle_event("goto_slide", %{"index" => idx}, socket) do
     {:noreply, assign(socket, :current_index, String.to_integer(idx))}
   end
@@ -66,20 +73,22 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
   def handle_event("prev_slide", _params, socket) do
     schedule_slide()
-    new_index = rem(socket.assigns.current_index - 1 + length(socket.assigns.slides), length(socket.assigns.slides))
+    new_index =
+      rem(socket.assigns.current_index - 1 + length(socket.assigns.slides),
+        length(socket.assigns.slides)
+      )
+
     {:noreply, assign(socket, :current_index, new_index)}
   end
 
-  # Auto-slide galeri
-  def handle_info(:next_gallery, socket) do
-    schedule_gallery_slide()
-    total = gallery_total(socket)
-    new_index = rem(socket.assigns.gallery_index + 1, total)
-    {:noreply, assign(socket, :gallery_index, new_index)}
+  ## ───── Private Helpers ─────
+
+  defp schedule_slide do
+    Process.send_after(self(), :next_slide, 3000)
   end
 
-  defp schedule_gallery_slide() do
-    Process.send_after(self(), :next_gallery, 3000) # tukar setiap 3s
+  defp schedule_gallery_slide do
+    Process.send_after(self(), :next_gallery, 3000)
   end
 
   defp gallery_total(socket) do
