@@ -210,7 +210,7 @@ end
 
                     <!-- Kursus Terkini Full Width -->
                         <div class="mb-8">
-                           <div class="bg-rose-50 p-6 rounded-3xl shadow-lg">
+                           <div class="bg-blue-50 p-6 rounded-3xl shadow-lg">
                               <h4 class="flex items-center text-lg font-bold gap-4 mb-4 text-gray-700">
                                   <img src={~p"/images/book.png"} alt="Book Icon" class="w-8 h-8" />
                                     Kursus Terkini
