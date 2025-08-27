@@ -49,23 +49,24 @@ defmodule SpkpProject.Accounts.User do
     |> put_change(:role, "user")
   end
 
-    # 📌 2. Role changeset – hanya untuk admin ubah role
-    def role_changeset(user, attrs) do
-      user
-      |> cast(attrs, [:role])
-      |> validate_required([:role])
-      |> validate_inclusion(:role, ["user", "staff", "admin"]) # ✅ validate di sini
-    end
+  # 📌 2. Role changeset – hanya untuk admin ubah role
+  def role_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:role])
+    |> validate_required([:role])
+    # ✅ validate di sini
+    |> validate_inclusion(:role, ["user", "staff", "admin"])
+  end
 
-    def update_changeset(user, attrs, opts \\ []) do
-      user
-      |> cast(attrs, [:email, :full_name, :password, :password_confirmation])
-      |> validate_email(opts)
-      |> validate_full_name(opts)
-      |> validate_password(opts)
-      |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
-      |> maybe_hash_password(opts)
-    end
+  def update_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :full_name, :password, :password_confirmation])
+    |> validate_email(opts)
+    |> validate_full_name(opts)
+    |> validate_password(opts)
+    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
+    |> maybe_hash_password(opts)
+  end
 
   defp validate_email(changeset, opts) do
     changeset
@@ -84,8 +85,13 @@ defmodule SpkpProject.Accounts.User do
   defp validate_password_confirmation(changeset, opts) do
     changeset
     |> validate_required([:password_confirmation])
-    |> validate_length(:password_confirmation, min: 12, max: 72, message: "Kata laluan tidak sepadan")
-    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan") # <-- ini penting
+    |> validate_length(:password_confirmation,
+      min: 12,
+      max: 72,
+      message: "Kata laluan tidak sepadan"
+    )
+    # <-- ini penting
+    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
     |> maybe_hash_password(opts)
   end
 

@@ -25,7 +25,8 @@ user
 |> change(%{
   full_name: "Super Admin",
   hashed_password: Pbkdf2.hash_pwd_salt(admin_password),
-  role: "admin", # 🚀 seed terus jadikan admin
+  # 🚀 seed terus jadikan admin
+  role: "admin",
   confirmed_at: DateTime.utc_now() |> DateTime.truncate(:second)
 })
 |> Repo.insert_or_update!()

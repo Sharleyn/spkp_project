@@ -25,8 +25,12 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Show do
     <.header>
       Kursus kategori {@kursus_kategori.id}
       <:subtitle>This is a kursus_kategori record from your database.</:subtitle>
+      
       <:actions>
-        <.link patch={~p"/admin/kursus_kategori/#{@kursus_kategori}/show/edit"} phx-click={JS.push_focus()}>
+        <.link
+          patch={~p"/admin/kursus_kategori/#{@kursus_kategori}/show/edit"}
+          phx-click={JS.push_focus()}
+        >
           <.button>Edit kursus_kategori</.button>
         </.link>
       </:actions>
@@ -38,7 +42,12 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Show do
 
     <.back navigate={~p"/admin/kursus_kategori"}>Back to kursus_kategori</.back>
 
-    <.modal :if={@live_action == :edit} id="kursus_kategori-modal" show on_cancel={JS.patch(~p"/admin/kursus_kategori/#{@kursus_kategori}")}>
+    <.modal
+      :if={@live_action == :edit}
+      id="kursus_kategori-modal"
+      show
+      on_cancel={JS.patch(~p"/admin/kursus_kategori/#{@kursus_kategori}")}
+    >
       <.live_component
         module={SpkpProjectWeb.KursusKategoriLive.FormComponent}
         id={@kursus_kategori.id}

@@ -81,8 +81,10 @@ defmodule SpkpProjectWeb.UserAuth do
     end
 
     conn
-    |> configure_session(drop: true)   # 🔑 buang semua session
-    |> delete_resp_cookie(@remember_me_cookie) # 🔑 buang remember-me cookie
+    # 🔑 buang semua session
+    |> configure_session(drop: true)
+    # 🔑 buang remember-me cookie
+    |> delete_resp_cookie(@remember_me_cookie)
     |> redirect(to: ~p"/lamanutama")
   end
 
@@ -174,36 +176,34 @@ defmodule SpkpProjectWeb.UserAuth do
     end
   end
 
-    # 🚀 Role-based guard untuk LiveView
-    def on_mount({:ensure_role, required_role}, _params, session, socket) do
-      socket = mount_current_user(socket, session)
+  # 🚀 Role-based guard untuk LiveView
+  def on_mount({:ensure_role, required_role}, _params, session, socket) do
+    socket = mount_current_user(socket, session)
 
-      cond do
-        # ✅ User ada dan role betul
-        socket.assigns.current_user && socket.assigns.current_user.role == required_role ->
-          {:cont, socket}
+    cond do
+      # ✅ User ada dan role betul
+      socket.assigns.current_user && socket.assigns.current_user.role == required_role ->
+        {:cont, socket}
 
-        # ❌ User login tapi role salah
-        socket.assigns.current_user ->
-          socket =
-            socket
-            |> Phoenix.LiveView.put_flash(:error, "Anda tidak dibenarkan akses halaman ini.")
-            |> Phoenix.LiveView.redirect(to: signed_in_path(socket.assigns.current_user))
+      # ❌ User login tapi role salah
+      socket.assigns.current_user ->
+        socket =
+          socket
+          |> Phoenix.LiveView.put_flash(:error, "Anda tidak dibenarkan akses halaman ini.")
+          |> Phoenix.LiveView.redirect(to: signed_in_path(socket.assigns.current_user))
 
-          {:halt, socket}
+        {:halt, socket}
 
-        # ❌ Belum login
-        true ->
-          socket =
-            socket
-            |> Phoenix.LiveView.put_flash(:error, "Sila log masuk dahulu.")
-            |> Phoenix.LiveView.redirect(to: ~p"/users/log_in")
+      # ❌ Belum login
+      true ->
+        socket =
+          socket
+          |> Phoenix.LiveView.put_flash(:error, "Sila log masuk dahulu.")
+          |> Phoenix.LiveView.redirect(to: ~p"/users/log_in")
 
-          {:halt, socket}
-      end
+        {:halt, socket}
     end
-
-
+  end
 
   defp mount_current_user(socket, session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
@@ -260,4 +260,4 @@ defmodule SpkpProjectWeb.UserAuth do
   defp signed_in_path(%{role: "pekerja"}), do: ~p"/pekerja/dashboard"
   defp signed_in_path(%{role: "user"}), do: ~p"/userdashboard"
   defp signed_in_path(_), do: ~p"/"
-    end
+end

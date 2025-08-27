@@ -53,18 +53,23 @@ defmodule SpkpProjectWeb.KursussLive.Index do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
       <!-- Sidebar -->
-      <.live_component module={SpkpProjectWeb.SidebarComponent} id="sidebar" current_view={@socket.view} />
-
+      <.live_component
+        module={SpkpProjectWeb.SidebarComponent}
+        id="sidebar"
+        current_view={@socket.view}
+      />
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
               <div class="flex items-center gap-4">
-                <img src={~p"/images/a3.png"} alt="Logo" class="h-12">
+                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
+              
               <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
             </div>
+            
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
               <button class="text-gray-600 hover:text-gray-800">Logout</button>
@@ -72,19 +77,15 @@ defmodule SpkpProjectWeb.KursussLive.Index do
             </div>
           </div>
         </.header>
-
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Senarai Kursus</h1>
+            
             <p class="text-gray-600">Semak dan urus semua kursus dan penambahan kursus baru</p>
           </div>
-
-          <.link patch={~p"/admin/kursus/new"}>
-            <.button>Kursus Baru</.button>
-          </.link>
+           <.link patch={~p"/admin/kursus/new"}><.button>Kursus Baru</.button></.link>
         </div>
-
         <!-- Table -->
         <.table
           id="kursus"
@@ -92,40 +93,50 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           row_click={fn {_id, kursuss} -> JS.navigate(~p"/admin/kursus/#{kursuss}") end}
         >
           <:col :let={{_id, kursuss}} label="Nama kursus">{kursuss.nama_kursus}</:col>
+          
           <:col :let={{_id, kursuss}} label="Tarikh mula">{kursuss.tarikh_mula}</:col>
+          
           <:col :let={{_id, kursuss}} label="Tarikh akhir">{kursuss.tarikh_akhir}</:col>
+          
           <:col :let={{_id, kursuss}} label="Status kursus">{kursuss.status_kursus}</:col>
+          
           <:col :let={{_id, kursuss}} label="Anjuran">{kursuss.anjuran}</:col>
+          
           <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
-
           <!-- Kolum gambar -->
           <:col :let={{_id, kursuss}} label="Gambar Anjuran">
             <div class="flex gap-2">
               <%= if kursuss.gambar_anjuran do %>
-                <img src={kursuss.gambar_anjuran} alt="Gambar Anjuran" class="w-16 h-16 rounded-lg object-cover border" />
+                <img
+                  src={kursuss.gambar_anjuran}
+                  alt="Gambar Anjuran"
+                  class="w-16 h-16 rounded-lg object-cover border"
+                />
               <% else %>
                 <span class="text-gray-400 text-xs">Tiada anjuran</span>
               <% end %>
-              </div>
+            </div>
           </:col>
-
+          
           <:col :let={{_id, kursuss}} label="Gambar Kursus">
             <div class="flex gap-2">
               <%= if kursuss.gambar_kursus do %>
-                <img src={kursuss.gambar_kursus} alt="Gambar Kursus" class="w-16 h-16 rounded-lg object-cover border" />
+                <img
+                  src={kursuss.gambar_kursus}
+                  alt="Gambar Kursus"
+                  class="w-16 h-16 rounded-lg object-cover border"
+                />
               <% else %>
                 <span class="text-gray-400 text-xs">Tiada kursus</span>
               <% end %>
             </div>
           </:col>
-
+          
           <:action :let={{_id, kursuss}}>
-            <div class="sr-only">
-              <.link navigate={~p"/admin/kursus/#{kursuss}"}>Show</.link>
-            </div>
-            <.link patch={~p"/admin/kursus/#{kursuss}/edit"}>Edit</.link>
+            <div class="sr-only"><.link navigate={~p"/admin/kursus/#{kursuss}"}>Show</.link></div>
+             <.link patch={~p"/admin/kursus/#{kursuss}/edit"}>Edit</.link>
           </:action>
-
+          
           <:action :let={{id, kursuss}}>
             <.link
               phx-click={JS.push("delete", value: %{id: kursuss.id}) |> hide("##{id}")}
@@ -135,8 +146,13 @@ defmodule SpkpProjectWeb.KursussLive.Index do
             </.link>
           </:action>
         </.table>
-
-        <.modal :if={@live_action in [:new, :edit]} id="kursuss-modal" show on_cancel={JS.patch(~p"/admin/kursus")}>
+        
+        <.modal
+          :if={@live_action in [:new, :edit]}
+          id="kursuss-modal"
+          show
+          on_cancel={JS.patch(~p"/admin/kursus")}
+        >
           <.live_component
             module={SpkpProjectWeb.KursussLive.FormComponent}
             id={@kursuss.id || :new}

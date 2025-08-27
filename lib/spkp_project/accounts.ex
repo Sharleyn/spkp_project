@@ -231,7 +231,6 @@ defmodule SpkpProject.Accounts do
     |> Repo.update()
   end
 
-
   ## Session
 
   @doc """
@@ -367,6 +366,4 @@ defmodule SpkpProject.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
-
-
 end

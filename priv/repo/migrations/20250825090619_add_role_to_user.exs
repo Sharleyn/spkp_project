@@ -4,6 +4,6 @@ defmodule SpkpProject.Repo.Migrations.AddRoleToUser do
   def change do
     alter table(:users) do
       add :role, :string, default: "user", null: false
+    end
   end
- end
 end

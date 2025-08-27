@@ -17,8 +17,8 @@ defmodule SpkpProject.Kursus.Kursuss do
     field :kuota, :integer
     field :tarikh_tutup, :date
 
-    belongs_to :kursus_kategori, SpkpProject.Kursus.KursusKategori, foreign_key: :kursus_kategori_id
-
+    belongs_to :kursus_kategori, SpkpProject.Kursus.KursusKategori,
+      foreign_key: :kursus_kategori_id
 
     timestamps(type: :utc_datetime)
   end
@@ -26,7 +26,37 @@ defmodule SpkpProject.Kursus.Kursuss do
   @doc false
   def changeset(kursuss, attrs) do
     kursuss
-    |> cast(attrs, [:nama_kursus, :tarikh_mula, :tarikh_akhir, :tempat, :status_kursus, :had_umur, :anjuran, :gambar_anjuran, :gambar_kursus, :syarat_penyertaan, :syarat_pendidikan, :kuota, :tarikh_tutup, :kursus_kategori_id])
-    |> validate_required([:nama_kursus, :tarikh_mula, :tarikh_akhir, :tempat, :status_kursus, :had_umur, :anjuran, :gambar_anjuran, :gambar_kursus, :syarat_penyertaan, :syarat_pendidikan, :kuota, :tarikh_tutup, :kursus_kategori_id])
+    |> cast(attrs, [
+      :nama_kursus,
+      :tarikh_mula,
+      :tarikh_akhir,
+      :tempat,
+      :status_kursus,
+      :had_umur,
+      :anjuran,
+      :gambar_anjuran,
+      :gambar_kursus,
+      :syarat_penyertaan,
+      :syarat_pendidikan,
+      :kuota,
+      :tarikh_tutup,
+      :kursus_kategori_id
+    ])
+    |> validate_required([
+      :nama_kursus,
+      :tarikh_mula,
+      :tarikh_akhir,
+      :tempat,
+      :status_kursus,
+      :had_umur,
+      :anjuran,
+      :gambar_anjuran,
+      :gambar_kursus,
+      :syarat_penyertaan,
+      :syarat_pendidikan,
+      :kuota,
+      :tarikh_tutup,
+      :kursus_kategori_id
+    ])
   end
 end
