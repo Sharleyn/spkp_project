@@ -10,55 +10,38 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
 
-    categories =
-      Repo.all(from k in Kursuss, distinct: k.kursus_kategori_id, preload: [:kursus_kategori])
-      |> Enum.map(& &1.kursus_kategori.kategori)
-
+    # Ambil semua kursus + preload kategori
     kursus = Repo.all(Kursuss) |> Repo.preload(:kursus_kategori)
 
-    socket =
-      socket
-      |> assign(:kursus, kursus)
-      |> assign(:categories, categories)
-      |> assign(:search_query, "")
-      |> assign(:selected_category, "")
-      |> assign(:selected_type, "")
-      |> assign(:current_user_name, current_user.full_name)
-      |> assign(:sidebar_open, true)
-      |> assign(:user_menu_open, false)
-      |> assign(:page, 1)        # ✅ default page
-      |> assign(:per_page, 5)    # ✅ kursus per page
-      |> assign(:total, length(kursus)) # total kursus
+    # Senarai kategori unik
+    categories =
+      kursus
+      |> Enum.map(& &1.kursus_kategori.kategori)
+      |> Enum.uniq()
 
-    {:ok, socket}
-  end
+    # Pisah ikut tempoh
+    jangka_panjang =
+      Enum.filter(kursus, fn k -> Date.diff(k.tarikh_akhir, k.tarikh_mula) > 30 end)
 
-  def on_mount(:default, _params, _session, socket) do
-    {:cont,
-       socket
-       |> assign(:current_path, socket.host_uri.path)
-       |> assign_new(:sidebar_open, fn -> true end)  # default sidebar terbuka
-  }
-end
-
-  def mount(_params, _session, socket) do
-      kursus = Repo.all(Course)
-         jangka_panjang =
-             Enum.filter(kursus, fn k ->
-               Date.diff(k.tarikh_akhir, k.tarikh_mula) > 30
-    end)
-
-         jangka_pendek =
-             Enum.filter(kursus, fn k ->
-             Date.diff(k.tarikh_akhir, k.tarikh_mula) <= 30
-    end)
+    jangka_pendek =
+      Enum.filter(kursus, fn k -> Date.diff(k.tarikh_akhir, k.tarikh_mula) <= 30 end)
 
     {:ok,
-         socket
-          |> assign(:kursus, nil)
-          |> assign(:jangka_panjang, jangka_panjang)
-          |> assign(:jangka_pendek, jangka_pendek)}
-
+     socket
+     |> assign(:kursus, kursus)
+     |> assign(:jangka_panjang, jangka_panjang)
+     |> assign(:jangka_pendek, jangka_pendek)
+     |> assign(:categories, categories)
+     |> assign(:search_query, "")
+     |> assign(:selected_category, "")
+     |> assign(:selected_type, "")
+     |> assign(:current_user_name, current_user.full_name)
+     |> assign(:sidebar_open, true)
+     |> assign(:user_menu_open, false)
+     # Pagination
+     |> assign(:page, 1)
+     |> assign(:per_page, 5)
+     |> assign(:total, length(kursus))}
   end
 
 
