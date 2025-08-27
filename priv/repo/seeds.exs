@@ -11,20 +11,23 @@
 # and so on) as they will fail if something goes wrong.
 alias SpkpProject.Repo
 alias SpkpProject.Accounts.User
+alias Pbkdf2
+import Ecto.Changeset
 
-unless Repo.get_by(User, email: "admin@gmail.com") do
-params = %{
-email: "admin@gmail.com",
-password: "123456789qwert"
-}
-%User{}
-|> User.registration_changeset(params)
-|> Ecto.Changeset.change(%{
-role: "admin",
-confirmed_at: DateTime.utc_now() |> DateTime.truncate(:second)
+admin_email = "admin@example.com"
+admin_password = "supersecretpassword"
+
+user =
+  Repo.get_by(User, email: admin_email) ||
+    %User{email: admin_email}
+
+user
+|> change(%{
+  full_name: "Super Admin",
+  hashed_password: Pbkdf2.hash_pwd_salt(admin_password),
+  role: "admin", # 🚀 seed terus jadikan admin
+  confirmed_at: DateTime.utc_now() |> DateTime.truncate(:second)
 })
-|> Repo.insert!()
-IO.puts("
- ✅
- Admin user created!")
-end
+|> Repo.insert_or_update!()
+
+IO.puts("✅ Admin ensured: #{admin_email} | password=#{admin_password}")

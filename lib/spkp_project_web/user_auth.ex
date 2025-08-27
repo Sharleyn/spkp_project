@@ -33,7 +33,7 @@ defmodule SpkpProjectWeb.UserAuth do
     |> renew_session()
     |> put_token_in_session(token)
     |> maybe_write_remember_me_cookie(token, params)
-    |> redirect(to: user_return_to || ~p"/userdashboard")
+    |> redirect(to: user_return_to || signed_in_path(user))
   end
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
@@ -174,6 +174,37 @@ defmodule SpkpProjectWeb.UserAuth do
     end
   end
 
+    # 🚀 Role-based guard untuk LiveView
+    def on_mount({:ensure_role, required_role}, _params, session, socket) do
+      socket = mount_current_user(socket, session)
+
+      cond do
+        # ✅ User ada dan role betul
+        socket.assigns.current_user && socket.assigns.current_user.role == required_role ->
+          {:cont, socket}
+
+        # ❌ User login tapi role salah
+        socket.assigns.current_user ->
+          socket =
+            socket
+            |> Phoenix.LiveView.put_flash(:error, "Anda tidak dibenarkan akses halaman ini.")
+            |> Phoenix.LiveView.redirect(to: signed_in_path(socket.assigns.current_user))
+
+          {:halt, socket}
+
+        # ❌ Belum login
+        true ->
+          socket =
+            socket
+            |> Phoenix.LiveView.put_flash(:error, "Sila log masuk dahulu.")
+            |> Phoenix.LiveView.redirect(to: ~p"/users/log_in")
+
+          {:halt, socket}
+      end
+    end
+
+
+
   defp mount_current_user(socket, session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
       if user_token = session["user_token"] do
@@ -225,10 +256,8 @@ defmodule SpkpProjectWeb.UserAuth do
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(conn) do
-    case conn.assigns.current_user.role do
-      "admin" -> ~p"/admin"
-      "user" -> ~p"/userdashboard"
+  defp signed_in_path(%{role: "admin"}), do: ~p"/admin/dashboard"
+  defp signed_in_path(%{role: "pekerja"}), do: ~p"/pekerja/dashboard"
+  defp signed_in_path(%{role: "user"}), do: ~p"/userdashboard"
+  defp signed_in_path(_), do: ~p"/"
     end
-  end
-end

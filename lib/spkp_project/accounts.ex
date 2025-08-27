@@ -221,6 +221,17 @@ defmodule SpkpProject.Accounts do
     end
   end
 
+  def change_user(user, attrs \\ %{}) do
+    User.update_changeset(user, attrs)
+  end
+
+  def update_user(%User{} = user, attrs) do
+    user
+    |> User.update_changeset(attrs)
+    |> Repo.update()
+  end
+
+
   ## Session
 
   @doc """
@@ -356,4 +367,6 @@ defmodule SpkpProject.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+
 end

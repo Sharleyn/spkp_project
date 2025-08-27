@@ -2,7 +2,6 @@ defmodule SpkpProjectWeb.UserLoginLive do
   use SpkpProjectWeb, :live_view
 
   alias SpkpProjectWeb.Accounts
-  alias SpkpProjectWeb.UserAuth
 
   def render(assigns) do
     ~H"""

@@ -136,7 +136,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
 
           <%= if @open_menu == "tetapan" do %>
             <div class="ml-4">
-              <.link navigate={~p"/admin/tetapan/editprofile"}
+              <.link navigate={~p"/admin/editprofile"}
                 class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/tetapan/editprofile", do: "bg-gray-600 font-bold"}"}>
                 Edit Profile
               </.link>

@@ -40,12 +40,32 @@ defmodule SpkpProject.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :full_name, :password_confirmation])
+    |> cast(attrs, [:role, :email, :password, :full_name, :password_confirmation])
+    |> validate_required([:full_name, :email, :password])
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_full_name(opts)
     |> validate_password_confirmation(opts)
+    |> put_change(:role, "user")
   end
+
+    # 📌 2. Role changeset – hanya untuk admin ubah role
+    def role_changeset(user, attrs) do
+      user
+      |> cast(attrs, [:role])
+      |> validate_required([:role])
+      |> validate_inclusion(:role, ["user", "staff", "admin"]) # ✅ validate di sini
+    end
+
+    def update_changeset(user, attrs, opts \\ []) do
+      user
+      |> cast(attrs, [:email, :full_name, :password, :password_confirmation])
+      |> validate_email(opts)
+      |> validate_full_name(opts)
+      |> validate_password(opts)
+      |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
+      |> maybe_hash_password(opts)
+    end
 
   defp validate_email(changeset, opts) do
     changeset
