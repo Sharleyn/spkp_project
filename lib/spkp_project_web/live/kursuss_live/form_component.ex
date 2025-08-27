@@ -24,7 +24,7 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
         {@title}
         <:subtitle>Isi maklumat kursus.</:subtitle>
       </.header>
-      
+
       <.simple_form
         for={@form}
         id="kursuss-form"
@@ -57,16 +57,16 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
         <.input
           field={@form[:anjuran]}
           type="select"
-          label="Anjuran"
-          prompt="-- Pilih anjuran --"
+          label="Tajaan"
+          prompt="-- Pilih tajaan --"
           options={[
-            {"JPSM", "JPSM"},
-            {"KBS", "KBS"}
+            {"Jabatan Pembangunan Sumber Manusia", "Jabatan Pembangunan Sumber Manusia"},
+            {"Kementerian Belia & Sukan", "Kementerian Belia & Sukan"}
           ]}
         />
-        <!-- Upload Gambar Anjuran -->
+        <!-- Upload Gambar Tajaan -->
         <div class="mb-4">
-          <label class="block font-semibold mb-2">Gambar Anjuran</label>
+          <label class="block font-semibold mb-2">Gambar Tajaan</label>
           <!-- Preview sebelum submit -->
           <%= for entry <- @uploads.gambar_anjuran.entries do %>
             <div class="mb-2">
