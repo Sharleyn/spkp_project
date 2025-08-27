@@ -63,6 +63,14 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     {:noreply, assign(socket, :current_index, new_index)}
   end
 
+    # Auto-slide galeri
+    def handle_info(:next_gallery, socket) do
+      schedule_gallery_slide()
+      total = gallery_total(socket)
+      new_index = rem(socket.assigns.gallery_index + 1, total)
+      {:noreply, assign(socket, :gallery_index, new_index)}
+    end
+
   # Manual slider utama
   def handle_event("goto_slide", %{"index" => idx}, socket) do
     {:noreply, assign(socket, :current_index, String.to_integer(idx))}
@@ -86,13 +94,6 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     {:noreply, assign(socket, :current_index, new_index)}
   end
 
-  # Auto-slide galeri
-  def handle_info(:next_gallery, socket) do
-    schedule_gallery_slide()
-    total = gallery_total(socket)
-    new_index = rem(socket.assigns.gallery_index + 1, total)
-    {:noreply, assign(socket, :gallery_index, new_index)}
-  end
 
   defp schedule_gallery_slide() do
     # tukar setiap 3s
@@ -135,7 +136,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
               <img src={~p"/images/logo 6.png"} alt="Logo 6" class="h-16" />
             </div>
           </div>
-          
+
           <div class="flex space-x-6">
             <.link
               navigate={~p"/users/log_in"}
@@ -189,7 +190,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
             {render_slide(%{slide: slide})}
           <% end %>
         </div>
-        
+
         <div class="flex justify-center space-x-2 mt-4">
           <%= for i <- 0..(length(@slides) - 1) do %>
             <button
@@ -212,37 +213,37 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
         <h2 class="bg-[#09033F] text-xl text-white font-bold text-center px-6 py-2  mb-6">
           KURSUS DITAWARKAN
         </h2>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-sky-300 bg-opacity-25 rounded-lg p-6">
             <h3 class="font-semibold mb-4">Kursus Jangka Panjang</h3>
-            
+
             <ul class="list-disc list-inside space-y-1">
               <li>Kursus Teknologi Maklumat - Program Software Development Bootcamp</li>
-              
+
               <li>Kursus Kecantikan Spa & Posnatal</li>
-              
+
               <li></li>
             </ul>
-            
+
             <img
               src={~p"/images/pic-panjang.jpeg"}
               alt="Kursus Panjang"
               class="mt-4 rounded-lg px-2 py-2 w-48 h-auto"
             />
           </div>
-          
+
           <div class="bg-sky-300 bg-opacity-25 rounded-lg p-6">
             <h3 class="font-semibold mb-4">Kursus Jangka Pendek</h3>
-            
+
             <ul class="list-disc list-inside space-y-1">
               <li>Kursus Masakan Pelbagai Jenis Kek Kukus</li>
-              
+
               <li>Kursus Asas Pemasangan & Penyelenggaraan Paip</li>
-              
+
               <li>Kursus Asas Membaikpulih & Penyelenggaraan Penghawa Dingin</li>
             </ul>
-            
+
             <img
               src={~p"/images/pic-pendek.jpeg"}
               alt="Kursus Pendek"
@@ -269,10 +270,10 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
                 class="h-18 w-18 mb-2 mx-auto"
               />
               <div class="text-4xl font-bold">250</div>
-              
+
               <div class="text-gray-600">Bilangan Pelatih</div>
             </div>
-            
+
             <div>
               <img
                 src={~p"/images/icon program.png"}
@@ -280,10 +281,10 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
                 class="h-18 w-18 mb-2 mx-auto"
               />
               <div class="text-4xl font-bold">25</div>
-              
+
               <div class="text-gray-600">Bilangan Program</div>
             </div>
-            
+
             <div>
               <img
                 src={~p"/images/icon jurusan.png"}
@@ -291,7 +292,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
                 class="h-18 w-18 mb-2 mx-auto"
               />
               <div class="text-4xl font-bold">10</div>
-              
+
               <div class="text-gray-600">Jurusan Ditawarkan</div>
             </div>
           </div>
@@ -301,7 +302,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     <!-- Galeri Auto-Slider -->
     <section class="max-w-7xl mx-auto px-4 mt-10">
       <h5 class="bg-[#09033F] text-xl text-white font-bold text-center px-6 py-2 mb-6">GALERI</h5>
-      
+
       <div class="relative h-[200px] overflow-hidden">
         <%= for {chunk, i} <- Enum.with_index(Enum.chunk_every(@gallery, 4)) do %>
           <div class={[
@@ -323,7 +324,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     <section id="hubungi">
       <footer class="bg-[#09033F] text-white mt-10 py-2 text-center">
         <p class="text-sm font-bold">SHARIF PERCHAYA SDN. BHD.</p>
-        
+
         <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
           <div class="flex items-center justify-between gap-6">
             <!-- Alamat -->
@@ -351,7 +352,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
           </div>
           <!-- Waktu Operasi -->
           <p class="text-sm text-center font-bold">MASA OPERASI</p>
-          
+
           <div class="bg-[#09033F] flex items-star text-white max-w-xl mx-auto mt-4 text-left gap-2">
             <img src={~p"/images/clock.png"} alt="Waktu Operasi" class="h-6 w-6" />
             <p class="text-sm">
@@ -374,13 +375,13 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
         <% %{type: :text, title: title, body: body} -> %>
           <div class="flex flex-col justify-center text-center w-full h-full">
             <h2 class="text-xl font-bold mb-4">{title}</h2>
-            
+
             <p class="mx-auto max-w-xl">{body}</p>
           </div>
         <% %{type: :list, title: title, items: items} -> %>
           <div class="flex flex-col justify-center w-full h-full">
             <h2 class="text-xl font-bold mb-4 text-center">{title}</h2>
-            
+
             <ul class="list-disc list-inside space-y-1 text-left mx-auto max-w-xl">
               <%= for item <- items do %>
                 <li>{item}</li>

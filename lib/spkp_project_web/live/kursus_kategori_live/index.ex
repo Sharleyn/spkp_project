@@ -66,13 +66,17 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-              
+
               <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
             </div>
-            
+
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
-              <button class="text-gray-600 hover:text-gray-800">Logout</button>
+
+                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
+              </.link>
+
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
@@ -81,15 +85,15 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Kategori Kursus</h1>
-            
+
             <p class="text-gray-600">Urus kursus mengikut kategori</p>
           </div>
-          
+
           <.link patch={~p"/admin/kursus_kategori/new"}>
             <.button>Kategori Kursus Baru</.button>
           </.link>
         </div>
-        
+
         <.table
           id="kursus_kategori"
           rows={@streams.kursus_kategori_collection}
@@ -100,14 +104,14 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
           }
         >
           <:col :let={{_id, kursus_kategori}} label="Kategori">{kursus_kategori.kategori}</:col>
-          
+
           <:action :let={{_id, kursus_kategori}}>
             <div class="sr-only">
               <.link navigate={~p"/admin/kursus_kategori/#{kursus_kategori}"}>Show</.link>
             </div>
              <.link patch={~p"/admin/kursus_kategori/#{kursus_kategori}/edit"}>Edit</.link>
           </:action>
-          
+
           <:action :let={{id, kursus_kategori}}>
             <.link
               phx-click={JS.push("delete", value: %{id: kursus_kategori.id}) |> hide("##{id}")}
@@ -117,7 +121,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
             </.link>
           </:action>
         </.table>
-        
+
         <.modal
           :if={@live_action in [:new, :edit]}
           id="kursus_kategori-modal"

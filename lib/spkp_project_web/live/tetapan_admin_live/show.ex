@@ -25,13 +25,17 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-              
+
               <h1 class="text-xl font-semibold text-gray-800">Kursus Hub</h1>
             </div>
-            
+
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
-              <button class="text-gray-600 hover:text-gray-800">Logout</button>
+
+                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
+              </.link>
+
               <div class="flex items-center space-x-2">
                 <span class="text-gray-600">Admin</span>
                 <div class="w-8 h-8 bg-black rounded-full"></div>
@@ -49,7 +53,7 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
               </svg>
               <h2 class="text-3xl font-semibold text-gray-800">Dashboard Admin Kursus</h2>
             </div>
-            
+
             <div class="text-sm text-gray-500">Tetapan admin</div>
           </div>
           <!-- Edit Profile Section -->
@@ -72,7 +76,7 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
                   placeholder="Masukkan nama penuh"
                 />
               </div>
-              
+
               <div>
                 <label class="block text-xl font-semibold text-gray-800 mb-2">Emel</label>
                 <input
@@ -81,7 +85,7 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
                   placeholder="Masukkan emel"
                 />
               </div>
-              
+
               <div>
                 <label class="block text-xl font-semibold text-gray-800 mb-2">No telefon</label>
                 <input

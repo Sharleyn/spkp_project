@@ -105,7 +105,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
           Mengenai Kami
         </a>
         <a
-          href={~p"/program"}
+          href={~p"/programkursus"}
           class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
         >
           Program
@@ -124,16 +124,16 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
       <!-- Kursus Jangka Panjang -->
       <section class="mb-12">
         <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Panjang</h2>
-        
+
         <div class="grid md:grid-cols-2 gap-6">
           <%= for course <- @long_courses do %>
             <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
               <h3 class="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
-              
+
               <p class="text-sm text-gray-600 mb-3">{course.description}</p>
-              
+
               <p class="text-xs text-gray-500">Tarikh: {course.start} &rarr; {course.end}</p>
-              
+
               <div class="mt-4">
                 <!-- Belum login, redirect ke login -->
                 <.link
@@ -150,16 +150,16 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
       <!-- Kursus Jangka Pendek -->
       <section>
         <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Pendek</h2>
-        
+
         <div class="grid md:grid-cols-2 gap-6">
           <%= for course <- @short_courses do %>
             <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
               <h3 class="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
-              
+
               <p class="text-sm text-gray-600 mb-3">{course.description}</p>
-              
+
               <p class="text-xs text-gray-500">Tarikh: {course.start} &rarr; {course.end}</p>
-              
+
               <div class="mt-4">
                 <!-- Belum login, redirect ke login -->
                 <.link
@@ -178,7 +178,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
     <section id="hubungi">
       <footer class="bg-[#09033F] text-white mt-10 py-2 text-center">
         <p class="text-sm font-bold">SHARIF PERCHAYA SDN. BHD.</p>
-        
+
         <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
           <div class="flex items-center justify-between gap-6 flex-wrap">
             <!-- Alamat -->
@@ -206,7 +206,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
           </div>
           <!-- Waktu Operasi -->
           <p class="text-sm text-center font-bold mt-4">MASA OPERASI</p>
-          
+
           <div class="bg-[#09033F] flex items-start text-white max-w-xl mx-auto mt-4 text-left gap-2">
             <img src={~p"/images/clock.png"} alt="Waktu Operasi" class="h-6 w-6" />
             <p class="text-sm">

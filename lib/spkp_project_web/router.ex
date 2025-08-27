@@ -140,6 +140,7 @@ defmodule SpkpProjectWeb.Router do
     pipe_through [:browser]
 
     delete "/halamanutama", UserSessionController, :delete
+    delete "/users/log_out", UserSessionController, :delete
 
     live_session :current_user,
       on_mount: [{SpkpProjectWeb.UserAuth, :mount_current_user}] do

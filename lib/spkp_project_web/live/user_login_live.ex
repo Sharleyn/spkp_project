@@ -1,8 +1,6 @@
 defmodule SpkpProjectWeb.UserLoginLive do
   use SpkpProjectWeb, :live_view
 
-  alias SpkpProjectWeb.Accounts
-
   def render(assigns) do
     ~H"""
     <div class="flex items-center justify-center min-h-screen bg-gray-50">
@@ -24,7 +22,7 @@ defmodule SpkpProjectWeb.UserLoginLive do
             />
           </svg>
           <h2 class="mt-4 text-2xl font-bold">Log Masuk</h2>
-          
+
           <p class="text-sm text-gray-600">Masukkan maklumat akaun anda untuk mengakses sistem</p>
         </div>
         <!-- Form - menggunakan regular form untuk POST ke controller -->

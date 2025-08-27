@@ -66,13 +66,17 @@ defmodule SpkpProjectWeb.KursussLive.Index do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-              
+
               <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
             </div>
-            
+
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
-              <button class="text-gray-600 hover:text-gray-800">Logout</button>
+
+                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
+              </.link>
+
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
@@ -81,7 +85,7 @@ defmodule SpkpProjectWeb.KursussLive.Index do
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Senarai Kursus</h1>
-            
+
             <p class="text-gray-600">Semak dan urus semua kursus dan penambahan kursus baru</p>
           </div>
            <.link patch={~p"/admin/kursus/new"}><.button>Kursus Baru</.button></.link>
@@ -93,15 +97,15 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           row_click={fn {_id, kursuss} -> JS.navigate(~p"/admin/kursus/#{kursuss}") end}
         >
           <:col :let={{_id, kursuss}} label="Nama kursus">{kursuss.nama_kursus}</:col>
-          
+
           <:col :let={{_id, kursuss}} label="Tarikh mula">{kursuss.tarikh_mula}</:col>
-          
+
           <:col :let={{_id, kursuss}} label="Tarikh akhir">{kursuss.tarikh_akhir}</:col>
-          
+
           <:col :let={{_id, kursuss}} label="Status kursus">{kursuss.status_kursus}</:col>
-          
+
           <:col :let={{_id, kursuss}} label="Anjuran">{kursuss.anjuran}</:col>
-          
+
           <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
           <!-- Kolum gambar -->
           <:col :let={{_id, kursuss}} label="Gambar Anjuran">
@@ -117,7 +121,7 @@ defmodule SpkpProjectWeb.KursussLive.Index do
               <% end %>
             </div>
           </:col>
-          
+
           <:col :let={{_id, kursuss}} label="Gambar Kursus">
             <div class="flex gap-2">
               <%= if kursuss.gambar_kursus do %>
@@ -131,12 +135,12 @@ defmodule SpkpProjectWeb.KursussLive.Index do
               <% end %>
             </div>
           </:col>
-          
+
           <:action :let={{_id, kursuss}}>
             <div class="sr-only"><.link navigate={~p"/admin/kursus/#{kursuss}"}>Show</.link></div>
              <.link patch={~p"/admin/kursus/#{kursuss}/edit"}>Edit</.link>
           </:action>
-          
+
           <:action :let={{id, kursuss}}>
             <.link
               phx-click={JS.push("delete", value: %{id: kursuss.id}) |> hide("##{id}")}
@@ -146,7 +150,7 @@ defmodule SpkpProjectWeb.KursussLive.Index do
             </.link>
           </:action>
         </.table>
-        
+
         <.modal
           :if={@live_action in [:new, :edit]}
           id="kursuss-modal"

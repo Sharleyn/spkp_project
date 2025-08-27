@@ -25,10 +25,14 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
               <img src={~p"/images/a3.png"} alt="Logo" class="h-12 w-auto max-w-full object-contain" />
               <h1 class="text-xl font-semibold text-gray-800 truncate">SPKP Admin Dashboard</h1>
             </div>
-            
+
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
-              <button class="text-gray-600 hover:text-gray-800">Logout</button>
+
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
+              </.link>
+
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
@@ -48,7 +52,7 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
             </svg>
             <h3 class="text-xl font-semibold text-gray-800">Tindakan pantas</h3>
           </div>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Box 1 -->
             <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer overflow-hidden">
@@ -56,10 +60,10 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
                 <div class="flex flex-wrap items-center justify-between min-w-0">
                   <div class="min-w-0 break-words">
                     <h4 class="font-semibold text-gray-800 mb-2">Tambah kursus baru</h4>
-                    
+
                     <p class="text-gray-600 text-sm">Cipta kursus baru untuk peserta</p>
                   </div>
-                  
+
                   <img
                     src={~p"/images/users.png"}
                     alt="Peserta"
@@ -73,10 +77,10 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
               <div class="flex flex-wrap items-center justify-between min-w-0">
                 <div class="min-w-0 break-words">
                   <h4 class="font-semibold text-gray-800 mb-2">Pengesahan permohonan</h4>
-                  
+
                   <p class="text-gray-600 text-sm">Semak dan sahkan permohonan baru</p>
                 </div>
-                
+
                 <img
                   src={~p"/images/sah.png"}
                   alt="Pengesahan"
@@ -89,10 +93,10 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
               <div class="flex flex-wrap items-center justify-between min-w-0">
                 <div class="min-w-0 break-words">
                   <h4 class="font-semibold text-gray-800 mb-2">Senarai peserta</h4>
-                  
+
                   <p class="text-gray-600 text-sm">Senarai peserta yang mengikuti kursus</p>
                 </div>
-                
+
                 <img
                   src={~p"/images/usershijauu.png"}
                   alt="SenaraiPeserta"
@@ -114,7 +118,7 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
               />
               <div class="flex flex-col items-center min-w-0 break-words">
                 <h4 class="text-sm text-gray-600">Jumlah peserta</h4>
-                
+
                 <div class="text-3xl font-bold text-gray-900">2300</div>
               </div>
             </div>
@@ -129,7 +133,7 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
               />
               <div class="flex flex-col items-center min-w-0 break-words">
                 <h4 class="text-sm text-gray-600">Kursus Tersedia</h4>
-                
+
                 <div class="text-3xl font-bold text-gray-900">20</div>
               </div>
             </div>
@@ -144,7 +148,7 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
               />
               <div class="flex flex-col items-center min-w-0 break-words">
                 <h4 class="text-sm text-gray-600">Pendaftaran Baharu</h4>
-                
+
                 <div class="text-3xl font-bold text-gray-900">132</div>
               </div>
             </div>
@@ -159,7 +163,7 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
               />
               <div class="flex flex-col items-center min-w-0 break-words">
                 <h4 class="text-sm text-gray-600">Kadar Tamat</h4>
-                
+
                 <div class="text-3xl font-bold text-gray-900">98%</div>
               </div>
             </div>
@@ -170,54 +174,54 @@ defmodule SpkpProjectWeb.AdminDashboardLive do
           <div class="p-6 border-b border-gray-200">
             <h3 class="text-xl font-semibold text-gray-800">Jumlah Pendaftaran terkini</h3>
           </div>
-          
+
           <table class="w-full min-w-max">
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Kursus
                 </th>
-                
+
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Jumlah
                 </th>
-                
+
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Tarikh tamat
                 </th>
               </tr>
             </thead>
-            
+
             <tbody class="bg-white divide-y divide-gray-200">
               <tr>
                 <td class="px-6 py-4 text-sm font-medium text-gray-900">Web Development Bootcamp</td>
-                
+
                 <td class="px-6 py-4 text-sm text-gray-500">9</td>
-                
+
                 <td class="px-6 py-4 text-sm text-gray-500">30.06.2025</td>
               </tr>
-              
+
               <tr>
                 <td class="px-6 py-4 text-sm font-medium text-gray-900">Solekan</td>
-                
+
                 <td class="px-6 py-4 text-sm text-gray-500">8</td>
-                
+
                 <td class="px-6 py-4 text-sm text-gray-500">30.07.2025</td>
               </tr>
-              
+
               <tr>
                 <td class="px-6 py-4 text-sm font-medium text-gray-900">Masakan</td>
-                
+
                 <td class="px-6 py-4 text-sm text-gray-500">2</td>
-                
+
                 <td class="px-6 py-4 text-sm text-gray-500">30.08.2025</td>
               </tr>
-              
+
               <tr>
                 <td class="px-6 py-4 text-sm font-medium text-gray-900">Spa</td>
-                
+
                 <td class="px-6 py-4 text-sm text-gray-500">1</td>
-                
+
                 <td class="px-6 py-4 text-sm text-gray-500">30.09.2025</td>
               </tr>
             </tbody>

@@ -25,13 +25,17 @@ defmodule SpkpProjectWeb.PermohonanLive do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-              
+
               <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
             </div>
-            
+
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
-              <button class="text-gray-600 hover:text-gray-800">Logout</button>
+
+                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
+              </.link>
+
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
@@ -41,7 +45,7 @@ defmodule SpkpProjectWeb.PermohonanLive do
           <!-- Page Header -->
           <div class="mb-8">
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Permohonan</h1>
-            
+
             <p class="text-gray-600">Semak dan urus semua permohonan kursus</p>
           </div>
           <!-- Statistics Cards -->
@@ -51,10 +55,10 @@ defmodule SpkpProjectWeb.PermohonanLive do
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-gray-600 mb-1">Jumlah permohonan</p>
-                  
+
                   <p class="text-3xl font-bold text-gray-900">50</p>
                 </div>
-                
+
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -71,10 +75,10 @@ defmodule SpkpProjectWeb.PermohonanLive do
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-gray-600 mb-1">Menunggu</p>
-                  
+
                   <p class="text-3xl font-bold text-gray-900">50</p>
                 </div>
-                
+
                 <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                   <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -91,10 +95,10 @@ defmodule SpkpProjectWeb.PermohonanLive do
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-gray-600 mb-1">Diterima</p>
-                  
+
                   <p class="text-3xl font-bold text-gray-900">50</p>
                 </div>
-                
+
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -111,10 +115,10 @@ defmodule SpkpProjectWeb.PermohonanLive do
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-sm text-gray-600 mb-1">Ditolak</p>
-                  
+
                   <p class="text-3xl font-bold text-gray-900">50</p>
                 </div>
-                
+
                 <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                   <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
                     <path
@@ -141,7 +145,7 @@ defmodule SpkpProjectWeb.PermohonanLive do
                     />
                   </svg>
                 </div>
-                
+
                 <input
                   type="text"
                   placeholder="Nama, email atau kursus ...."
@@ -152,13 +156,13 @@ defmodule SpkpProjectWeb.PermohonanLive do
               <div class="relative">
                 <select class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white">
                   <option>Status permohonan</option>
-                  
+
                   <option>Semua</option>
-                  
+
                   <option>Menunggu</option>
-                  
+
                   <option>Diterima</option>
-                  
+
                   <option>Ditolak</option>
                 </select>
                 <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -182,50 +186,50 @@ defmodule SpkpProjectWeb.PermohonanLive do
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       NAMA PEMOHON
                     </th>
-                    
+
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       E-MEL
                     </th>
-                    
+
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       KURSUS DIPOHON
                     </th>
-                    
+
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       TARIKH PERMOHONAN
                     </th>
-                    
+
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       STATUS PERMOHONAN
                     </th>
-                    
+
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       TINDAKAN
                     </th>
                   </tr>
                 </thead>
-                
+
                 <tbody class="bg-white divide-y divide-gray-200">
                   <!-- Row 1 -->
                   <tr>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Ali bin Abu Bakar
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       aliabubakar@gmail.com
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Web Development</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01.01.2025</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                         Diterima
                       </span>
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                         Edit
@@ -237,21 +241,21 @@ defmodule SpkpProjectWeb.PermohonanLive do
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Aminan binti Ali
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       aminah@gmail.com
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Make Up</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">02.01.2025</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
                         Menunggu
                       </span>
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                         Edit
@@ -263,21 +267,21 @@ defmodule SpkpProjectWeb.PermohonanLive do
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Siti binti Mukmin
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       sitimukmin@gmail.com
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Masakan</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">03.01.2025</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                         Diterima
                       </span>
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                         Edit
@@ -289,21 +293,21 @@ defmodule SpkpProjectWeb.PermohonanLive do
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Abu bin Talib
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       abutalib@gmail.com
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Data Saintis</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">04.01.2025</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                         Diterima
                       </span>
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                         Edit
@@ -315,21 +319,21 @@ defmodule SpkpProjectWeb.PermohonanLive do
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Syerina binti Osman
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       syerina@gmail.com
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Web Development</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05.01.2025</td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
                         Menunggu
                       </span>
                     </td>
-                    
+
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                         Edit
