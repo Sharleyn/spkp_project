@@ -32,39 +32,6 @@ defmodule SpkpProjectWeb.Router do
     live "/hubungi", HubungiLive
   end
 
-  scope "/admin", SpkpProjectWeb do
-    pipe_through :browser
-
-    live "/dashboard", AdminDashboardLive
-    live "/permohonan", PermohonanLive
-    live "/tetapan", TetapanLive
-
-    live "/kursus", KursussLive.Index, :index
-    live "/kursus/new", KursussLive.Index, :new
-    live "/kursus/:id/edit", KursussLive.Index, :edit
-
-    live "/kursus/:id", KursussLive.Show, :show
-    live "/kursus/:id/show/edit", KursussLive.Show, :edit
-
-    live "/kursus_kategori", KursusKategoriLive.Index, :index
-    live "/kursus_kategori/new", KursusKategoriLive.Index, :new
-    live "/kursus_kategori/:id/edit", KursusKategoriLive.Index, :edit
-
-    live "/kursus_kategori/:id", KursusKategoriLive.Show, :show
-    live "/kursus_kategori/:id/show/edit", KursusKategoriLive.Show, :edit
-
-
-    live "/peserta/senaraipeserta", SenaraiPesertaLive
-
-    live "/elaunpekerja/senaraituntutan", SenaraiTuntutanLive
-    live "/elaunpekerja/buattuntutanbaru", BuatTuntutanBaruLive
-    live "/elaunpekerja/senaraipekerja", SenaraiPekerjaLive
-
-    live "/tetapan/editprofile", EditProfileLive
-    live "/tetapan/tukarkatalaluan", TukarKataLaluanLive
-
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", SpkpProjectWeb do
   #   pipe_through :api
@@ -88,6 +55,50 @@ defmodule SpkpProjectWeb.Router do
   end
 
   ## Authentication routes
+
+  scope "/admin", SpkpProjectWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_admin,
+      on_mount: [{SpkpProjectWeb.UserAuth, {:ensure_role, "admin"}}] do
+      live "/dashboard", AdminDashboardLive
+      live "/permohonan", PermohonanLive
+      live "/tetapan", TetapanLive
+
+      live "/kursus", KursussLive.Index, :index
+      live "/kursus/new", KursussLive.Index, :new
+      live "/kursus/:id/edit", KursussLive.Index, :edit
+
+      live "/kursus/:id", KursussLive.Show, :show
+      live "/kursus/:id/show/edit", KursussLive.Show, :edit
+
+      live "/kursus_kategori", KursusKategoriLive.Index, :index
+      live "/kursus_kategori/new", KursusKategoriLive.Index, :new
+      live "/kursus_kategori/:id/edit", KursusKategoriLive.Index, :edit
+
+      live "/kursus_kategori/:id", KursusKategoriLive.Show, :show
+      live "/kursus_kategori/:id/show/edit", KursusKategoriLive.Show, :edit
+
+      live "/peserta/senaraipeserta", SenaraiPesertaLive
+
+      live "/elaunpekerja/senaraituntutan", SenaraiTuntutanLive
+      live "/elaunpekerja/buattuntutanbaru", BuatTuntutanBaruLive
+      live "/elaunpekerja/senaraipekerja", SenaraiPekerjaLive
+
+      live "/editprofile", EditProfileLive.Show
+      live "/tetapan/tukarkatalaluan", TukarKataLaluanLive
+    end
+  end
+
+  # Pekerja routes
+  scope "/pekerja", SpkpProjectWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_pekerja,
+      on_mount: [{SpkpProjectWeb.UserAuth, {:ensure_role, "pekerja"}}] do
+      live "/dashboard", PekerjaDashboardLive
+    end
+  end
 
   scope "/", SpkpProjectWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
@@ -116,19 +127,20 @@ defmodule SpkpProjectWeb.Router do
     end
   end
 
-    scope "/", SpkpProjectWeb do
-      pipe_through [:browser, :require_authenticated_user]
+  scope "/", SpkpProjectWeb do
+    pipe_through [:browser, :require_authenticated_user]
 
-      live "/userdashboard", UserDashboardLive, :index
-      live "/userprofile", UserProfileLive, :index
-      live "/senaraikursususer", SenaraiKursusLive, :index
-      live "/permohonanuser", PermohonanUserLive, :index
+    live "/userdashboard", UserDashboardLive, :index
+    live "/userprofile", UserProfileLive, :index
+    live "/senaraikursususer", SenaraiKursusLive, :index
+    live "/permohonanuser", PermohonanUserLive, :index
   end
 
   scope "/", SpkpProjectWeb do
     pipe_through [:browser]
 
     delete "/halamanutama", UserSessionController, :delete
+    delete "/users/log_out", UserSessionController, :delete
 
     live_session :current_user,
       on_mount: [{SpkpProjectWeb.UserAuth, :mount_current_user}] do

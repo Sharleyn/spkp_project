@@ -1,4 +1,4 @@
-defmodule SpkpProject.Repo.Migrations.AddRoleToUsers do
+defmodule SpkpProject.Repo.Migrations.AddRoleToUser do
   use Ecto.Migration
 
   def change do

@@ -40,11 +40,32 @@ defmodule SpkpProject.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :full_name, :password_confirmation])
+    |> cast(attrs, [:role, :email, :password, :full_name, :password_confirmation])
+    |> validate_required([:full_name, :email, :password])
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_full_name(opts)
     |> validate_password_confirmation(opts)
+    |> put_change(:role, "user")
+  end
+
+  # 📌 2. Role changeset – hanya untuk admin ubah role
+  def role_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:role])
+    |> validate_required([:role])
+    # ✅ validate di sini
+    |> validate_inclusion(:role, ["user", "staff", "admin"])
+  end
+
+  def update_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :full_name, :password, :password_confirmation])
+    |> validate_email(opts)
+    |> validate_full_name(opts)
+    |> validate_password(opts)
+    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
+    |> maybe_hash_password(opts)
   end
 
   defp validate_email(changeset, opts) do
@@ -55,7 +76,7 @@ defmodule SpkpProject.Accounts.User do
     |> maybe_validate_unique_email(opts)
   end
 
-  defp validate_password(changeset, opts) do
+  defp validate_password(changeset, _opts) do
     changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 12, max: 72, message: "Masukkan kata laluan")
@@ -64,12 +85,17 @@ defmodule SpkpProject.Accounts.User do
   defp validate_password_confirmation(changeset, opts) do
     changeset
     |> validate_required([:password_confirmation])
-    |> validate_length(:password_confirmation, min: 12, max: 72, message: "Kata laluan tidak sepadan")
-    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan") # <-- ini penting
+    |> validate_length(:password_confirmation,
+      min: 12,
+      max: 72,
+      message: "Kata laluan tidak sepadan"
+    )
+    # <-- ini penting
+    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
     |> maybe_hash_password(opts)
   end
 
-  defp validate_full_name(changeset, opts) do
+  defp validate_full_name(changeset, _opts) do
     changeset
     |> validate_required([:full_name])
     |> validate_length(:full_name, min: 5, max: 160, message: "Isikan nama penuh anda")

@@ -5,8 +5,7 @@ defmodule SpkpProject.Kursus.KursusKategori do
   schema "kursus_kategori" do
     field :kategori, :string
 
-    has_many :kursus, SpkpProject.Kursus.Kursuss,
-    foreign_key: :kursus_kategori_id
+    has_many :kursus, SpkpProject.Kursus.Kursuss, foreign_key: :kursus_kategori_id
 
     timestamps(type: :utc_datetime)
   end
