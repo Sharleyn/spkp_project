@@ -3,7 +3,7 @@ import Config
 # Configure your database
 config :spkp_project, SpkpProject.Repo,
   username: "postgres",
-  password: "123",
+  password: "123456789",
   hostname: "localhost",
   database: "spkp_project_dev",
   stacktrace: true,
