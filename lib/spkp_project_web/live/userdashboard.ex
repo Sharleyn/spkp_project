@@ -7,27 +7,43 @@ defmodule SpkpProjectWeb.UserDashboardLive do
 def mount(_params, _session, socket) do
   current_user = socket.assigns.current_user
 
-  socket =
-    socket
-    |> assign(:current_user_name, current_user.full_name)
-    |> assign(:sidebar_open, true)
-    |> assign(:user_menu_open, false)
-    |> assign(:active_applications_count, 3)
-    |> assign(:available_courses_count, 3)
-    |> assign(:completed_courses_count, 0)
-    |> assign(:recent_applications, [
-      %{name: "Kursus Komputer Asas", date: "2025-01-24", status: "Diterima", status_class: "bg-green-100 text-green-600"},
-      %{name: "Kursus Bahasa Inggeris", date: "2025-02-17", status: "Dalam Proses", status_class: "bg-yellow-100 text-yellow-600"},
-      %{name: "Kursus Kemahiran Digital", date: "2025-02-21", status: "Ditolak", status_class: "bg-red-100 text-red-600"}
-    ])
-    |> assign(:available_courses, [
-      %{name: "Kursus Komputer Asas", duration: "4 minggu", slots: "15 tempat"},
-      %{name: "Kursus Bahasa Inggeris", duration: "2 minggu", slots: "8 tempat"},
-      %{name: "Kursus Kemahiran Digital", duration: "3 minggu", slots: "20 tempat"}
-    ])
+    socket =
+      socket
+      |> assign(:current_user_name, current_user.full_name)
+      |> assign(:sidebar_open, true)
+      |> assign(:user_menu_open, false)
+      |> assign(:active_applications_count, 3)
+      |> assign(:available_courses_count, 3)
+      |> assign(:completed_courses_count, 0)
+      |> assign(:recent_applications, [
+        %{
+          name: "Kursus Komputer Asas",
+          date: "2025-01-24",
+          status: "Diterima",
+          status_class: "bg-green-100 text-green-600"
+        },
+        %{
+          name: "Kursus Bahasa Inggeris",
+          date: "2025-02-17",
+          status: "Dalam Proses",
+          status_class: "bg-yellow-100 text-yellow-600"
+        },
+        %{
+          name: "Kursus Kemahiran Digital",
+          date: "2025-02-21",
+          status: "Ditolak",
+          status_class: "bg-red-100 text-red-600"
+        }
+      ])
+      |> assign(:available_courses, [
+        %{name: "Kursus Komputer Asas", duration: "4 minggu", slots: "15 tempat"},
+        %{name: "Kursus Bahasa Inggeris", duration: "2 minggu", slots: "8 tempat"},
+        %{name: "Kursus Kemahiran Digital", duration: "3 minggu", slots: "20 tempat"}
+      ])
 
-  {:ok, socket}
-end
+    {:ok, socket}
+  end
+
 
 # Hook untuk inject current_path dan sidebar_open
 def on_mount(:default, _params, _session, socket) do
@@ -40,29 +56,33 @@ end
 
   # 'render' berfungsi sebagai template HTML LiveView
   # ========== RENDER ==========
-    @impl true
-    def render(assigns) do
-      ~H"""
-      <div class="bg-white-100 min-h-screen antialiased text-gray-800">
-
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class="bg-white-100 min-h-screen antialiased text-gray-800">
       <!-- Burger Button -->
-            <button class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
-               phx-click="toggle_sidebar">
-                   <img src={~p"/images/burger3.png"} alt="Burger Icon" class="w-6 h-6" />
-           </button>
-
-         <!-- Sidebar -->
-              <aside
-                   class={"fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
+      <button
+        class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
+        phx-click="toggle_sidebar"
+      >
+        <img src={~p"/images/burger3.png"} alt="Burger Icon" class="w-6 h-6" />
+      </button>
+      <!-- Sidebar -->
+      <aside class={"fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
                            (if @sidebar_open, do: "translate-x-0", else: "-translate-x-full") <>
                             " bg-[#191970] text-white" }>
+        <!-- Brand -->
+        <div class="mt-4 mb-10 w-full">
+          <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
+
 
           <!-- Brand -->
                <div class="mt-4 mb-10 w-full">
-               <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
-               <div class="text-xs text-center font-bold text-indigo-200">
+                <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
+                 <div class="text-xs text-center font-bold text-indigo-200">
                     Sistem Permohonan Kursus & Pengurusan
                </div>
+            </div>
             </div>
 
           <!-- Menu -->
@@ -244,9 +264,7 @@ end
                 </main>
             </div>
         </div>
-        <script>
-            lucide.createIcons();
-        </script>
+
     """
   end
 

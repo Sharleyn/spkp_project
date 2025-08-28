@@ -189,6 +189,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
   @impl true
   def render(assigns) do
     ~H"""
+
     <div class="bg-zinc-50 min-h-screen antialiased text-gray-800">
       <!-- Burger Button -->
       <button
@@ -197,6 +198,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
       >
         <img src={~p"/images/burger3.png"} alt="Burger Icon" class="w-6 h-6" />
       </button>
+
       <!-- Sidebar -->
       <aside class={"fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
                     (if @sidebar_open, do: "translate-x-0", else: "-translate-x-full") <>
@@ -209,6 +211,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
             Sistem Permohonan Kursus & Pengurusan
           </div>
         </div>
+
         <!-- Menu -->
         <nav class="w-full flex-grow">
           <ul class="space-y-4">
@@ -258,12 +261,14 @@ defmodule SpkpProjectWeb.UserProfileLive do
           </ul>
         </nav>
       </aside>
+
       <!-- Main content area -->
       <div class={"flex-grow p-6 transition-all duration-300 ease-in-out " <>
                          (if @sidebar_open, do: "md:ml-64", else: "md:ml-0 mx-auto")}>
-        <!-- Top Header Bar -->
+
         <header class="flex justify-end items-center mb-6">
           <div class="relative">
+
             <!-- Button User -->
             <button
               phx-click="toggle_user_menu"
@@ -299,7 +304,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
           </div>
         </header>
 
-        <!-- Main Content -->
+        <!-- Table Pertama -->
         <h1 class="text-2xl font-bold mb-2">Profil Pengguna</h1>
 
         <p class="text-gray-600 mb-6">Kemaskini Maklumat Peribadi Anda Untuk Permohonan Kursus</p>
@@ -404,7 +409,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
 
             </.simple_form>
           </div>
-        </div>
+         </div>
     """
   end
 

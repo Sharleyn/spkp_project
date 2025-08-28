@@ -49,7 +49,9 @@ defmodule SpkpProjectWeb.KursusKategoriLiveTest do
     test "updates kursus_kategori in listing", %{conn: conn, kursus_kategori: kursus_kategori} do
       {:ok, index_live, _html} = live(conn, ~p"/kursus_kategori")
 
-      assert index_live |> element("#kursus_kategori-#{kursus_kategori.id} a", "Edit") |> render_click() =~
+      assert index_live
+             |> element("#kursus_kategori-#{kursus_kategori.id} a", "Edit")
+             |> render_click() =~
                "Edit Kursus kategori"
 
       assert_patch(index_live, ~p"/kursus_kategori/#{kursus_kategori}/edit")
@@ -72,7 +74,10 @@ defmodule SpkpProjectWeb.KursusKategoriLiveTest do
     test "deletes kursus_kategori in listing", %{conn: conn, kursus_kategori: kursus_kategori} do
       {:ok, index_live, _html} = live(conn, ~p"/kursus_kategori")
 
-      assert index_live |> element("#kursus_kategori-#{kursus_kategori.id} a", "Delete") |> render_click()
+      assert index_live
+             |> element("#kursus_kategori-#{kursus_kategori.id} a", "Delete")
+             |> render_click()
+
       refute has_element?(index_live, "#kursus_kategori-#{kursus_kategori.id}")
     end
   end
