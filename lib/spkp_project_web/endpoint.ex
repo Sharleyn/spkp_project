@@ -19,11 +19,22 @@ defmodule SpkpProjectWeb.Endpoint do
   #
   # You should set gzip to true if you are running phx.digest
   # when deploying your static files in production.
-  plug Plug.Static,
+  # Default static
+    plug Plug.Static,
     at: "/",
     from: :spkp_project,
     gzip: false,
     only: ~w(assets fonts images favicon.ico robots.txt uploads)
+
+  # Serve uploaded files
+    plug Plug.Static,
+    at: "/uploads",
+    from: Path.expand("./uploads"),
+    gzip: false
+
+  # Pastikan uploads directory wujud
+  # Ini akan dijalankan setiap kali endpoint start
+
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

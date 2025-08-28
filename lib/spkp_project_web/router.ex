@@ -2,7 +2,6 @@ defmodule SpkpProjectWeb.Router do
   use SpkpProjectWeb, :router
 
   import SpkpProjectWeb.UserAuth
-  alias SpkpProjectWeb.PageLive
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -23,7 +22,7 @@ defmodule SpkpProjectWeb.Router do
 
     live "/", LamanUtamaLive
 
-    live "/lamanutama", LamanUtamaLive
+
 
     live "/mengenaikami", MengenaiKamiLive
 
@@ -119,21 +118,17 @@ defmodule SpkpProjectWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{SpkpProjectWeb.UserAuth, :ensure_authenticated}] do
-      live "/userdashboard", UserDashboardLive
+
+      # User dashboard & profile
+      live "/userdashboard", UserDashboardLive, :dashboard
+      live "/userprofile", UserProfileLive, :profile
+      live "/senaraikursususer", SenaraiKursusLive, :courses
+      live "/permohonanuser", PermohonanUserLive, :applications
+
+      # User settings
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
-      live "/admin", PageLive, :admin
-      live "/user", PageLive, :user
     end
-  end
-
-  scope "/", SpkpProjectWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    live "/userdashboard", UserDashboardLive, :index
-    live "/userprofile", UserProfileLive, :index
-    live "/senaraikursususer", SenaraiKursusLive, :index
-    live "/permohonanuser", PermohonanUserLive, :index
   end
 
   scope "/", SpkpProjectWeb do
@@ -146,6 +141,8 @@ defmodule SpkpProjectWeb.Router do
       on_mount: [{SpkpProjectWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+      live "/lamanutama", LamanUtamaLive
     end
   end
 end

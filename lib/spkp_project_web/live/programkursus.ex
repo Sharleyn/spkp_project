@@ -53,22 +53,26 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
         }
       </style>
     </head>
+
     <!-- Header -->
     <header class="transparent">
       <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
         <!-- Logo kiri -->
         <div class="flex items-center">
-          <!-- Logo 1 -->
-          <img src={~p"/images/logo 1.png"} alt="Logo 1" style="height:90px;" class="mr-6" />
-          <!-- Logo 2–6 rapat -->
-          <div class="flex gap-1 mt-10">
-            <img src={~p"/images/logo 2.png"} alt="Logo 2" class="h-10" />
-            <img src={~p"/images/logo 3.png"} alt="Logo 3" class="h-10" />
-            <img src={~p"/images/logo 4.png"} alt="Logo 4" class="h-10" />
-            <img src={~p"/images/logo 5.png"} alt="Logo 5" class="h-10" />
-            <img src={~p"/images/logo 6.png"} alt="Logo 6" class="h-16" />
-          </div>
+
+      <!-- Logo 1 -->
+        <img src={~p"/images/logo 1.png"} alt="Logo 1" style="height:90px;" class="mr-6">
+
+      <!-- Logo 2–6 rapat -->
+        <div class="flex gap-1 mt-10">
+          <img src={~p"/images/logo 2.png"} alt="Logo 2" class="h-10">
+          <img src={~p"/images/logo 3.png"} alt="Logo 3" class="h-10">
+          <img src={~p"/images/logo 4.png"} alt="Logo 4" class="h-10">
+          <img src={~p"/images/logo 5.png"} alt="Logo 5" class="h-10">
+          <img src={~p"/images/logo 6.png"} alt="Logo 6" class="h-16">
         </div>
+      </div>
+
         <!-- Ikon kanan -->
         <div class="flex space-x-6">
           <!-- Pengguna -->
@@ -89,31 +93,28 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
         </div>
       </div>
     </header>
+
     <!-- Navigasi -->
     <div class="bg-[#09033F] shadow py-2">
       <div class="max-w-7xl mx-auto flex space-x-2">
         <a
           href={~p"/"}
-          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
-        >
+          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
           Laman Utama
         </a>
         <a
           href={~p"/mengenaikami"}
-          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
-        >
+          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
           Mengenai Kami
         </a>
         <a
           href={~p"/programkursus"}
-          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
-        >
+          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
           Program
         </a>
         <a
           href="/#hubungi"
-          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
-        >
+          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
           Hubungi
         </a>
       </div>
@@ -147,6 +148,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
           <% end %>
         </div>
       </section>
+
       <!-- Kursus Jangka Pendek -->
       <section>
         <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Pendek</h2>
@@ -174,6 +176,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
         </div>
       </section>
     </div>
+
     <!-- FOOTER -->
     <section id="hubungi">
       <footer class="bg-[#09033F] text-white mt-10 py-2 text-center">
@@ -181,6 +184,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
 
         <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
           <div class="flex items-center justify-between gap-6 flex-wrap">
+
             <!-- Alamat -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6" />
@@ -188,22 +192,26 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
                 Alamat: Block G. 2ND Floor, Lot 9, Lintas Jaya Uptownship Penampang, 88200 Sabah
               </p>
             </div>
+
             <!-- Telefon & Faks -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/fax.png"} alt="Telefon & Faks" class="h-6 w-6" />
               <p class="text-sm">No. Tel: 011-3371 7129<br />Faks: 088 729717</p>
             </div>
+
             <!-- Email -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/email.png"} alt="Email" class="h-6 w-6" />
               <p class="text-sm">Email: sharifperchaya@gmail.com</p>
             </div>
+
             <!-- FB -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/fb.png"} alt="Facebook" class="h-6 w-6" />
               <p class="text-sm">Sharif Perchaya Sdn Bhd</p>
             </div>
           </div>
+
           <!-- Waktu Operasi -->
           <p class="text-sm text-center font-bold mt-4">MASA OPERASI</p>
 
