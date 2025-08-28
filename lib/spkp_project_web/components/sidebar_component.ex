@@ -33,10 +33,10 @@ defmodule SpkpProjectWeb.SidebarComponent do
       <div class="p-6 border-b border-blue-800">
         <div class="flex items-center space-x-3">
           <div class="text-3xl">🎓</div>
-          
+
           <div>
             <div class="font-bold text-lg">SPKP</div>
-            
+
             <div class="text-sm text-blue-200">Admin Dashboard</div>
           </div>
         </div>
@@ -61,7 +61,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
           >
             <span>Kursus</span>
           </div>
-          
+
           <%= if @open_menu == "kursus" do %>
             <div class="ml-4">
               <.link
@@ -96,7 +96,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
           >
             <span>Peserta</span>
           </div>
-          
+
           <%= if @open_menu == "peserta" do %>
             <div class="ml-4">
               <.link
@@ -118,11 +118,11 @@ defmodule SpkpProjectWeb.SidebarComponent do
           >
             <span>Elaun Pekerja</span>
           </div>
-          
+
           <%= if @open_menu == "elaunpekerja" do %>
             <div class="ml-4">
               <.link
-                navigate={~p"/admin/elaunpekerja/senaraituntutan"}
+                navigate={~p"/admin/elaun_pekerja"}
                 class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaunpekerja/senaraituntutan", do: "bg-gray-600 font-bold"}"}
               >
                 Senarai Tuntutan
@@ -134,7 +134,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
                 Buat Tuntutan Baru
               </.link>
               <.link
-                navigate={~p"/admin/elaunpekerja/senaraipekerja"}
+                navigate={~p"/admin/maklumat_pekerja"}
                 class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaunpekerja/senaraipekerja", do: "bg-gray-600 font-bold"}"}
               >
                 Senarai Pekerja
@@ -152,7 +152,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
           >
             <span>Tetapan</span>
           </div>
-          
+
           <%= if @open_menu == "tetapan" do %>
             <div class="ml-4">
               <.link

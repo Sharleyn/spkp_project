@@ -28,4 +28,21 @@ defmodule SpkpProject.AccountsFixtures do
     [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
     token
   end
+
+  @doc """
+  Generate a maklumat_pekerja.
+  """
+  def maklumat_pekerja_fixture(attrs \\ %{}) do
+    {:ok, maklumat_pekerja} =
+      attrs
+      |> Enum.into(%{
+        nama_bank: "some nama_bank",
+        no_akaun: "some no_akaun",
+        no_ic: "some no_ic",
+        no_tel: "some no_tel"
+      })
+      |> SpkpProject.Accounts.create_maklumat_pekerja()
+
+    maklumat_pekerja
+  end
 end

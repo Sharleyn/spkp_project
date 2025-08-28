@@ -81,9 +81,21 @@ defmodule SpkpProjectWeb.Router do
 
       live "/peserta/senaraipeserta", SenaraiPesertaLive
 
-      live "/elaunpekerja/senaraituntutan", SenaraiTuntutanLive
+      live "/elaun_pekerja", ElaunPekerjaLive.Index, :index
+      live "/elaun_pekerja/new", ElaunPekerjaLive.Index, :new
+      live "/elaun_pekerja/:id/edit", ElaunPekerjaLive.Index, :edit
+
+      live "/elaun_pekerja/:id", ElaunPekerjaLive.Show, :show
+      live "/elaun_pekerja/:id/show/edit", ElaunPekerjaLive.Show, :edit
+
       live "/elaunpekerja/buattuntutanbaru", BuatTuntutanBaruLive
-      live "/elaunpekerja/senaraipekerja", SenaraiPekerjaLive
+
+      live "/maklumat_pekerja", MaklumatPekerjaLive.Index, :index
+      live "/maklumat_pekerja/new", MaklumatPekerjaLive.Index, :new
+      live "/maklumat_pekerja/:id/edit", MaklumatPekerjaLive.Index, :edit
+
+      live "/maklumat_pekerja/:id", MaklumatPekerjaLive.Show, :show
+      live "/maklumat_pekerja/:id/show/edit", MaklumatPekerjaLive.Show, :edit
 
       live "/editprofile", EditProfileLive.Show
       live "/tetapan/tukarkatalaluan", TukarKataLaluanLive
