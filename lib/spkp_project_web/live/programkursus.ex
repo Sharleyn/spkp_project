@@ -85,11 +85,11 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
 
     <div class="max-w-7xl mx-auto p-6">
 
-      <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Program</h1>
+      <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Kursus Ditawarkan</h1>
 
       <!-- Kursus Jangka Panjang -->
       <section class="mb-12">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Panjang</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-black-500">Kursus Jangka Panjang</h2>
         <div class="grid md:grid-cols-4 gap-6">
           <%= for course <- @long_courses do %>
             <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition">
@@ -98,7 +98,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
                 <h3 class="text-lg font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
                 <div class="flex items-center gap-2 mb-2">
                   <img src={course.gambar_anjuran} alt={course.anjuran} class="h-8 w-8 rounded-full" />
-                  <p class="text-sm text-gray-600">Anjuran: <%= course.anjuran %></p>
+                  <p class="text-sm text-gray-600">Tajaan: <%= course.anjuran %></p>
                 </div>
                 <p class="text-xs text-gray-500 mb-1">Tempat: <%= course.tempat %></p>
                 <p class="text-xs text-gray-500 mb-2">Tarikh: <%= course.tarikh_mula %> &rarr; <%= course.tarikh_akhir %></p>
@@ -113,8 +113,8 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
 
       <!-- Kursus Jangka Pendek -->
       <section>
-        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Pendek</h2>
-        <div class="grid md:grid-cols-3 gap-6">
+        <h2 class="text-2xl font-semibold mb-4 text-black-500">Kursus Jangka Pendek</h2>
+        <div class="grid md:grid-cols-4 gap-6">
           <%= for course <- @short_courses do %>
             <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition">
               <img src={course.gambar_kursus} alt={course.nama_kursus} class="w-full h-48 object-cover" />
@@ -122,7 +122,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
                 <h3 class="text-lg font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
                 <div class="flex items-center gap-2 mb-2">
                   <img src={course.gambar_anjuran} alt={course.anjuran} class="h-8 w-8 rounded-full" />
-                  <p class="text-sm text-gray-600">Anjuran: <%= course.anjuran %></p>
+                  <p class="text-sm text-gray-600">Tajaan: <%= course.anjuran %></p>
                 </div>
                  <p class="text-xs text-gray-500 mb-1">Tempat: <%= course.tempat %></p>
                  <p class="text-xs text-gray-500 mb-2">Tarikh: <%= course.tarikh_mula %> &rarr; <%= course.tarikh_akhir %></p>

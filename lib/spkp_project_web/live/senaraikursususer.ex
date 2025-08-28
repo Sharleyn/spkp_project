@@ -188,8 +188,8 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                     <div class="w-full md:w-auto">
                        <select name="type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                          <option value="">Semua Kursus</option>
-    <!-- belum siap -->  <option value="Kursus Jangka Panjang" selected={@selected_type == "Kursus Jangka Panjang"}>Kursus Jangka Panjang</option>
-    <!-- belum siap -->  <option value="Kursus Jangka Pendek" selected={@selected_type == "Kursus Jangka Pendek"}>Kursus Jangka Pendek</option>
+                          <option value="Kursus Jangka Panjang" selected={@selected_type == "Kursus Jangka Panjang"}>Kursus Jangka Panjang</option>
+                           <option value="Kursus Jangka Pendek" selected={@selected_type == "Kursus Jangka Pendek"}>Kursus Jangka Pendek</option>
                       </select>
                     </div>
 
@@ -246,12 +246,12 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                    <strong>Status:</strong> <%= kursus.status_kursus %></p>
 
                 <p class="flex items-center gap-2">
-                   <i class="fas fa-clipboard" aria-hidden="true"></i>
+                   <i class="fa fa-institution" aria-hidden="true"></i>
                    <strong>Tajaan:</strong> <%= kursus.anjuran %></p>
 
-                <p class="flex items-center gap-2">
-                   <i class="fas fa-clipboard" aria-hidden="true"></i>
-                   <strong>:</strong> <%= kursus.anjuran %></p>
+                <p class="flex items-center gap-1">
+                   <i class="fa fa-desktop" aria-hidden="true"></i>
+                   <strong>Kaedah:</strong> <%= kursus.anjuran %></p>
 
               </div>
 
