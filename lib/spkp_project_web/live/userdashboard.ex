@@ -3,14 +3,14 @@ defmodule SpkpProjectWeb.UserDashboardLive do
 
 
   @impl true
-def mount(_params, _session, socket) do
-  current_user = socket.assigns.current_user
+  def mount(_params, _session, socket) do
+   current_user = socket.assigns.current_user
 
-  available_courses =
+   available_courses =
     SpkpProject.Kursus.list_all_courses()
     |> Enum.take(3)  # ambil maksimum 3 kursus untuk dashboard
 
-  socket =
+   socket =
     socket
     |> assign(:current_user_name, current_user.full_name)
     |> assign(:sidebar_open, true)
@@ -39,27 +39,25 @@ end
 
   # 'render' berfungsi sebagai template HTML LiveView
   # ========== RENDER ==========
-    @impl true
-    def render(assigns) do
-      ~H"""
-      <div class="bg-white-100 min-h-screen antialiased text-gray-800">
-
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class="bg-white-100 min-h-screen antialiased text-gray-800">
       <!-- Burger Button -->
+
             <button class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
                phx-click="toggle_sidebar">
                    <i class="fa fa-bars fa-lg text-indigo-300" aria-hidden="true"></i>
            </button>
 
-         <!-- Sidebar -->
-              <aside
-                   class={"fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
+      <!-- Sidebar -->
+      <aside class={"fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
                            (if @sidebar_open, do: "translate-x-0", else: "-translate-x-full") <>
                             " bg-[#191970] text-white" }>
-
-          <!-- Brand -->
-               <div class="mt-4 mb-10 w-full">
-               <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
-               <div class="text-xs text-center font-bold text-indigo-200">
+        <!-- Brand -->
+        <div class="mt-4 mb-10 w-full">
+          <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
+            <div class="text-xs text-center font-bold text-indigo-200">
                     Sistem Permohonan Kursus & Pengurusan
                </div>
             </div>
@@ -68,33 +66,36 @@ end
               <nav class="w-full flex-grow">
                 <ul class="space-y-4">
                   <li>
-                      <.link navigate={~p"/userdashboard"}
-                           class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                           <img src={~p"/images/right.png"} alt="Laman Utama" class="w-5 h-5" />
-                            <span>Laman Utama</span>
-                      </.link>
-                  </li>
-                <li>
-                      <.link navigate={~p"/userprofile"}
-                            class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                        <img src={~p"/images/right.png"} alt="Profil Pengguna" class="w-5 h-5" />
-                            <span>Profil Saya</span>
-                      </.link>
-                   </li>
-                <li>
-                      <.link navigate={~p"/senaraikursususer"}
-                           class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                       <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" />
-                           <span>Senarai Kursus</span>
-                      </.link>
-                    </li>
-                <li>
-                      <.link navigate={~p"/permohonanuser"}
-                          class="flex items-center space-x-3 font-semibold p-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200">
-                       <img src={~p"/images/right.png"} alt="Permohonan Saya" class="w-5 h-5" />
-                           <span>Permohonan Saya</span>
-                    </.link>
-                 </li>
+                    <.link navigate={~p"/userdashboard"} class={nav_class(@live_action, :dashboard)}
+                   aria-current={if @live_action == :dashboard, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Laman Utama" class="w-5 h-5" />
+              <span>Laman Utama</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/userprofile"} class={nav_class(@live_action, :profile)}
+                   aria-current={if @live_action == :profile, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Profil Saya" class="w-5 h-5" />
+              <span>Profil Saya</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/senaraikursususer"} class={nav_class(@live_action, :courses)}
+                   aria-current={if @live_action == :courses, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" />
+              <span>Senarai Kursus</span>
+            </.link>
+          </li>
+
+          <li>
+            <.link navigate={~p"/permohonanuser"} class={nav_class(@live_action, :applications)}
+                   aria-current={if @live_action == :applications, do: "page", else: nil}>
+              <img src={~p"/images/right.png"} alt="Permohonan Saya" class="w-5 h-5" />
+              <span>Permohonan Saya</span>
+            </.link>
+          </li>
               </ul>
             </nav>
           </aside>
@@ -137,7 +138,7 @@ end
 
             <!-- Dashboard Content -->
                 <main>
-                    <h2 class="text-2xl font-semibold mb-1">Selamat Datang, <%= @current_user_name %></h2>
+                    <h2 class="text-2xl font-bold mb-1">Selamat Datang, <%= @current_user_name %></h2>
                     <p class="text-gray-500 mb-6">Urus Permohonan Kursus Dan Lihat Perkembangan Anda Di Sini</p>
 
                     <!-- Summary Cards Section -->
@@ -248,6 +249,7 @@ end
 
   @impl true
   def handle_event("logout", _params, socket) do
+
   {:noreply,
    socket
    |> put_flash(:info, "Anda telah log keluar.")
@@ -267,6 +269,16 @@ end
 
   def handle_event("close_user_menu", _params, socket) do
     {:noreply, assign(socket, :user_menu_open, false)}
+  end
+
+  defp nav_class(current, expected) do
+    base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
+
+    if current == expected do
+      base <> " bg-indigo-700 text-white"  # aktif
+    else
+      base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
+    end
   end
 
 end

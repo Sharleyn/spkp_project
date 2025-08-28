@@ -1,4 +1,4 @@
-defmodule SpkpProjectWeb.TukarKataLaluanLive do
+defmodule SpkpProjectWeb.EditProfileLive.Show do
   use SpkpProjectWeb, :live_view
 
   @impl true
@@ -25,13 +25,17 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-              
+
               <h1 class="text-xl font-semibold text-gray-800">Kursus Hub</h1>
             </div>
-            
+
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
-              <button class="text-gray-600 hover:text-gray-800">Logout</button>
+
+                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
+              </.link>
+
               <div class="flex items-center space-x-2">
                 <span class="text-gray-600">Admin</span>
                 <div class="w-8 h-8 bg-black rounded-full"></div>
@@ -49,40 +53,45 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
               </svg>
               <h2 class="text-3xl font-semibold text-gray-800">Dashboard Admin Kursus</h2>
             </div>
-            
+
             <div class="text-sm text-gray-500">Tetapan admin</div>
           </div>
-          <!-- Tukar Kata Laluan Section -->
+          <!-- Edit Profile Section -->
           <div class="bg-white rounded-lg shadow-sm border p-8 max-w-2xl mx-auto">
-            <h3 class="text-3xl font-semibold text-gray-800 text-center mb-8">Tukar Kata Laluan</h3>
+            <h3 class="text-3xl font-semibold text-gray-800 text-center mb-8">Edit Profile</h3>
+            <!-- Profile Picture -->
+            <div class="flex flex-col items-center mb-8">
+              <div class="w-32 h-32 bg-black rounded-full mb-4 flex items-center justify-center">
+                <!-- Profile picture placeholder -->
+              </div>
+               <button class="text-xl font-semibold text-gray-800 hover:text-gray-600">Edit</button>
+            </div>
             <!-- Form Fields -->
             <form class="space-y-6">
               <div>
-                <label class="block text-xl font-semibold text-gray-800 mb-2">Kata Laluan Lama</label>
+                <label class="block text-xl font-semibold text-gray-800 mb-2">Nama Penuh</label>
                 <input
                   type="text"
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Masukkan kata laluan lama"
+                  placeholder="Masukkan nama penuh"
                 />
               </div>
-              
+
               <div>
-                <label class="block text-xl font-semibold text-gray-800 mb-2">Kata Laluan Baru</label>
+                <label class="block text-xl font-semibold text-gray-800 mb-2">Emel</label>
                 <input
-                  type="text"
+                  type="email"
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Masukkan kata laluan baru"
+                  placeholder="Masukkan emel"
                 />
               </div>
-              
+
               <div>
-                <label class="block text-xl font-semibold text-gray-800 mb-2">
-                  Sahkan Kata Laluan Baru
-                </label>
+                <label class="block text-xl font-semibold text-gray-800 mb-2">No telefon</label>
                 <input
-                  type="text"
+                  type="tel"
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Masukkan kata laluan baru"
+                  placeholder="Masukkan nombor telefon"
                 />
               </div>
               <!-- Save Button -->

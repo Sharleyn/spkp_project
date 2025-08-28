@@ -29,7 +29,6 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
 
   def render(assigns) do
     ~H"""
-
     <head>
       <style>
         body {
@@ -39,8 +38,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
           background-position: center;
         }
         html {
-          scroll-behavior: smooth;
-        }
+          scroll-behavior: smooth;}
       </style>
     </head>
 
@@ -59,52 +57,77 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
             </div>
           </div>
 
-          <div class="flex space-x-6">
-            <.link navigate={~p"/users/log_in"} class="flex flex-col items-center text-sm hover:opacity-80">
-              <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
-              <span>Pengguna</span>
-            </.link>
-
-            <.link navigate={~p"/users/log_in"} class="flex flex-col items-center text-sm hover:opacity-80">
-              <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-8 mb-1" />
-              <span>Admin</span>
-            </.link>
-          </div>
-        </div>
-      </header>
-
-      <!-- Navigation bar -->
-      <div class="bg-[#09033F] shadow py-2">
-        <div class="max-w-7xl mx-auto flex space-x-2">
-          <a href={~p"/"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Laman Utama</a>
-          <a href={~p"/mengenaikami"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Mengenai Kami</a>
-          <a href={~p"/programkursus"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Program</a>
-          <a href="/#hubungi" class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">Hubungi</a>
+        <!-- Ikon kanan -->
+        <div class="flex space-x-6">
+          <!-- Pengguna -->
+          <.link
+            navigate={~p"/users/log_in"}
+            class="flex flex-col items-center text-sm hover:opacity-80"
+          >
+            <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
+            <span>Pengguna</span>
+          </.link>
+          <!-- Admin -->
+          <.link
+            navigate={~p"/users/log_in"}
+            class="flex flex-col items-center text-sm hover:opacity-80"
+          >
+            <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-8 mb-1" /> <span>Admin</span>
+          </.link>
         </div>
       </div>
+    </header>
+
+    <!-- Navigasi -->
+    <div class="bg-[#09033F] shadow py-2">
+      <div class="max-w-7xl mx-auto flex space-x-2">
+        <a
+          href={~p"/"}
+          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
+          Laman Utama
+        </a>
+        <a
+          href={~p"/mengenaikami"}
+          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
+          Mengenai Kami
+        </a>
+        <a
+          href={~p"/programkursus"}
+          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
+          Program
+        </a>
+        <a
+          href="/#hubungi"
+          class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
+          Hubungi
+        </a>
+      </div>
+    </div>
 
     <div class="max-w-7xl mx-auto p-6">
-
-      <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Kursus Ditawarkan</h1>
+      <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Program</h1>
 
       <!-- Kursus Jangka Panjang -->
       <section class="mb-12">
-        <h2 class="text-2xl font-semibold mb-4 text-black-500">Kursus Jangka Panjang</h2>
-        <div class="grid md:grid-cols-4 gap-6">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Panjang</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
           <%= for course <- @long_courses do %>
-            <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition">
-              <img src={course.gambar_kursus} alt={course.nama_kursus} class="w-full h-48 object-cover" />
-              <div class="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
-                <div class="flex items-center gap-2 mb-2">
-                  <img src={course.gambar_anjuran} alt={course.anjuran} class="h-8 w-8 rounded-full" />
-                  <p class="text-sm text-gray-600">Tajaan: <%= course.anjuran %></p>
-                </div>
-                <p class="text-xs text-gray-500 mb-1">Tempat: <%= course.tempat %></p>
-                <p class="text-xs text-gray-500 mb-2">Tarikh: <%= course.tarikh_mula %> &rarr; <%= course.tarikh_akhir %></p>
-                 <.link navigate={~p"/senaraikursususer"} class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                  Lihat Lagi
-                 </.link>
+            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
+
+              <p class="text-sm text-gray-600 mb-3">{course.description}</p>
+
+              <p class="text-xs text-gray-500">Tarikh: {course.start} &rarr; {course.end}</p>
+
+              <div class="mt-4">
+                <!-- Belum login, redirect ke login -->
+                <.link
+                  navigate={~p"/users/log_in"}
+                  class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  Mohon
+                </.link>
               </div>
             </div>
           <% end %>
@@ -113,22 +136,26 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
 
       <!-- Kursus Jangka Pendek -->
       <section>
-        <h2 class="text-2xl font-semibold mb-4 text-black-500">Kursus Jangka Pendek</h2>
-        <div class="grid md:grid-cols-4 gap-6">
+
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Pendek</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
           <%= for course <- @short_courses do %>
-            <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition">
-              <img src={course.gambar_kursus} alt={course.nama_kursus} class="w-full h-48 object-cover" />
-              <div class="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
-                <div class="flex items-center gap-2 mb-2">
-                  <img src={course.gambar_anjuran} alt={course.anjuran} class="h-8 w-8 rounded-full" />
-                  <p class="text-sm text-gray-600">Tajaan: <%= course.anjuran %></p>
-                </div>
-                 <p class="text-xs text-gray-500 mb-1">Tempat: <%= course.tempat %></p>
-                 <p class="text-xs text-gray-500 mb-2">Tarikh: <%= course.tarikh_mula %> &rarr; <%= course.tarikh_akhir %></p>
-                  <.link navigate={~p"/senaraikursususer"} class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                  Lihat Lagi
-                 </.link>
+            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
+
+              <p class="text-sm text-gray-600 mb-3">{course.description}</p>
+
+              <p class="text-xs text-gray-500">Tarikh: {course.start} &rarr; {course.end}</p>
+
+              <div class="mt-4">
+                <!-- Belum login, redirect ke login -->
+                <.link
+                  navigate={~p"/users/log_in"}
+                  class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  Mohon
+                </.link>
               </div>
              </div>
             <% end %>
@@ -136,6 +163,54 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
          </section>
         </div>
        </div>
+
+    <!-- FOOTER -->
+    <section id="hubungi">
+      <footer class="bg-[#09033F] text-white mt-10 py-2 text-center">
+        <p class="text-sm font-bold">SHARIF PERCHAYA SDN. BHD.</p>
+
+        <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
+          <div class="flex items-center justify-between gap-6 flex-wrap">
+
+            <!-- Alamat -->
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6" />
+              <p class="text-sm">
+                Alamat: Block G. 2ND Floor, Lot 9, Lintas Jaya Uptownship Penampang, 88200 Sabah
+              </p>
+            </div>
+
+            <!-- Telefon & Faks -->
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/fax.png"} alt="Telefon & Faks" class="h-6 w-6" />
+              <p class="text-sm">No. Tel: 011-3371 7129<br />Faks: 088 729717</p>
+            </div>
+
+            <!-- Email -->
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/email.png"} alt="Email" class="h-6 w-6" />
+              <p class="text-sm">Email: sharifperchaya@gmail.com</p>
+            </div>
+
+            <!-- FB -->
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/fb.png"} alt="Facebook" class="h-6 w-6" />
+              <p class="text-sm">Sharif Perchaya Sdn Bhd</p>
+            </div>
+          </div>
+
+          <!-- Waktu Operasi -->
+          <p class="text-sm text-center font-bold mt-4">MASA OPERASI</p>
+
+          <div class="bg-[#09033F] flex items-start text-white max-w-xl mx-auto mt-4 text-left gap-2">
+            <img src={~p"/images/clock.png"} alt="Waktu Operasi" class="h-6 w-6" />
+            <p class="text-sm">
+              Hari Bekerja: Isnin - Jumaat | 8:00 A.M. – 5:00 P.M. | Cuti: Sabtu, Ahad, Cuti Umum
+            </p>
+          </div>
+        </div>
+      </footer>
+    </section>
     """
   end
 end

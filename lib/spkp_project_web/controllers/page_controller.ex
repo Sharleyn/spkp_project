@@ -10,5 +10,4 @@ defmodule SpkpProjectWeb.PageController do
   def mengenaikami(conn, _params) do
     render(conn, :mengenaikami)
   end
-
 end

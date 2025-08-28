@@ -4,9 +4,51 @@ defmodule SpkpProjectWeb.KursussLiveTest do
   import Phoenix.LiveViewTest
   import SpkpProject.KursusFixtures
 
-  @create_attrs %{nama_kursus: "some nama_kursus", tarikh_mula: "2025-08-20", tarikh_akhir: "2025-08-20", tempat: "some tempat", status_kursus: "some status_kursus", had_umur: 42, anjuran: "some anjuran", gambar_anjuran: "some gambar_anjuran", gambar_kursus: "some gambar_kursus", syarat_penyertaan: "some syarat_penyertaan", syarat_pendidikan: "some syarat_pendidikan", kuota: 42, tarikh_tutup: "2025-08-20"}
-  @update_attrs %{nama_kursus: "some updated nama_kursus", tarikh_mula: "2025-08-21", tarikh_akhir: "2025-08-21", tempat: "some updated tempat", status_kursus: "some updated status_kursus", had_umur: 43, anjuran: "some updated anjuran", gambar_anjuran: "some updated gambar_anjuran", gambar_kursus: "some updated gambar_kursus", syarat_penyertaan: "some updated syarat_penyertaan", syarat_pendidikan: "some updated syarat_pendidikan", kuota: 43, tarikh_tutup: "2025-08-21"}
-  @invalid_attrs %{nama_kursus: nil, tarikh_mula: nil, tarikh_akhir: nil, tempat: nil, status_kursus: nil, had_umur: nil, anjuran: nil, gambar_anjuran: nil, gambar_kursus: nil, syarat_penyertaan: nil, syarat_pendidikan: nil, kuota: nil, tarikh_tutup: nil}
+  @create_attrs %{
+    nama_kursus: "some nama_kursus",
+    tarikh_mula: "2025-08-20",
+    tarikh_akhir: "2025-08-20",
+    tempat: "some tempat",
+    status_kursus: "some status_kursus",
+    had_umur: 42,
+    anjuran: "some anjuran",
+    gambar_anjuran: "some gambar_anjuran",
+    gambar_kursus: "some gambar_kursus",
+    syarat_penyertaan: "some syarat_penyertaan",
+    syarat_pendidikan: "some syarat_pendidikan",
+    kuota: 42,
+    tarikh_tutup: "2025-08-20"
+  }
+  @update_attrs %{
+    nama_kursus: "some updated nama_kursus",
+    tarikh_mula: "2025-08-21",
+    tarikh_akhir: "2025-08-21",
+    tempat: "some updated tempat",
+    status_kursus: "some updated status_kursus",
+    had_umur: 43,
+    anjuran: "some updated anjuran",
+    gambar_anjuran: "some updated gambar_anjuran",
+    gambar_kursus: "some updated gambar_kursus",
+    syarat_penyertaan: "some updated syarat_penyertaan",
+    syarat_pendidikan: "some updated syarat_pendidikan",
+    kuota: 43,
+    tarikh_tutup: "2025-08-21"
+  }
+  @invalid_attrs %{
+    nama_kursus: nil,
+    tarikh_mula: nil,
+    tarikh_akhir: nil,
+    tempat: nil,
+    status_kursus: nil,
+    had_umur: nil,
+    anjuran: nil,
+    gambar_anjuran: nil,
+    gambar_kursus: nil,
+    syarat_penyertaan: nil,
+    syarat_pendidikan: nil,
+    kuota: nil,
+    tarikh_tutup: nil
+  }
 
   defp create_kursuss(_) do
     kursuss = kursuss_fixture()

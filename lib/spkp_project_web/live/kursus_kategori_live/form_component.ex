@@ -11,7 +11,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.FormComponent do
         {@title}
         <:subtitle>Use this form to manage kursus_kategori records in your database.</:subtitle>
       </.header>
-
+      
       <.simple_form
         for={@form}
         id="kursus_kategori-form"
@@ -20,9 +20,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:kategori]} type="text" label="Kategori" />
-        <:actions>
-          <.button phx-disable-with="Saving...">Save Kursus kategori</.button>
-        </:actions>
+        <:actions><.button phx-disable-with="Saving...">Save Kursus kategori</.button></:actions>
       </.simple_form>
     </div>
     """
@@ -40,7 +38,9 @@ defmodule SpkpProjectWeb.KursusKategoriLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"kursus_kategori" => kursus_kategori_params}, socket) do
-    changeset = Kursus.change_kursus_kategori(socket.assigns.kursus_kategori, kursus_kategori_params)
+    changeset =
+      Kursus.change_kursus_kategori(socket.assigns.kursus_kategori, kursus_kategori_params)
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 

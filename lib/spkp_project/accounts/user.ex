@@ -12,6 +12,8 @@ defmodule SpkpProject.Accounts.User do
     field :full_name, :string
     field :role, :string
 
+    has_one :user_profile, SpkpProject.Accounts.UserProfile
+
     timestamps(type: :utc_datetime)
   end
 
@@ -40,11 +42,33 @@ defmodule SpkpProject.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
+
     |> cast(attrs, [:email, :password, :full_name, :password_confirmation])
+    |> cast_assoc(:user_profile, with: &SpkpProject.Accounts.UserProfile.changeset/2)
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_full_name(opts)
     |> validate_password_confirmation(opts)
+    |> put_change(:role, "user")
+  end
+
+  # 📌 2. Role changeset – hanya untuk admin ubah role
+  def role_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:role])
+    |> validate_required([:role])
+    # ✅ validate di sini
+    |> validate_inclusion(:role, ["user", "staff", "admin"])
+  end
+
+  def update_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :full_name, :password, :password_confirmation])
+    |> validate_email(opts)
+    |> validate_full_name(opts)
+    |> validate_password(opts)
+    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
+    |> maybe_hash_password(opts)
   end
 
   defp validate_email(changeset, opts) do
@@ -64,8 +88,13 @@ defmodule SpkpProject.Accounts.User do
   defp validate_password_confirmation(changeset, opts) do
     changeset
     |> validate_required([:password_confirmation])
-    |> validate_length(:password_confirmation, min: 12, max: 72, message: "Kata laluan tidak sepadan")
-    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan") # <-- ini penting
+    |> validate_length(:password_confirmation,
+      min: 12,
+      max: 72,
+      message: "Kata laluan tidak sepadan"
+    )
+    # <-- ini penting
+    |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
     |> maybe_hash_password(opts)
   end
 
@@ -170,4 +199,15 @@ defmodule SpkpProject.Accounts.User do
       add_error(changeset, :current_password, "is not valid")
     end
   end
+
+  @doc """
+  A user changeset for updating user information (excluding password).
+  """
+  def profile_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :full_name])
+    |> validate_email(validate_email: false)
+    |> validate_full_name(validate_email: false)
+  end
+
 end

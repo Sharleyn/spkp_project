@@ -221,6 +221,16 @@ defmodule SpkpProject.Accounts do
     end
   end
 
+  def change_user(user, attrs \\ %{}) do
+    User.update_changeset(user, attrs)
+  end
+
+  def update_user(%User{} = user, attrs) do
+    user
+    |> User.update_changeset(attrs)
+    |> Repo.update()
+  end
+
   ## Session
 
   @doc """
@@ -355,5 +365,87 @@ defmodule SpkpProject.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  ## User Profile Management
+
+  alias SpkpProject.Accounts.UserProfile
+
+  @doc """
+  Gets a user profile by user ID.
+  """
+  def get_user_profile_by_user_id(user_id) do
+    Repo.get_by(UserProfile, user_id: user_id)
+  end
+
+  @doc """
+  Creates or updates a user profile.
+  """
+  def create_or_update_user_profile(attrs) do
+    case Repo.get_by(UserProfile, user_id: attrs["user_id"]) do
+      nil ->
+        %UserProfile{}
+        |> UserProfile.changeset(attrs)
+        |> Repo.insert()
+
+      profile ->
+        profile
+        |> UserProfile.changeset(attrs)
+        |> Repo.update()
+    end
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking user profile changes.
+  """
+  # Fungsi untuk buat changeset gabungan user + profile
+  def change_user_profile(%User{} = user, attrs \\ %{}) do
+    user
+    |> Ecto.Changeset.cast(attrs, [:full_name, :email])
+    |> Ecto.Changeset.cast_assoc(:user_profile, with: &UserProfile.changeset/2)
+  end
+
+  # Fungsi untuk update user + user_profile
+  def update_user_profile(%User{} = user, attrs) do
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:user, User.profile_changeset(user, %{
+      full_name: attrs["full_name"],
+      email: attrs["email"]
+    }))
+    |> Ecto.Multi.run(:profile, fn repo, %{user: updated_user} ->
+      # Prepare profile attributes, ensuring ic_attachment is preserved
+      profile_attrs = Map.merge(attrs, %{"user_id" => updated_user.id})
+
+      case get_user_profile_by_user_id(updated_user.id) do
+        nil ->
+          # Create new profile
+          %UserProfile{}
+          |> UserProfile.changeset(profile_attrs)
+          |> repo.insert()
+
+        profile ->
+          # Update existing profile
+          profile
+          |> UserProfile.changeset(profile_attrs)
+          |> repo.update()
+      end
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user, profile: _profile}} -> {:ok, user}
+      {:error, :user, changeset, _} -> {:error, changeset}
+      {:error, :profile, changeset, _} -> {:error, changeset}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  @doc """
+  Updates a user.
+  """
+  def update_user(%User{} = user, attrs) do
+    user
+    |> User.update_changeset(attrs)
+    |> Repo.update()
   end
 end
