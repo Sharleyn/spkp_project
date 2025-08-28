@@ -22,7 +22,7 @@ defmodule SpkpProjectWeb.Router do
 
     live "/", LamanUtamaLive
 
-    live "/lamanutama", LamanUtamaLive
+
 
     live "/mengenaikami", MengenaiKamiLive
 
@@ -141,6 +141,8 @@ defmodule SpkpProjectWeb.Router do
       on_mount: [{SpkpProjectWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+      live "/lamanutama", LamanUtamaLive
     end
   end
 end

@@ -409,7 +409,7 @@ defmodule SpkpProject.Accounts do
   def update_user_profile(%User{} = user, attrs) do
 
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, User.update_changeset(user, %{
+    |> Ecto.Multi.update(:user, User.profile_changeset(user, %{
       full_name: attrs["full_name"],
       email: attrs["email"]
     }))

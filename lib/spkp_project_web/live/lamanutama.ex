@@ -1,6 +1,9 @@
 defmodule SpkpProjectWeb.LamanUtamaLive do
   use SpkpProjectWeb, :live_view
 
+  # Tambahkan ini
+  on_mount {SpkpProjectWeb.UserAuth, :mount_current_user}
+
   # Data slider
   @slides [
     %{type: :image, src: "/images/logo 1.png"},
@@ -46,7 +49,8 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
      |> assign(:slides, @slides)
      |> assign(:current_index, 0)
      |> assign(:gallery, @gallery)
-     |> assign(:gallery_index, 0)}
+     |> assign(:gallery_index, 0)
+     |> assign_new(:current_user, fn -> nil end)}
   end
 
   # Auto slide scheduling
@@ -148,52 +152,54 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
             </div>
           </div>
 
-          <div class="flex space-x-6">
-            <.link
-              navigate={~p"/users/log_in"}
-              class="flex flex-col items-center text-sm hover:opacity-80"
-            >
-              <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
-              <span>Pengguna</span>
-            </.link>
-            <.link
-              navigate={~p"/users/log_in"}
-              class="flex flex-col items-center text-sm hover:opacity-80"
-            >
+          <div class="flex space-x-6 items-center text-sm hover:opacity-80">
+             <%= if @current_user do %>
+                <!-- Sudah login: pergi ke dashboard -->
+                   <.link navigate={~p"/userdashboard"}>
+                     <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
+                       <span>Pengguna</span>
+                   </.link>
+
+              <% else %>
+
+                <!-- Belum login: pergi ke login page -->
+                  <.link href={~p"/users/log_in"}>
+                    <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
+                      <span>Pengguna</span>
+                  </.link>
+              <% end %>
+
+            <.link href={~p"/users/log_in"} class="flex flex-col items-center text-sm hover:opacity-80">
               <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-8 mb-1" /> <span>Admin</span>
             </.link>
+
           </div>
         </div>
       </header>
+
       <!-- Navigation bar -->
       <div class="bg-[#09033F] shadow py-2">
         <div class="max-w-7xl mx-auto flex space-x-2">
-          <a
-            href={~p"/"}
-            class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
-          >
+
+          <a href={~p"/"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
             Laman Utama
           </a>
-          <a
-            href={~p"/mengenaikami"}
-            class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
-          >
+
+          <a href={~p"/mengenaikami"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
             Mengenai Kami
           </a>
-          <a
-            href={~p"/programkursus"}
-            class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
-          >
+
+          <a href={~p"/programkursus"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
             Program
           </a>
-          <a
-            href="/#hubungi"
-            class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded"
-          >
+
+          <a href="/#hubungi"class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
             Hubungi
           </a>
+
         </div>
       </div>
+
       <!-- Slider -->
       <section class="max-w-6xl mx-auto mt-10 px-6 text-center">
         <div class="h-[320px] flex items-center justify-center">
@@ -210,14 +216,13 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
               class={
                 if i == @current_index,
                   do: "bg-blue-500 w-3 h-3 rounded-full",
-                  else: "bg-gray-300 w-3 h-3 rounded-full"
-              }
-            >
+                  else: "bg-gray-300 w-3 h-3 rounded-full"}>
             </button>
           <% end %>
         </div>
       </section>
     </div>
+
     <!-- Kursus Ditawarkan -->
     <section class="transparent">
       <div class="max-w-7xl mx-auto mt-10 px-4">
@@ -237,11 +242,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
               <li></li>
             </ul>
 
-            <img
-              src={~p"/images/pic-panjang.jpeg"}
-              alt="Kursus Panjang"
-              class="mt-4 rounded-lg px-2 py-2 w-48 h-auto"
-            />
+            <img src={~p"/images/pic-panjang.jpeg"} alt="Kursus Panjang" class="mt-4 rounded-lg px-2 py-2 w-48 h-auto"/>
           </div>
 
           <div class="bg-sky-300 bg-opacity-25 rounded-lg p-6">
@@ -255,22 +256,20 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
               <li>Kursus Asas Membaikpulih & Penyelenggaraan Penghawa Dingin</li>
             </ul>
 
-            <img
-              src={~p"/images/pic-pendek.jpeg"}
-              alt="Kursus Pendek"
-              class="mt-4 rounded-lg px-2 py-2 w-48 h-auto"
-            />
+            <img src={~p"/images/pic-pendek.jpeg"} alt="Kursus Pendek" class="mt-4 rounded-lg px-2 py-2 w-48 h-auto"/>
           </div>
         </div>
       </div>
     </section>
 
     <section class="transparent">
+
       <!-- Tajuk penuh lebar -->
       <div class="max-w-7xl mx-auto mt-10 px-4">
         <h4 class="bg-[#09033F] text-xl text-white font-bold text-center mt-10 px-2 py-2">
           STATISTIK
         </h4>
+
         <!-- Kandungan statistik -->
         <div class="max-w-7xl mx-auto px-4 py-10">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 place-items-center text-center">
@@ -297,11 +296,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
             </div>
 
             <div>
-              <img
-                src={~p"/images/icon jurusan.png"}
-                alt="Jurusan Ditawarkan"
-                class="h-18 w-18 mb-2 mx-auto"
-              />
+              <img src={~p"/images/icon jurusan.png"} alt="Jurusan Ditawarkan" class="h-18 w-18 mb-2 mx-auto"/>
               <div class="text-4xl font-bold">10</div>
 
               <div class="text-gray-600">Jurusan Ditawarkan</div>
@@ -310,6 +305,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
         </div>
       </div>
     </section>
+
     <!-- Galeri Auto-Slider -->
     <section class="max-w-7xl mx-auto px-4 mt-10">
       <h5 class="bg-[#09033F] text-xl text-white font-bold text-center px-6 py-2 mb-6">GALERI</h5>
@@ -331,6 +327,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
         <% end %>
       </div>
     </section>
+
     <!-- Footer -->
     <section id="hubungi">
       <footer class="bg-[#09033F] text-white mt-10 py-2 text-center">
@@ -338,6 +335,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
         <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
           <div class="flex items-center justify-between gap-6">
+
             <!-- Alamat -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6" />
@@ -345,22 +343,26 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
                 Alamat: Block G. 2ND Floor, Lot 9, Lintas Jaya Uptownship Penampang, 88200 Sabah
               </p>
             </div>
+
             <!-- Telefon & Faks -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/fax.png"} alt="Telefon & Faks" class="h-6 w-6" />
               <p class="text-sm">No. Tel: 011-3371 7129<br />Faks: 088 729717</p>
             </div>
+
             <!-- Email -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/email.png"} alt="Email" class="h-6 w-6" />
               <p class="text-sm">Email: sharifperchaya@gmail.com</p>
             </div>
+
             <!-- FB -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/fb.png"} alt="Facebook" class="h-6 w-6" />
               <p class="text-sm">Sharif Perchaya Sdn Bhd</p>
             </div>
           </div>
+
           <!-- Waktu Operasi -->
           <p class="text-sm text-center font-bold">MASA OPERASI</p>
 

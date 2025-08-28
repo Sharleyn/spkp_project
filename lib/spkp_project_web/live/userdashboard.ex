@@ -63,10 +63,10 @@ end
       <!-- Burger Button -->
       <button
         class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
-        phx-click="toggle_sidebar"
-      >
+        phx-click="toggle_sidebar">
         <img src={~p"/images/burger3.png"} alt="Burger Icon" class="w-6 h-6" />
       </button>
+
       <!-- Sidebar -->
       <aside class={"fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
                            (if @sidebar_open, do: "translate-x-0", else: "-translate-x-full") <>
@@ -74,15 +74,9 @@ end
         <!-- Brand -->
         <div class="mt-4 mb-10 w-full">
           <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
-
-
-          <!-- Brand -->
-               <div class="mt-4 mb-10 w-full">
-                <div class="text-2xl text-center font-extrabold tracking-wide">SPKP</div>
-                 <div class="text-xs text-center font-bold text-indigo-200">
+            <div class="text-xs text-center font-bold text-indigo-200">
                     Sistem Permohonan Kursus & Pengurusan
                </div>
-            </div>
             </div>
 
           <!-- Menu -->

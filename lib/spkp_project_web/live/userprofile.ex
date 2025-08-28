@@ -304,7 +304,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
           </div>
         </header>
 
-        <!-- Table Pertama -->
+        <!-- Table -->
         <h1 class="text-2xl font-bold mb-2">Profil Pengguna</h1>
 
         <p class="text-gray-600 mb-6">Kemaskini Maklumat Peribadi Anda Untuk Permohonan Kursus</p>
