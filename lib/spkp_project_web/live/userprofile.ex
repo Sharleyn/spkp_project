@@ -189,7 +189,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="bg-white-100 min-h-screen antialiased text-gray-800">
+    <div class="bg-zinc-50 min-h-screen antialiased text-gray-800">
       <!-- Burger Button -->
       <button
         class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
@@ -363,8 +363,12 @@ defmodule SpkpProjectWeb.UserProfileLive do
           </div>
 
           <!-- Upload IC Attachment -->
-           <div class="border-2 border-indigo-300 rounded-xl mt-4 p-4 mb-4">
-             <label class="block font-semibold mb-2">IC Attachment</label>
+            <div class="border-2 border-indigo-300 rounded-xl mt-4 mb-4 p-4">
+            <h3 class="flex items-center font-semibold mb-4 space-x-2">
+              <img src={~p"/images/paper.png"} alt="Lampiran Tambahan" class="w-5 h-5" />
+              <span>Lampiran Tambahan</span>
+            </h3>
+             <label class="block font-semibold mb-2">Salinan Kad Pengenalan</label>
 
              <!-- Preview sebelum submit -->
              <%= for entry <- @uploads.ic_attachment.entries do %>
@@ -386,7 +390,9 @@ defmodule SpkpProjectWeb.UserProfileLive do
              <% end %>
 
              <!-- Input upload -->
+               <div class="mt-2">
                <.live_file_input upload={@uploads.ic_attachment} />
+               </div>
               </div>
 
                <:actions>
