@@ -64,6 +64,16 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
             {"Kementerian Belia & Sukan", "Kementerian Belia & Sukan"}
           ]}
         />
+        <.input
+          field={@form[:kaedah]}
+          type="select"
+          label="Kaedah Pembelajaran"
+          prompt="-- Pilih Kaedah Pembelajaran --"
+          options={[
+            {"Dalam Talian", "Dalam Talian"},
+            {"Bersemuka", "Bersemuka"}
+          ]}
+        />
         <!-- Upload Gambar Tajaan -->
         <div class="mb-4">
           <label class="block font-semibold mb-2">Gambar Tajaan</label>

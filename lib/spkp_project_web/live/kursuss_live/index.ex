@@ -103,6 +103,7 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           <:col :let={{_id, kursuss}} label="Tarikh akhir">{kursuss.tarikh_akhir}</:col>
 
           <:col :let={{_id, kursuss}} label="Status kursus">{kursuss.status_kursus}</:col>
+          <:col :let={{_id, kursuss}} label="Kaedah Pembelajaran">{kursuss.kaedah}</:col>
 
           <:col :let={{_id, kursuss}} label="Anjuran">{kursuss.anjuran}</:col>
 
