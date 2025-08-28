@@ -38,3 +38,5 @@ priv\static\uploads
 npm-debug.log
 /assets/node_modules/
 
+/uploads/
+

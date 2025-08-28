@@ -30,7 +30,7 @@ defmodule SpkpProjectWeb.Endpoint do
   # Serve uploaded files
     plug Plug.Static,
     at: "/uploads",
-    from: Path.expand("./priv/static/uploads"),
+    from: Path.expand("./uploads"),
     gzip: false
 
   # Pastikan uploads directory wujud

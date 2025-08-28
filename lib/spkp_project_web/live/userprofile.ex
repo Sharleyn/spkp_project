@@ -399,7 +399,9 @@ defmodule SpkpProjectWeb.UserProfileLive do
   defp save_uploads(socket, params, user_id) do
     ic_attachment =
       consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, _entry ->
-        dest = Path.join(["priv/static/uploads", Path.basename(path)])
+        uploads_dir = Path.expand("./uploads")
+        File.mkdir_p!(uploads_dir)
+        dest = Path.join(uploads_dir, Path.basename(path))
         File.cp!(path, dest)
         {:ok, "/uploads/#{Path.basename(dest)}"}
       end)
