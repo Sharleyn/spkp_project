@@ -103,16 +103,6 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     {:noreply, assign(socket, :current_index, new_index)}
   end
 
-  ## ───── Private Helpers ─────
-  defp schedule_slide do
-    Process.send_after(self(), :next_slide, 3000)
-  end
-
-  # Helper untuk galeri
-  defp schedule_gallery_slide() do
-    Process.send_after(self(), :next_gallery, 3000) # tukar setiap 3s
-  end
-
   defp gallery_total(socket) do
     socket.assigns.gallery
     |> Enum.chunk_every(4)
