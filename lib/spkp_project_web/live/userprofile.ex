@@ -298,12 +298,13 @@ defmodule SpkpProjectWeb.UserProfileLive do
             <% end %>
           </div>
         </header>
+
         <!-- Main Content -->
         <h1 class="text-2xl font-bold mb-2">Profil Pengguna</h1>
 
         <p class="text-gray-600 mb-6">Kemaskini Maklumat Peribadi Anda Untuk Permohonan Kursus</p>
         <!-- Profile Pengguna Section -->
-        <div class="border rounded-xl p-6 mb-6 bg-gray-50">
+        <div class="border-2 border-indigo-300 rounded-xl p-6 mb-6 bg-gray-50">
           <h3 class="font-semibold mb-4 text-center text-lg">Profil Pengguna</h3>
 
           <div class="text-center">
@@ -316,11 +317,11 @@ defmodule SpkpProjectWeb.UserProfileLive do
             <p class="text-gray-600">{@current_user.email}</p>
           </div>
         </div>
+
         <!-- Main Content -->
-          <!-- Maklumat Asas -->
                  <.simple_form :let={f} for={@profile_form} id="user-profile-form" as={:user_profile} phx-change="validate" phx-submit="save_profile">
           <!-- Maklumat Asas -->
-          <div class="border rounded-xl p-4">
+          <div class="border-2 border-indigo-300 rounded-xl p-4">
             <h3 class="flex items-center font-semibold mb-4 space-x-2">
               <img src={~p"/images/carbonuser.png"} alt="Profile Pengguna" class="w-5 h-5" />
               <span>Maklumat Asas</span>
@@ -334,8 +335,9 @@ defmodule SpkpProjectWeb.UserProfileLive do
               <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
             </div>
           </div>
+
           <!-- Maklumat Perhubungan -->
-          <div class="border rounded-xl mt-4 p-4">
+          <div class="border-2 border-indigo-300 rounded-xl mt-4 p-4">
             <h3 class="flex items-center font-semibold mb-4 space-x-2">
               <img src={~p"/images/phonelinear.png"} alt="Maklumat Perhubungan" class="w-5 h-5" />
               <span>Maklumat Perhubungan</span>
@@ -344,8 +346,9 @@ defmodule SpkpProjectWeb.UserProfileLive do
             <.input field={f[:address]} type="textarea" label="Alamat" />
             <.input field={f[:district]} type="select" label="Daerah" options={@district_options} />
           </div>
+
           <!-- Pendidikan -->
-          <div class="border rounded-xl mt-4 p-4">
+          <div class="border-2 border-indigo-300 rounded-xl mt-4 p-4">
             <h3 class="flex items-center font-semibold mb-4 space-x-2">
               <img src={~p"/images/bookeducation.png"} alt="Pendidikan" class="w-5 h-5" />
               <span>Pendidikan</span>
@@ -358,8 +361,9 @@ defmodule SpkpProjectWeb.UserProfileLive do
               options={@education_options}
             />
           </div>
-                     <!-- Upload IC Attachment -->
-           <div class="mb-4">
+
+          <!-- Upload IC Attachment -->
+           <div class="border-2 border-indigo-300 rounded-xl mt-4 p-4 mb-4">
              <label class="block font-semibold mb-2">IC Attachment</label>
 
              <!-- Preview sebelum submit -->
@@ -382,20 +386,23 @@ defmodule SpkpProjectWeb.UserProfileLive do
              <% end %>
 
              <!-- Input upload -->
-             <.live_file_input upload={@uploads.ic_attachment} />
-           </div>
-                     <:actions>
-             <.button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
-               💾 Simpan Profil
-             </.button>
-           </:actions>
-         </.simple_form>
-      </div>
-    </div>
+               <.live_file_input upload={@uploads.ic_attachment} />
+              </div>
+
+               <:actions>
+                 <.button
+                    type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition mt-4 w-fit mx-auto">
+                        💾 Simpan Profil
+                </.button>
+              </:actions>
+
+            </.simple_form>
+          </div>
+        </div>
     """
   end
 
-    # Simpan fail ke priv/static/uploads + guna gambar lama kalau tiada upload baru
+    # Simpan fail ke DB + guna gambar lama kalau tiada upload baru
   defp save_uploads(socket, params, user_id) do
     ic_attachment =
       consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, _entry ->
