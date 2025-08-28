@@ -37,7 +37,7 @@ defmodule SpkpProject.Accounts.UserProfile do
   def district_options, do: @district_options
   def education_options, do: @education_options
 
-  @doc false
+    @doc false
   def changeset(user_profile, attrs) do
     user_profile
     |> cast(attrs, [:user_id, :ic, :age, :gender, :phone_number, :address, :district, :education, :ic_attachment])

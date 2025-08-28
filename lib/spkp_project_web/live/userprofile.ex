@@ -82,14 +82,18 @@ defmodule SpkpProjectWeb.UserProfileLive do
       |> assign(:gender_options, @gender_options)
       |> assign(:education_options, @education_options)
       |> assign(:district_options, @district_options)
-      |> allow_upload(:ic_attachment,
-        accept: ~w(.jpg .jpeg .png .pdf),
-        max_entries: 1,
-        # 10MB
-        max_file_size: 10_000_000
-      )
+             |> allow_upload(:ic_attachment,
+         accept: ~w(.jpg .jpeg .png .pdf),
+         max_entries: 1
+       )
 
     {:ok, socket}
+  end
+
+  # Handle validation
+  def handle_event("validate", %{"user_profile" => profile_params}, socket) do
+    changeset = UserProfile.changeset(socket.assigns.profile_changeset.data, profile_params)
+    {:noreply, assign(socket, profile_form: to_form(changeset, action: :validate))}
   end
 
   # Save User (nama & email)
@@ -314,7 +318,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
         </div>
         <!-- Main Content -->
           <!-- Maklumat Asas -->
-        <.form :let={f} for={@profile_form} as={:user_profile} phx-submit="save_profile" multipart>
+                 <.simple_form :let={f} for={@profile_form} id="user-profile-form" as={:user_profile} phx-change="validate" phx-submit="save_profile">
           <!-- Maklumat Asas -->
           <div class="border rounded-xl p-4">
             <h3 class="flex items-center font-semibold mb-4 space-x-2">
@@ -354,100 +358,66 @@ defmodule SpkpProjectWeb.UserProfileLive do
               options={@education_options}
             />
           </div>
-          <!-- Lampiran Tambahan -->
+                     <!-- Upload IC Attachment -->
+           <div class="mb-4">
+             <label class="block font-semibold mb-2">IC Attachment</label>
 
-          <div class="border rounded-xl p-4 mt-4">
-            <h3 class="flex items-center font-semibold mb-4 space-x-2">
-              <img src={~p"/images/upload.png"} class="w-5 h-5" />
-              <span>Lampiran Tambahan</span>
-            </h3>
-            
-    <!-- Kalau ada fail lama dalam DB -->
-            <%= if @profile_changeset.data.ic_attachment do %>
-              <div class="mb-2">
-                <p class="text-sm text-gray-500">Fail IC sedia ada:</p>
+             <!-- Preview sebelum submit -->
+             <%= for entry <- @uploads.ic_attachment.entries do %>
+               <div class="mb-2">
+                 <.live_img_preview entry={entry} class="w-32 h-32 rounded-lg border" />
+                 <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+               </div>
+             <% end %>
 
-                <%= if String.ends_with?(@profile_changeset.data.ic_attachment, [".jpg", ".jpeg", ".png"]) do %>
-                  <img
-                    src={@profile_changeset.data.ic_attachment}
-                    alt="IC lama"
-                    class="w-32 h-32 object-cover rounded-lg border"
-                  />
-                <% else %>
-                  <a
-                    href={@profile_changeset.data.ic_attachment}
-                    target="_blank"
-                    class="text-blue-600 underline"
-                  >
-                    📄 Lihat fail IC lama
-                  </a>
-                <% end %>
-              </div>
-            <% end %>
-            
-    <!-- Kalau tiada fail lama & tiada upload baru -->
-            <%= if is_nil(@profile_changeset.data.ic_attachment) and Enum.empty?(@uploads.ic_attachment.entries) do %>
-              <p class="text-sm text-gray-400 italic">❌ Tiada fail IC disimpan</p>
-            <% end %>
-            
-    <!-- Preview fail yang baru dipilih -->
-            <%= for entry <- @uploads.ic_attachment.entries do %>
-              <div class="mb-2">
-                <.live_img_preview entry={entry} class="w-32 h-32 rounded-lg border" />
-                <progress value={entry.progress} max="100">
-                  {entry.progress}%
-                </progress>
-              </div>
-            <% end %>
-            
-    <!-- Input Upload Baru -->
-            <label class="block text-sm font-medium text-gray-700">Muat naik IC baru</label>
-            <.live_file_input
-              upload={@uploads.ic_attachment}
-              class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
-            />
-          </div>
-          <!-- Button -->
-          <div class="flex justify-center mt-8">
-            <.button
-              type="submit"
-              class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition"
-            >
-              💾 Simpan Profil
-            </.button>
-          </div>
-        </.form>
+             <!-- Gambar lama bila edit -->
+             <%= if @profile_changeset.data.ic_attachment && @uploads.ic_attachment.entries == [] do %>
+               <%= if String.ends_with?(@profile_changeset.data.ic_attachment, [".jpg", ".jpeg", ".png"]) do %>
+                 <img src={@profile_changeset.data.ic_attachment} class="w-32 h-32 rounded-lg border" />
+               <% else %>
+                 <a href={@profile_changeset.data.ic_attachment} target="_blank" class="text-blue-600 underline">
+                   📄 Lihat fail IC lama
+                 </a>
+               <% end %>
+             <% end %>
+
+             <!-- Input upload -->
+             <.live_file_input upload={@uploads.ic_attachment} />
+           </div>
+                     <:actions>
+             <.button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition">
+               💾 Simpan Profil
+             </.button>
+           </:actions>
+         </.simple_form>
       </div>
     </div>
     """
   end
 
-  # Simpan fail ke priv/static/uploads + guna gambar lama kalau tiada upload baru
+    # Simpan fail ke priv/static/uploads + guna gambar lama kalau tiada upload baru
   defp save_uploads(socket, params, user_id) do
-    uploads_dir = Path.join(["priv/static/uploads"])
-    File.mkdir_p!(uploads_dir)
-
     ic_attachment =
-      consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, entry ->
-        dest = Path.join(uploads_dir, entry.client_name)
+      consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, _entry ->
+        dest = Path.join(["priv/static/uploads", Path.basename(path)])
         File.cp!(path, dest)
-        {:ok, "/uploads/#{entry.client_name}"}
+        {:ok, "/uploads/#{Path.basename(dest)}"}
       end)
       |> List.first()
 
     existing_profile = Accounts.get_user_profile_by_user_id(user_id) || %UserProfile{}
 
-    params
+    result = params
     |> Map.put("user_id", user_id)
     |> maybe_put("ic_attachment", ic_attachment, existing_profile.ic_attachment)
+
+    result
   end
 
   defp maybe_put(params, key, new_val, old_val) do
     cond do
-      # guna gambar baru
-      is_binary(new_val) -> Map.put(params, key, new_val)
-      # kekalkan gambar lama
-      true -> Map.put(params, key, old_val)
+      is_binary(new_val) -> Map.put(params, key, new_val) # guna gambar baru
+      true -> Map.put(params, key, old_val)              # kekalkan gambar lama
     end
   end
 end
