@@ -35,3 +35,5 @@ spkp_project-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/uploads/
+

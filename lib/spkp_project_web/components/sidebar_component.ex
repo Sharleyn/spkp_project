@@ -9,12 +9,12 @@ defmodule SpkpProjectWeb.SidebarComponent do
     # Tentukan menu mana perlu terbuka
     open_menu =
       cond do
-        String.starts_with?(current_path, "/admin/dashboard") -> "dashboard"
-        String.starts_with?(current_path, "/admin/kursus") -> "kursus"
-        String.starts_with?(current_path, "/admin/peserta") -> "peserta"
-        String.starts_with?(current_path, "/admin/permohonan") -> "permohonan"
-        String.starts_with?(current_path, "/admin/elaunpekerja") -> "elaunpekerja"
-        String.starts_with?(current_path, "/admin/tetapan") -> "tetapan"
+        String.starts_with?(current_path, "/#{assigns.role}/dashboard") -> "dashboard"
+        String.starts_with?(current_path, "/#{assigns.role}/kursus") -> "kursus"
+        String.starts_with?(current_path, "/#{assigns.role}/peserta") -> "peserta"
+        String.starts_with?(current_path, "/#{assigns.role}/permohonan") -> "permohonan"
+        String.starts_with?(current_path, "/#{assigns.role}/elaun") -> "elaun"
+        String.starts_with?(current_path, "/#{assigns.role}/tetapan") -> "tetapan"
         true -> nil
       end
 
@@ -33,24 +33,29 @@ defmodule SpkpProjectWeb.SidebarComponent do
       <div class="p-6 border-b border-blue-800">
         <div class="flex items-center space-x-3">
           <div class="text-3xl">🎓</div>
-
           <div>
+
             <div class="font-bold text-lg">SPKP</div>
 
-            <div class="text-sm text-blue-200">Admin Dashboard</div>
+            <div class="text-sm text-blue-200">
+              <%= if @role == "admin", do: "Admin Dashboard", else: "Pekerja Dashboard" %>
+            </div>
           </div>
         </div>
       </div>
+
       <!-- Navigation Menu -->
-      <nav class="p-4">
+      <nav class="p-4 flex-1 overflow-y-auto">
         <div class="text-sm font-semibold text-blue-300 mb-4">Menu Utama</div>
+
         <!-- Dashboard -->
         <.link
-          navigate={~p"/admin/dashboard"}
-          class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 #{if @active_link == "/admin/dashboard", do: "bg-gray-700"}"}
+         navigate={if @role == "admin", do: ~p"/admin/dashboard", else: ~p"/pekerja/dashboard"}
+         class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 #{if @active_link == "/#{@role}/dashboard", do: "bg-gray-700"}"}
         >
-          Dashboard
+         Dashboard
         </.link>
+
         <!-- Kursus -->
         <div>
           <div
@@ -64,6 +69,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
 
           <%= if @open_menu == "kursus" do %>
             <div class="ml-4">
+                <%= if @role == "admin" do %>
               <.link
                 navigate={~p"/admin/kursus_kategori"}
                 class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/kursus_kategori", do: "bg-gray-600 font-bold"}"}
@@ -76,16 +82,41 @@ defmodule SpkpProjectWeb.SidebarComponent do
               >
                 Senarai Kursus
               </.link>
+
+              <% else %>
+                  <.link
+                    navigate={~p"/pekerja/kursus_kategori"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/kursus_kategori", do: "bg-gray-600 font-bold"}"}
+                  >
+                    Kategori Kursus
+                  </.link>
+                  <.link
+                    navigate={~p"/pekerja/kursus"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/kursus", do: "bg-gray-600 font-bold"}"}
+                  >
+                    Senarai Kursus
+                  </.link>
+                <% end %>
             </div>
           <% end %>
         </div>
+
         <!-- Permohonan -->
-        <.link
-          navigate={~p"/admin/permohonan"}
-          class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 #{if @active_link == "/admin/permohonan", do: "bg-gray-700"}"}
-        >
+       <%= if @role == "admin" do %>
+           <.link
+              navigate={~p"/admin/permohonan"}
+                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/permohonan", do: "bg-gray-600 font-bold"}"}
+            >
+              Permohonan
+              </.link>
+              <% else %>
+               <.link
+                    navigate={~p"/pekerja/permohonan"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/permohonan", do: "bg-gray-600 font-bold"}"}
+              >
           Permohonan
         </.link>
+        <% end %>
         <!-- Peserta -->
         <div>
           <div
@@ -99,49 +130,75 @@ defmodule SpkpProjectWeb.SidebarComponent do
 
           <%= if @open_menu == "peserta" do %>
             <div class="ml-4">
-              <.link
-                navigate={~p"/admin/peserta/senaraipeserta"}
-                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/peserta/senaraipeserta", do: "bg-gray-600 font-bold"}"}
+             <%= if @role == "admin" do %>
+                  <.link
+                    navigate={~p"/admin/senaraipeserta"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/senaraipeserta", do: "bg-gray-600 font-bold"}"}
               >
                 Senarai Peserta
               </.link>
+              <% else %>
+                  <.link
+                    navigate={~p"/pekerja/senaraipeserta"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/senaraipeserta", do: "bg-gray-600 font-bold"}"}
+              >
+              Senarai Peserta
+              </.link>
+               <% end %>
             </div>
           <% end %>
         </div>
-        <!-- Elaun Pekerja -->
-        <div>
-          <div
-            phx-click="toggle_menu"
-            phx-value-menu="elaunpekerja"
-            phx-target={@myself}
-            class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @open_menu == "elaunpekerja", do: "bg-gray-700"}"}
-          >
-            <span>Elaun Pekerja</span>
+
+       <!-- Elaun -->
+          <div>
+            <div
+              phx-click="toggle_menu"
+              phx-value-menu="elaunpekerja"
+              phx-target={@myself}
+              class={"block p-3 mb-2 rounded-lg hover:bg-gray-700 cursor-pointer flex justify-between items-center #{if @open_menu == "elaunpekerja", do: "bg-gray-700"}"}
+            >
+              <span>Elaun</span>
+            </div>
+
+            <%= if @open_menu == "elaunpekerja" do %>
+              <div class="ml-4">
+                <%= if @role == "admin" do %>
+                  <.link
+                    navigate={~p"/admin/elaun_pekerja"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaun_pekerja", do: "bg-gray-600 font-bold"}"}
+                  >
+                    Senarai Tuntutan
+                  </.link>
+                  <.link
+                    navigate={~p"/admin/item_elaun_pekerja"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/item_elaun_pekerja", do: "bg-gray-600 font-bold"}"}
+                  >
+                    Buat Tuntutan Baru
+                  </.link>
+                  <.link
+                    navigate={~p"/admin/maklumat_pekerja"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/maklumat_pekerja", do: "bg-gray-600 font-bold"}"}
+                  >
+                    Senarai Pekerja
+                  </.link>
+                <% else %>
+                  <.link
+                    navigate={~p"/pekerja/elaun_saya"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/elaun_saya", do: "bg-gray-600 font-bold"}"}
+                  >
+                    Tuntutan Saya
+                  </.link>
+                  <.link
+                    navigate={~p"/pekerja/elaun_saya/baru"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/elaun_saya/baru", do: "bg-gray-600 font-bold"}"}
+                  >
+                    Buat Tuntutan Baru
+                  </.link>
+                <% end %>
+              </div>
+            <% end %>
           </div>
 
-          <%= if @open_menu == "elaunpekerja" do %>
-            <div class="ml-4">
-              <.link
-                navigate={~p"/admin/elaun_pekerja"}
-                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaunpekerja/senaraituntutan", do: "bg-gray-600 font-bold"}"}
-              >
-                Senarai Tuntutan
-              </.link>
-              <.link
-                navigate={~p"/admin/elaunpekerja/buattuntutanbaru"}
-                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaunpekerja/buattuntutanbaru", do: "bg-gray-600 font-bold"}"}
-              >
-                Buat Tuntutan Baru
-              </.link>
-              <.link
-                navigate={~p"/admin/maklumat_pekerja"}
-                class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/elaunpekerja/senaraipekerja", do: "bg-gray-600 font-bold"}"}
-              >
-                Senarai Pekerja
-              </.link>
-            </div>
-          <% end %>
-        </div>
         <!-- Tetapan -->
         <div>
           <div
@@ -156,17 +213,27 @@ defmodule SpkpProjectWeb.SidebarComponent do
           <%= if @open_menu == "tetapan" do %>
             <div class="ml-4">
               <.link
-                navigate={~p"/admin/editprofile"}
+                navigate={~p"/#{@role}/editprofile"}
                 class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/tetapan/editprofile", do: "bg-gray-600 font-bold"}"}
               >
                 Edit Profile
               </.link>
+
               <.link
-                navigate={~p"/admin/tetapan/tukarkatalaluan"}
+                navigate={~p"/#{@role}/tukarkatalaluan"}
                 class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/tetapan/tukarkatalaluan", do: "bg-gray-600 font-bold"}"}
               >
                 Tukar Kata Laluan
               </.link>
+
+              <%= if @role == "admin" do %>
+                <.link
+                  navigate={~p"/admin/assignstaff"}
+                  class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/users", do: "bg-gray-600 font-bold"}"}
+                >
+                  Pengurusan Pengguna
+                 </.link>
+                 <% end %>
             </div>
           <% end %>
         </div>

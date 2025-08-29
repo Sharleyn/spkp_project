@@ -25,6 +25,12 @@ defmodule SpkpProjectWeb.Endpoint do
     gzip: false,
     only: ~w(assets fonts images favicon.ico robots.txt uploads)
 
+  plug Plug.Static,
+  at: "/uploads",
+  from: Path.expand("./uploads"),
+  gzip: false
+
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

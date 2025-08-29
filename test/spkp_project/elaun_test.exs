@@ -62,4 +62,68 @@ defmodule SpkpProject.ElaunTest do
       assert %Ecto.Changeset{} = Elaun.change_elaun_pekerja(elaun_pekerja)
     end
   end
+
+  describe "item_elaun_pekerja" do
+    alias SpkpProject.Elaun.ItemElaunPekerja
+
+    import SpkpProject.ElaunFixtures
+
+    @invalid_attrs %{kenyataan_tuntutan: nil, tarikh_tuntutan: nil, masa_mula: nil, masa_tamat: nil, keterangan: nil, jumlah: nil}
+
+    test "list_item_elaun_pekerja/0 returns all item_elaun_pekerja" do
+      item_elaun_pekerja = item_elaun_pekerja_fixture()
+      assert Elaun.list_item_elaun_pekerja() == [item_elaun_pekerja]
+    end
+
+    test "get_item_elaun_pekerja!/1 returns the item_elaun_pekerja with given id" do
+      item_elaun_pekerja = item_elaun_pekerja_fixture()
+      assert Elaun.get_item_elaun_pekerja!(item_elaun_pekerja.id) == item_elaun_pekerja
+    end
+
+    test "create_item_elaun_pekerja/1 with valid data creates a item_elaun_pekerja" do
+      valid_attrs = %{kenyataan_tuntutan: "some kenyataan_tuntutan", tarikh_tuntutan: ~D[2025-08-27], masa_mula: ~T[14:00:00], masa_tamat: ~T[14:00:00], keterangan: "some keterangan", jumlah: "120.5"}
+
+      assert {:ok, %ItemElaunPekerja{} = item_elaun_pekerja} = Elaun.create_item_elaun_pekerja(valid_attrs)
+      assert item_elaun_pekerja.kenyataan_tuntutan == "some kenyataan_tuntutan"
+      assert item_elaun_pekerja.tarikh_tuntutan == ~D[2025-08-27]
+      assert item_elaun_pekerja.masa_mula == ~T[14:00:00]
+      assert item_elaun_pekerja.masa_tamat == ~T[14:00:00]
+      assert item_elaun_pekerja.keterangan == "some keterangan"
+      assert item_elaun_pekerja.jumlah == Decimal.new("120.5")
+    end
+
+    test "create_item_elaun_pekerja/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Elaun.create_item_elaun_pekerja(@invalid_attrs)
+    end
+
+    test "update_item_elaun_pekerja/2 with valid data updates the item_elaun_pekerja" do
+      item_elaun_pekerja = item_elaun_pekerja_fixture()
+      update_attrs = %{kenyataan_tuntutan: "some updated kenyataan_tuntutan", tarikh_tuntutan: ~D[2025-08-28], masa_mula: ~T[15:01:01], masa_tamat: ~T[15:01:01], keterangan: "some updated keterangan", jumlah: "456.7"}
+
+      assert {:ok, %ItemElaunPekerja{} = item_elaun_pekerja} = Elaun.update_item_elaun_pekerja(item_elaun_pekerja, update_attrs)
+      assert item_elaun_pekerja.kenyataan_tuntutan == "some updated kenyataan_tuntutan"
+      assert item_elaun_pekerja.tarikh_tuntutan == ~D[2025-08-28]
+      assert item_elaun_pekerja.masa_mula == ~T[15:01:01]
+      assert item_elaun_pekerja.masa_tamat == ~T[15:01:01]
+      assert item_elaun_pekerja.keterangan == "some updated keterangan"
+      assert item_elaun_pekerja.jumlah == Decimal.new("456.7")
+    end
+
+    test "update_item_elaun_pekerja/2 with invalid data returns error changeset" do
+      item_elaun_pekerja = item_elaun_pekerja_fixture()
+      assert {:error, %Ecto.Changeset{}} = Elaun.update_item_elaun_pekerja(item_elaun_pekerja, @invalid_attrs)
+      assert item_elaun_pekerja == Elaun.get_item_elaun_pekerja!(item_elaun_pekerja.id)
+    end
+
+    test "delete_item_elaun_pekerja/1 deletes the item_elaun_pekerja" do
+      item_elaun_pekerja = item_elaun_pekerja_fixture()
+      assert {:ok, %ItemElaunPekerja{}} = Elaun.delete_item_elaun_pekerja(item_elaun_pekerja)
+      assert_raise Ecto.NoResultsError, fn -> Elaun.get_item_elaun_pekerja!(item_elaun_pekerja.id) end
+    end
+
+    test "change_item_elaun_pekerja/1 returns a item_elaun_pekerja changeset" do
+      item_elaun_pekerja = item_elaun_pekerja_fixture()
+      assert %Ecto.Changeset{} = Elaun.change_item_elaun_pekerja(item_elaun_pekerja)
+    end
+  end
 end

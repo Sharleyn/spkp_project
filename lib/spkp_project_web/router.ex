@@ -61,7 +61,9 @@ defmodule SpkpProjectWeb.Router do
 
     live_session :require_admin,
       on_mount: [{SpkpProjectWeb.UserAuth, {:ensure_role, "admin"}}] do
-      live "/dashboard", AdminDashboardLive
+
+      live "/dashboard", DashboardLive, :index
+
       live "/permohonan", PermohonanLive
       live "/tetapan", TetapanLive
 
@@ -88,7 +90,12 @@ defmodule SpkpProjectWeb.Router do
       live "/elaun_pekerja/:id", ElaunPekerjaLive.Show, :show
       live "/elaun_pekerja/:id/show/edit", ElaunPekerjaLive.Show, :edit
 
-      live "/elaunpekerja/buattuntutanbaru", BuatTuntutanBaruLive
+      live "/item_elaun_pekerja", ItemElaunPekerjaLive.Index, :index
+      live "/item_elaun_pekerja/new", ItemElaunPekerjaLive.Index, :new
+      live "/item_elaun_pekerja/:id/edit", ItemElaunPekerjaLive.Index, :edit
+
+      live "/item_elaun_pekerja/:id", ItemElaunPekerjaLive.Show, :show
+      live "/item_elaun_pekerja/:id/show/edit", ItemElaunPekerjaLive.Show, :edit
 
       live "/maklumat_pekerja", MaklumatPekerjaLive.Index, :index
       live "/maklumat_pekerja/new", MaklumatPekerjaLive.Index, :new
@@ -99,6 +106,10 @@ defmodule SpkpProjectWeb.Router do
 
       live "/editprofile", EditProfileLive.Show
       live "/tetapan/tukarkatalaluan", TukarKataLaluanLive
+      live "/assignstaff", AssignStaffLive, :index
+      live "/assignstaff/:id/edit", AssignStaffLive, :edit
+
+
     end
   end
 
@@ -108,7 +119,16 @@ defmodule SpkpProjectWeb.Router do
 
     live_session :require_pekerja,
       on_mount: [{SpkpProjectWeb.UserAuth, {:ensure_role, "pekerja"}}] do
-      live "/dashboard", PekerjaDashboardLive
+      live "/dashboard", DashboardLive, :index
+
+      live "/elaun_saya", TuntutanSayaLive
+
+      live "/elaun_pekerja", ElaunPekerjaLive.Index, :index
+      live "/elaun_pekerja/new", ElaunPekerjaLive.Index, :new
+      live "/elaun_pekerja/:id/edit", ElaunPekerjaLive.Index, :edit
+
+      live "/elaun_pekerja/:id", ElaunPekerjaLive.Show, :show
+      live "/elaun_pekerja/:id/show/edit", ElaunPekerjaLive.Show, :edit
     end
   end
 

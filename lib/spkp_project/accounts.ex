@@ -231,6 +231,21 @@ defmodule SpkpProject.Accounts do
     |> Repo.update()
   end
 
+   # Dapatkan changeset untuk ubah role (guna dalam form)
+   def change_user_role(%User{} = user, attrs \\ %{}) do
+    User.role_changeset(user, attrs)
+  end
+
+  # Update role (guna dalam handle_event save)
+  def update_user_role(%User{} = user, role) when role in ["admin", "pekerja", "user"] do
+    user
+    |> Ecto.Changeset.change(%{role: role})
+    |> Repo.update()
+  end
+
+
+
+
   ## Session
 
   @doc """

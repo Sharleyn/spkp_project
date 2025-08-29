@@ -20,4 +20,23 @@ defmodule SpkpProject.ElaunFixtures do
 
     elaun_pekerja
   end
+
+  @doc """
+  Generate a item_elaun_pekerja.
+  """
+  def item_elaun_pekerja_fixture(attrs \\ %{}) do
+    {:ok, item_elaun_pekerja} =
+      attrs
+      |> Enum.into(%{
+        jumlah: "120.5",
+        kenyataan_tuntutan: "some kenyataan_tuntutan",
+        keterangan: "some keterangan",
+        masa_mula: ~T[14:00:00],
+        masa_tamat: ~T[14:00:00],
+        tarikh_tuntutan: ~D[2025-08-27]
+      })
+      |> SpkpProject.Elaun.create_item_elaun_pekerja()
+
+    item_elaun_pekerja
+  end
 end

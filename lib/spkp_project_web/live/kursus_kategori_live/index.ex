@@ -6,7 +6,12 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :kursus_kategori_collection, Kursus.list_kursus_kategori())}
+    role = socket.assigns.current_user.role
+
+  {:ok,
+   socket
+   |> assign(:role, role)
+   |> stream(:kursus_kategori_collection, Kursus.list_kursus_kategori())}
   end
 
   @impl true
@@ -135,6 +140,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
             action={@live_action}
             kursus_kategori={@kursus_kategori}
             patch={~p"/admin/kursus_kategori"}
+            role={@role}
           />
         </.modal>
       </div>

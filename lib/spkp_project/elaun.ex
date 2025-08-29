@@ -106,4 +106,100 @@ defmodule SpkpProject.Elaun do
   def change_elaun_pekerja(%ElaunPekerja{} = elaun_pekerja, attrs \\ %{}) do
     ElaunPekerja.changeset(elaun_pekerja, attrs)
   end
+
+  alias SpkpProject.Elaun.ItemElaunPekerja
+
+  @doc """
+  Returns the list of item_elaun_pekerja.
+
+  ## Examples
+
+      iex> list_item_elaun_pekerja()
+      [%ItemElaunPekerja{}, ...]
+
+  """
+  def list_item_elaun_pekerja do
+    Repo.all(ItemElaunPekerja)
+  end
+
+  @doc """
+  Gets a single item_elaun_pekerja.
+
+  Raises `Ecto.NoResultsError` if the Item elaun pekerja does not exist.
+
+  ## Examples
+
+      iex> get_item_elaun_pekerja!(123)
+      %ItemElaunPekerja{}
+
+      iex> get_item_elaun_pekerja!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_item_elaun_pekerja!(id), do: Repo.get!(ItemElaunPekerja, id)
+
+  @doc """
+  Creates a item_elaun_pekerja.
+
+  ## Examples
+
+      iex> create_item_elaun_pekerja(%{field: value})
+      {:ok, %ItemElaunPekerja{}}
+
+      iex> create_item_elaun_pekerja(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_item_elaun_pekerja(attrs \\ %{}) do
+    %ItemElaunPekerja{}
+    |> ItemElaunPekerja.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a item_elaun_pekerja.
+
+  ## Examples
+
+      iex> update_item_elaun_pekerja(item_elaun_pekerja, %{field: new_value})
+      {:ok, %ItemElaunPekerja{}}
+
+      iex> update_item_elaun_pekerja(item_elaun_pekerja, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_item_elaun_pekerja(%ItemElaunPekerja{} = item_elaun_pekerja, attrs) do
+    item_elaun_pekerja
+    |> ItemElaunPekerja.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a item_elaun_pekerja.
+
+  ## Examples
+
+      iex> delete_item_elaun_pekerja(item_elaun_pekerja)
+      {:ok, %ItemElaunPekerja{}}
+
+      iex> delete_item_elaun_pekerja(item_elaun_pekerja)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_item_elaun_pekerja(%ItemElaunPekerja{} = item_elaun_pekerja) do
+    Repo.delete(item_elaun_pekerja)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking item_elaun_pekerja changes.
+
+  ## Examples
+
+      iex> change_item_elaun_pekerja(item_elaun_pekerja)
+      %Ecto.Changeset{data: %ItemElaunPekerja{}}
+
+  """
+  def change_item_elaun_pekerja(%ItemElaunPekerja{} = item_elaun_pekerja, attrs \\ %{}) do
+    ItemElaunPekerja.changeset(item_elaun_pekerja, attrs)
+  end
 end

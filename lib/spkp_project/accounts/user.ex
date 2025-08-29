@@ -55,7 +55,7 @@ defmodule SpkpProject.Accounts.User do
     |> cast(attrs, [:role])
     |> validate_required([:role])
     # ✅ validate di sini
-    |> validate_inclusion(:role, ["user", "staff", "admin"])
+    |> validate_inclusion(:role, ["user", "pekerja", "admin"])
   end
 
   def update_changeset(user, attrs, opts \\ []) do
