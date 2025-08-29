@@ -216,7 +216,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
             </div>
 
             <!-- Bahagian Kanan: Maklumat Kursus -->
-            <div class="md:col-span-2 bg-[#F8F8FF] rounded-lg px-4 py-4 flex flex-col">
+            <div class="md:col-span-2 bg-[#F8F8FF] rounded-lg border border-indigo-200 px-4 py-4 flex flex-col">
               <div class="flex justify-between items-start mb-1">
                 <div>
                   <h3 class="text-xl font-bold text-gray-800"><%= kursus.nama_kursus %></h3>

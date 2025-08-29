@@ -1,24 +1,36 @@
 defmodule SpkpProjectWeb.UserDashboardLive do
   use SpkpProjectWeb, :live_view
 
+  import Ecto.Query
+
 
   @impl true
   def mount(_params, _session, socket) do
    current_user = socket.assigns.current_user
 
-   available_courses =
-    SpkpProject.Kursus.list_all_courses()
-    |> Enum.take(3)  # ambil maksimum 3 kursus untuk dashboard
+   # ✅ Kursus Tersedia (kira jumlah dengan status aktif / akan datang)
+  available_courses_count =
+    from(k in SpkpProject.Kursus.Kursuss,
+      where: k.status_kursus in ^["Aktif", "Akan Datang"])
+    |> SpkpProject.Repo.aggregate(:count, :id)
+
+  # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini"
+  available_courses =
+    from(k in SpkpProject.Kursus.Kursuss,
+      order_by: [desc: k.inserted_at],
+      limit: 3
+    )
+    |> SpkpProject.Repo.all()
 
    socket =
     socket
     |> assign(:current_user_name, current_user.full_name)
     |> assign(:sidebar_open, true)
     |> assign(:user_menu_open, false)
-    |> assign(:available_courses, available_courses)
-    |> assign(:active_applications_count, 3)
-    |> assign(:available_courses_count, length(available_courses))
-    |> assign(:completed_courses_count, 0)
+    |> assign(:available_courses, available_courses)            # 👉 senarai untuk "Kursus Terkini"
+    |> assign(:available_courses_count, available_courses_count) # 👉 total untuk "Kursus Tersedia"
+    |> assign(:active_applications_count, 3) # (boleh tukar ikut permohonan user)
+    |> assign(:completed_courses_count, 0)   # (boleh tukar ikut DB)
     |> assign(:recent_applications, [
       %{name: "Kursus Komputer Asas", date: "2025-01-24", status: "Diterima", status_class: "bg-green-100 text-green-600"},
       %{name: "Kursus Bahasa Inggeris", date: "2025-02-17", status: "Dalam Proses", status_class: "bg-yellow-100 text-yellow-600"},
@@ -172,9 +184,9 @@ end
                         </div>
                     </div>
 
-            <!-- Status Profil and Permohonan Terkini Section -->
+            <!-- Status Profil Section -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-sky-50 p-6 rounded-3xl shadow-lg">
+                        <div class="bg-sky-50 border border-sky-100 p-6 rounded-3xl shadow-lg">
                             <h4 class="flex justify-center px-8 mt-6 items-center text-lg font-semibold mb-4 text-black-700">
                                 <img src={~p"/images/tableuser.png"} alt="Certificate Icon" class="w-10 h-10 mr-2" />
                                 Status Profil
@@ -189,7 +201,8 @@ end
                             </div>
                         </div>
 
-                        <div class="bg-[#C8C4DF] bg-opacity-20 p-6 rounded-3xl shadow-lg">
+              <!-- Permohonan Terkini Section -->
+                        <div class="bg-[#C8C4DF] bg-opacity-20 border border-indigo-100 p-6 rounded-3xl shadow-lg">
                             <h4 class="flex items-center text-lg font-bold gap-4 mb-4 text-gray-700">
                                 <img src={~p"/images/bookclock.png"} alt="Bookclock Icon" class="w-8 h-8" />
                                 Permohonan Terkini
@@ -215,9 +228,9 @@ end
                         </div>
                     </div>
 
-                    <!-- Kursus Terkini Full Width -->
+                    <!-- Kursus Terkini Section -->
                         <div class="mb-8">
-                           <div class="bg-blue-50 p-6 rounded-3xl shadow-lg">
+                           <div class="bg-blue-50 border border-indigo-100 p-6 rounded-3xl shadow-lg">
                               <h4 class="flex items-center text-lg font-bold gap-4 mb-4 text-gray-700">
                                   <img src={~p"/images/book.png"} alt="Book Icon" class="w-8 h-8" />
                                     Kursus Terkini

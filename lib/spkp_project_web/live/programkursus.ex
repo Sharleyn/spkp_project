@@ -84,7 +84,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
         <a
           href={~p"/"}
           class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
-          Laman Utama
+          Halaman Utama
         </a>
         <a
           href={~p"/mengenaikami"}
