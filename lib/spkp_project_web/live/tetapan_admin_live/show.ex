@@ -7,6 +7,12 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
   end
 
   @impl true
+  def handle_params(_params, uri, socket) do
+    {:noreply, assign(socket, :current_path, URI.parse(uri).path)}
+  end
+
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
@@ -15,7 +21,11 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
         current_view={@socket.view}
+        role={@current_user.role}
+        current_user={@current_user}
+        current_path={@current_path}
       />
+
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <!-- Header -->

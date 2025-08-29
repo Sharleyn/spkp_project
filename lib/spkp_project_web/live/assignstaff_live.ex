@@ -2,7 +2,6 @@ defmodule SpkpProjectWeb.AssignStaffLive do
   use SpkpProjectWeb, :live_view
   alias SpkpProject.Accounts
 
-
   @impl true
   def mount(_params, _session, socket) do
     users = Accounts.list_users()
@@ -13,7 +12,6 @@ defmodule SpkpProjectWeb.AssignStaffLive do
   def handle_params(%{"id" => id}, _uri, socket) do
     user = Accounts.get_user!(id)
     changeset = Accounts.change_user_role(user)
-
 
     {:noreply,
      assign(socket,
@@ -48,6 +46,9 @@ defmodule SpkpProjectWeb.AssignStaffLive do
 
         <:actions>
           <.button>Simpan</.button>
+          <.link patch={~p"/admin/assignstaff"} class="ml-2 text-gray-600 hover:underline">
+            Kembali
+          </.link>
         </:actions>
       </.simple_form>
     </div>
@@ -73,7 +74,17 @@ defmodule SpkpProjectWeb.AssignStaffLive do
             <tr>
               <td class="border px-4 py-2"><%= user.full_name %></td>
               <td class="border px-4 py-2"><%= user.email %></td>
-              <td class="border px-4 py-2"><%= user.role %></td>
+              <td class="border px-4 py-2">
+                <span class={
+                  case user.role do
+                    "admin" -> "text-red-600 font-bold"
+                    "pekerja" -> "text-green-600"
+                    _ -> "text-gray-700"
+                  end
+                }>
+                  <%= user.role %>
+                </span>
+              </td>
               <td class="border px-4 py-2">
                 <.link patch={~p"/admin/assignstaff/#{user.id}/edit"} class="text-blue-600 hover:underline">
                   Tukar Role
@@ -96,7 +107,7 @@ defmodule SpkpProjectWeb.AssignStaffLive do
         {:noreply,
          socket
          |> put_flash(:info, "Role berjaya dikemaskini")
-         |> assign(users: users, live_action: :index)}
+         |> assign(users: users, user: nil, changeset: nil, live_action: :index)}
 
       {:error, changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

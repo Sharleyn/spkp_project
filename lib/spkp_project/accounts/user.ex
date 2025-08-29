@@ -12,6 +12,8 @@ defmodule SpkpProject.Accounts.User do
     field :full_name, :string
     field :role, :string
 
+    has_one :user_profile, SpkpProject.Accounts.UserProfile
+
     timestamps(type: :utc_datetime)
   end
 
@@ -40,8 +42,9 @@ defmodule SpkpProject.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:role, :email, :password, :full_name, :password_confirmation])
-    |> validate_required([:full_name, :email, :password])
+
+    |> cast(attrs, [:email, :password, :full_name, :password_confirmation])
+    |> cast_assoc(:user_profile, with: &SpkpProject.Accounts.UserProfile.changeset/2)
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_full_name(opts)
@@ -196,4 +199,15 @@ defmodule SpkpProject.Accounts.User do
       add_error(changeset, :current_password, "is not valid")
     end
   end
+
+  @doc """
+  A user changeset for updating user information (excluding password).
+  """
+  def profile_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :full_name])
+    |> validate_email(validate_email: false)
+    |> validate_full_name(validate_email: false)
+  end
+
 end

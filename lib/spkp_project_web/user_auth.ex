@@ -256,8 +256,10 @@ defmodule SpkpProjectWeb.UserAuth do
 
   defp maybe_store_return_to(conn), do: conn
 
+
   defp signed_in_path(%{role: "admin"}), do: ~p"/admin/dashboard"
   defp signed_in_path(%{role: "pekerja"}), do: ~p"/pekerja/dashboard"
   defp signed_in_path(%{role: "user"}), do: ~p"/userdashboard"
   defp signed_in_path(_), do: ~p"/"
+
 end

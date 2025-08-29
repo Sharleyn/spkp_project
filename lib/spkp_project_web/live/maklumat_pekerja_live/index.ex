@@ -10,8 +10,11 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  def handle_params(params, uri, socket) do
+    {:noreply,
+     socket
+     |> assign(:current_path, URI.parse(uri).path)
+     |> apply_action(socket.assigns.live_action, params)}
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -50,11 +53,15 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
     ~H"""
         <div class="w-full min-h-screen bg-gray-100 flex">
       <!-- Sidebar -->
-      <.live_component
+       <.live_component
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
         current_view={@socket.view}
+        role={@current_user.role}
+        current_user={@current_user}
+        current_path={@current_path}
       />
+
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <.header class="bg-white shadow-sm border-b border-gray-200">
