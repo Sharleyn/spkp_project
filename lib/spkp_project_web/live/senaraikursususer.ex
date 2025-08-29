@@ -29,7 +29,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     # 👉 Declare dulu
     per_page = 5
     total = length(kursus)
-    total_pages = total_pages(total, per_page)
+    _total_pages = total_pages(total, per_page)
 
     {:ok,
      socket

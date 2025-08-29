@@ -104,12 +104,12 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto p-6">
+    <div class="max-w-8xl mx-auto p-8">
       <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Kursus Ditawarkan</h1>
 
       <!-- Kursus Jangka Panjang -->
          <h3 class="text-lg font-semibold mb-4">Kursus Jangka Panjang</h3>
-             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-10">
                  <%= for course <- @long_courses do %>
                     <div class="bg-white shadow-lg rounded-xl p-3 border border-gray-200 hover:shadow-xl transition flex flex-col justify-between">
       <!-- Bahagian atas -->
@@ -142,7 +142,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
 
       <!-- Kursus Jangka Pendek -->
          <h3 class="text-lg font-semibold mb-4">Kursus Jangka Pendek</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                <%= for course <- @short_courses do %>
                   <div class="bg-white shadow-lg rounded-xl p-3 border border-gray-200 hover:shadow-xl transition flex flex-col justify-between">
 
