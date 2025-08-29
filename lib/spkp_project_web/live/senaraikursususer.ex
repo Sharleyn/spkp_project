@@ -26,6 +26,11 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     jangka_pendek =
       Enum.filter(kursus, fn k -> Date.diff(k.tarikh_akhir, k.tarikh_mula) <= 30 end)
 
+    # 👉 Declare dulu
+    per_page = 5
+    total = length(kursus)
+    total_pages = total_pages(total, per_page)
+
     {:ok,
      socket
      |> assign(:kursus, kursus)
@@ -40,8 +45,9 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:user_menu_open, false)
      # Pagination
      |> assign(:page, 1)
-     |> assign(:per_page, 5)
-     |> assign(:total, length(kursus))}
+     |> assign(:per_page, per_page)
+     |> assign(:total, total)
+     |> assign(:total_pages, total_pages(total, per_page))}
   end
 
 
@@ -212,7 +218,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                 <%= kursus.kursus_kategori.kategori %>
               </span>
               <img src={kursus.gambar_kursus} alt="Gambar Kursus"
-                   class="rounded-xl w-full h-48 object-cover" />
+                   class="rounded-xl w-full h-auto object-cover" />
             </div>
 
             <!-- Bahagian Kanan: Maklumat Kursus -->
@@ -221,6 +227,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                 <div>
                   <h3 class="text-xl font-bold text-gray-800"><%= kursus.nama_kursus %></h3>
                 </div>
+
                 <img src={kursus.gambar_anjuran} alt="Logo Penganjur"
                      class="w-16 h-16 rounded-full" />
               </div>
@@ -290,32 +297,32 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
            <!-- ✅ Pagination cantik -->
                 <div class="flex justify-center mt-6 space-x-1">
-                   <!-- Prev Button -->
-                      <button
-                         phx-click="prev_page"
-                         class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                         disabled={@page == 1}>
+                  <!-- Prev Button -->
+                     <button
+                      phx-click="prev_page"
+                       class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={@page == 1}>
                          &laquo; Prev
                      </button>
 
-                   <!-- Current Page / Total Pages -->
-                        <span class="px-3 py-1 text-gray-700 font-medium">
-                           Page <%= @page %> of <%= div(@total + @per_page - 1, @per_page) %>
-                       </span>
+                  <!-- Current Page / Total Pages -->
+                     <span class="px-3 py-1 text-gray-700 font-medium">
+                        Page <%= @page %> of <%= @total_pages %>
+                    </span>
 
-                   <!-- Next Button -->
-                      <button
-                         phx-click="next_page"
+                  <!-- Next Button -->
+                     <button
+                        phx-click="next_page"
                          class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                         disabled={@page >= div(@total + @per_page - 1, @per_page)}>
+                          disabled={@page >= @total_pages}>
                            Next &raquo;
-                   </button>
-               </div>
-           <% end %>
+                    </button>
+                 </div>
+              <% end %>
+             </div>
+            </div>
+           </div>
           </div>
-         </div>
-        </div>
-       </div>
     """
   end
 
@@ -352,24 +359,34 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
   @impl true
   def handle_event("search", %{"search_query" => search, "category" => category, "type" => type}, socket) do
     kursus = filter_courses(search, category, type)
+    total = length(kursus)
+    per_page = socket.assigns.per_page
     {:noreply,
      socket
      |> assign(:kursus, kursus)
      |> assign(:search_query, search)
      |> assign(:selected_category, category)
-     |> assign(:selected_type, type)}
+     |> assign(:selected_type, type)
+     |> assign(:total_pages, total_pages(total, per_page))
+     |> assign(:total, total)    # ✅ update total
+     |> assign(:page, 1)}        # ✅ reset ke page 1 bila search baru
   end
 
   # Bila user ubah search / filter
   @impl true
   def handle_event("filter", %{"search_query" => search, "category" => category, "type" => type}, socket) do
     kursus = filter_courses(search, category, type)
+    total = length(kursus)
+    per_page = socket.assigns.per_page
     {:noreply,
      socket
      |> assign(:kursus, kursus)
      |> assign(:search_query, search)
      |> assign(:selected_category, category)
-     |> assign(:selected_type, type)}
+     |> assign(:selected_type, type)
+     |> assign(:total_pages, total_pages(total, per_page))
+     |> assign(:total, total)    # ✅ update total
+     |> assign(:page, 1)}        # ✅ reset ke page 1 bila filter berubah
   end
 
   def handle_event("next_page", _params, socket) do
@@ -424,5 +441,9 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     kursus
     |> Enum.chunk_every(per_page)
     |> Enum.at(page - 1, [])
+  end
+
+  defp total_pages(total, per_page) do
+    div(total + per_page - 1, per_page)
   end
 end

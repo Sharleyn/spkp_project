@@ -17,6 +17,7 @@ defmodule SpkpProjectWeb.UserDashboardLive do
   # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini"
   available_courses =
     from(k in SpkpProject.Kursus.Kursuss,
+      where: k.status_kursus in ^["Aktif", "Akan Datang"],
       order_by: [desc: k.inserted_at],
       limit: 3
     )
