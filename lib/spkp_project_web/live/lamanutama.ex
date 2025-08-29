@@ -142,8 +142,9 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
           <div class="flex space-x-6 items-center text-sm hover:opacity-80">
              <%= if @current_user do %>
+
                 <!-- Sudah login: pergi ke dashboard -->
-                   <.link navigate={~p"/userdashboard"}>
+                   <.link navigate={~p"/userdashboard"} class="flex flex-col items-center text-sm hover:opacity-80">
                      <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
                        <span>Pengguna</span>
                    </.link>
@@ -151,15 +152,16 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
               <% else %>
 
                 <!-- Belum login: pergi ke login page -->
-                  <.link href={~p"/users/log_in"}>
+                  <.link href={~p"/users/log_in"} class="flex flex-col items-center text-sm hover:opacity-80">
                     <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
                       <span>Pengguna</span>
                   </.link>
               <% end %>
 
             <.link href={~p"/users/log_in"} class="flex flex-col items-center text-sm hover:opacity-80">
-              <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-8 mb-1" /> <span>Admin</span>
-            </.link>
+                <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-8 mb-1" />
+                  <span>Admin</span>
+             </.link>
 
           </div>
         </div>

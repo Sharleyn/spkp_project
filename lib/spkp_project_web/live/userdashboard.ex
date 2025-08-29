@@ -144,12 +144,16 @@ end
                     <!-- Summary Cards Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-orange-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
+
+                        <!-- Permohonan Aktif -->
                             <div>
                                 <p class="text-orange-700 text-sm font-medium">Permohonan Aktif</p>
                                 <h3 class="text-3xl font-bold mt-1"><%= @active_applications_count %></h3>
                             </div>
                                 <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
                         </div>
+
+                        <!-- Kursus Tersedia -->
                         <div class="bg-green-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
                             <div>
                                 <p class="text-green-700 text-sm font-medium">Kursus Tersedia</p>
@@ -157,6 +161,8 @@ end
                             </div>
                                 <img src={~p"/images/book.png"} alt="Book Icon" class="w-10 h-10" />
                         </div>
+
+                        <!-- Kursus Selesai -->
                         <div class="bg-blue-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
                             <div>
                                 <p class="text-blue-700 text-sm font-medium">Kursus Selesai</p>
