@@ -111,59 +111,65 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
          <h3 class="text-lg font-semibold mb-4">Kursus Jangka Panjang</h3>
              <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
                  <%= for course <- @long_courses do %>
-                    <div class="bg-white shadow-lg rounded-xl p-3 border border-gray-200 hover:shadow-xl transition">
+                    <div class="bg-white shadow-lg rounded-xl p-3 border border-gray-200 hover:shadow-xl transition flex flex-col justify-between">
+      <!-- Bahagian atas -->
+           <div>
+            <!-- Gambar Kursus -->
+              <img src={course.gambar_kursus || "/images/default-course.jpg"} alt={"Gambar #{course.nama_kursus}"} class="w-full h-40 object-cover rounded-lg mb-4"/>
 
-      <!-- Gambar Kursus -->
-         <img src={course.gambar_kursus || "/images/default-course.jpg"} alt={"Gambar #{course.nama_kursus}"} class="w-full h-40 object-cover rounded-lg mb-4"/>
+               <h3 class="text-sm font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
 
-         <h3 class="text-sm font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
+               <!-- Gambar Anjuran + Nama -->
+                  <div class="flex items-center space-x-2 mt-3">
+                    <img src={course.gambar_anjuran || "/images/default-logo.png"} alt="Logo Anjuran" class="w-12 h-12 rounded-full object-cover border"/>
+                      <span class="text-xs text-gray-600">Tajaan: <%= course.anjuran %></span>
+                 </div>
 
-         <!-- Gambar Anjuran + Nama -->
-         <div class="flex items-center space-x-2 mt-3">
-           <img src={course.gambar_anjuran || "/images/default-logo.png"} alt="Logo Anjuran" class="w-6 h-6 rounded-full object-cover border"/>
-            <span class="text-xs text-gray-500">Tajaan: <%= course.anjuran %></span>
-        </div>
+                 <p class="text-sm text-gray-600 mt-2 mb-2">Tempat: <%= course.tempat %></p>
 
-         <p class="text-sm text-gray-600 mb-3">Tempat: <%= course.tempat %></p>
+                 <p class="text-xs text-gray-600">Tarikh: <%= course.tarikh_mula %> → <%= course.tarikh_akhir %></p>
+            </div>
 
-         <p class="text-xs text-gray-500">Tarikh: <%= course.tarikh_mula %> → <%= course.tarikh_akhir %></p>
-
-        <div class="mt-4">
-           <.link navigate={~p"/senaraikursususer"} class="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-              Lihat lagi
-           </.link>
-       </div>
-      </div>
-     <% end %>
-    </div>
+            <!-- Button di bawah -->
+               <div class="mt-4">
+                   <.link navigate={~p"/senaraikursususer"} class="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                      Lihat lagi
+                  </.link>
+                </div>
+              </div>
+            <% end %>
+          </div>
 
       <!-- Kursus Jangka Pendek -->
          <h3 class="text-lg font-semibold mb-4">Kursus Jangka Pendek</h3>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                <%= for course <- @short_courses do %>
-                  <div class="bg-white shadow-lg rounded-xl border p-3 border-gray-200 hover:shadow-xl transition">
+                  <div class="bg-white shadow-lg rounded-xl p-3 border border-gray-200 hover:shadow-xl transition flex flex-col justify-between">
 
-      <!-- Gambar Kursus -->
-         <img src={course.gambar_kursus || "/images/default-course.jpg"} alt={"Gambar #{course.nama_kursus}"} class="w-full h-40 object-cover rounded-lg mb-4"/>
+      <!-- Bahagian atas -->
+           <div>
+            <!-- Gambar Kursus -->
+             <img src={course.gambar_kursus || "/images/default-course.jpg"} alt={"Gambar #{course.nama_kursus}"} class="w-full h-40 object-cover rounded-lg mb-4"/>
 
-         <h3 class="text-l font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
+               <h3 class="text-sm font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
 
-         <!-- Gambar Anjuran + Nama -->
-         <div class="flex items-center space-x-2 mt-3">
-           <img src={course.gambar_anjuran || "/images/default-logo.png"} alt="Logo Anjuran" class="w-6 h-6 rounded-full object-cover border"/>
-           <span class="text-xs text-gray-500">Tajaan: <%= course.anjuran %></span>
-        </div>
+               <!-- Gambar Anjuran + Nama -->
+                  <div class="flex items-center space-x-2 mt-3">
+                   <img src={course.gambar_anjuran || "/images/default-logo.png"} alt="Logo Anjuran" class="w-12 h-12 rounded-full object-cover border"/>
+                    <span class="text-xs text-gray-600">Tajaan: <%= course.anjuran %></span>
+                 </div>
 
-         <p class="text-sm text-gray-600 mb-3">Tempat: <%= course.tempat %></p>
+                  <p class="text-sm text-gray-600 mt-2 mb-2">Tempat: <%= course.tempat %></p>
 
-         <p class="text-xs text-gray-500">Tarikh: <%= course.tarikh_mula %> → <%= course.tarikh_akhir %></p>
+                  <p class="text-xs text-gray-600">Tarikh: <%= course.tarikh_mula %> → <%= course.tarikh_akhir %></p>
+           </div>
 
-         <div class="mt-4">
-           <.link navigate={~p"/senaraikursususer"} class="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-              Lihat lagi
-          </.link>
+      <!-- Button di bawah -->
+          <div class="mt-4">
+            <.link navigate={~p"/senaraikursususer"} class="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+               Lihat lagi
+            </.link>
          </div>
-
         </div>
        <% end %>
       </div>
