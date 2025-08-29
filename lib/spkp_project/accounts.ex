@@ -439,13 +439,4 @@ defmodule SpkpProject.Accounts do
       {:error, changeset} -> {:error, changeset}
     end
   end
-
-  @doc """
-  Updates a user.
-  """
-  def update_user(%User{} = user, attrs) do
-    user
-    |> User.update_changeset(attrs)
-    |> Repo.update()
-  end
 end
