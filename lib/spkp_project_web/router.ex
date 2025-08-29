@@ -59,8 +59,13 @@ defmodule SpkpProjectWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_admin,
-      on_mount: [{SpkpProjectWeb.UserAuth, {:ensure_role, "admin"}}] do
-      live "/dashboard", AdminDashboardLive
+    on_mount: [
+      {SpkpProjectWeb.UserAuth, :mount_current_user},  # <-- wajib, supaya @current_user wujud
+      {SpkpProjectWeb.UserAuth, {:ensure_role, "admin"}} # <-- role filter
+    ] do
+
+      live "/dashboard", DashboardLive, :index
+
       live "/permohonan", PermohonanLive
       live "/tetapan", TetapanLive
 
@@ -80,12 +85,33 @@ defmodule SpkpProjectWeb.Router do
 
       live "/peserta/senaraipeserta", SenaraiPesertaLive
 
-      live "/elaunpekerja/senaraituntutan", SenaraiTuntutanLive
-      live "/elaunpekerja/buattuntutanbaru", BuatTuntutanBaruLive
-      live "/elaunpekerja/senaraipekerja", SenaraiPekerjaLive
+      live "/elaun_pekerja", ElaunPekerjaLive.Index, :index
+      live "/elaun_pekerja/new", ElaunPekerjaLive.Index, :new
+      live "/elaun_pekerja/:id/edit", ElaunPekerjaLive.Index, :edit
+
+      live "/elaun_pekerja/:id", ElaunPekerjaLive.Show, :show
+      live "/elaun_pekerja/:id/show/edit", ElaunPekerjaLive.Show, :edit
+
+      live "/item_elaun_pekerja", ItemElaunPekerjaLive.Index, :index
+      live "/item_elaun_pekerja/new", ItemElaunPekerjaLive.Index, :new
+      live "/item_elaun_pekerja/:id/edit", ItemElaunPekerjaLive.Index, :edit
+
+      live "/item_elaun_pekerja/:id", ItemElaunPekerjaLive.Show, :show
+      live "/item_elaun_pekerja/:id/show/edit", ItemElaunPekerjaLive.Show, :edit
+
+      live "/maklumat_pekerja", MaklumatPekerjaLive.Index, :index
+      live "/maklumat_pekerja/new", MaklumatPekerjaLive.Index, :new
+      live "/maklumat_pekerja/:id/edit", MaklumatPekerjaLive.Index, :edit
+
+      live "/maklumat_pekerja/:id", MaklumatPekerjaLive.Show, :show
+      live "/maklumat_pekerja/:id/show/edit", MaklumatPekerjaLive.Show, :edit
 
       live "/editprofile", EditProfileLive.Show
-      live "/tetapan/tukarkatalaluan", TukarKataLaluanLive
+      live "/tukarkatalaluan", TukarKataLaluanLive
+      live "/assignstaff", AssignStaffLive, :index
+      live "/assignstaff/:id/edit", AssignStaffLive, :edit
+
+
     end
   end
 
@@ -94,8 +120,21 @@ defmodule SpkpProjectWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_pekerja,
-      on_mount: [{SpkpProjectWeb.UserAuth, {:ensure_role, "pekerja"}}] do
-      live "/dashboard", PekerjaDashboardLive
+    on_mount: [
+      {SpkpProjectWeb.UserAuth, :mount_current_user}, # <-- assign current_user
+      {SpkpProjectWeb.UserAuth, {:ensure_role, "pekerja"}} # <-- pastikan pekerja sahaja
+    ] do
+
+      live "/dashboard", DashboardLive, :index
+
+      live "/elaun_saya", TuntutanSayaLive
+
+      live "/elaun_pekerja", ElaunPekerjaLive.Index, :index
+      live "/elaun_pekerja/new", ElaunPekerjaLive.Index, :new
+      live "/elaun_pekerja/:id/edit", ElaunPekerjaLive.Index, :edit
+
+      live "/elaun_pekerja/:id", ElaunPekerjaLive.Show, :show
+      live "/elaun_pekerja/:id/show/edit", ElaunPekerjaLive.Show, :edit
     end
   end
 

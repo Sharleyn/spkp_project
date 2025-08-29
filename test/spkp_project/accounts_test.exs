@@ -505,4 +505,64 @@ defmodule SpkpProject.AccountsTest do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
+
+  describe "maklumat_pekerja" do
+    alias SpkpProject.Accounts.MaklumatPekerja
+
+    import SpkpProject.AccountsFixtures
+
+    @invalid_attrs %{no_ic: nil, no_tel: nil, nama_bank: nil, no_akaun: nil}
+
+    test "list_maklumat_pekerja/0 returns all maklumat_pekerja" do
+      maklumat_pekerja = maklumat_pekerja_fixture()
+      assert Accounts.list_maklumat_pekerja() == [maklumat_pekerja]
+    end
+
+    test "get_maklumat_pekerja!/1 returns the maklumat_pekerja with given id" do
+      maklumat_pekerja = maklumat_pekerja_fixture()
+      assert Accounts.get_maklumat_pekerja!(maklumat_pekerja.id) == maklumat_pekerja
+    end
+
+    test "create_maklumat_pekerja/1 with valid data creates a maklumat_pekerja" do
+      valid_attrs = %{no_ic: "some no_ic", no_tel: "some no_tel", nama_bank: "some nama_bank", no_akaun: "some no_akaun"}
+
+      assert {:ok, %MaklumatPekerja{} = maklumat_pekerja} = Accounts.create_maklumat_pekerja(valid_attrs)
+      assert maklumat_pekerja.no_ic == "some no_ic"
+      assert maklumat_pekerja.no_tel == "some no_tel"
+      assert maklumat_pekerja.nama_bank == "some nama_bank"
+      assert maklumat_pekerja.no_akaun == "some no_akaun"
+    end
+
+    test "create_maklumat_pekerja/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_maklumat_pekerja(@invalid_attrs)
+    end
+
+    test "update_maklumat_pekerja/2 with valid data updates the maklumat_pekerja" do
+      maklumat_pekerja = maklumat_pekerja_fixture()
+      update_attrs = %{no_ic: "some updated no_ic", no_tel: "some updated no_tel", nama_bank: "some updated nama_bank", no_akaun: "some updated no_akaun"}
+
+      assert {:ok, %MaklumatPekerja{} = maklumat_pekerja} = Accounts.update_maklumat_pekerja(maklumat_pekerja, update_attrs)
+      assert maklumat_pekerja.no_ic == "some updated no_ic"
+      assert maklumat_pekerja.no_tel == "some updated no_tel"
+      assert maklumat_pekerja.nama_bank == "some updated nama_bank"
+      assert maklumat_pekerja.no_akaun == "some updated no_akaun"
+    end
+
+    test "update_maklumat_pekerja/2 with invalid data returns error changeset" do
+      maklumat_pekerja = maklumat_pekerja_fixture()
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_maklumat_pekerja(maklumat_pekerja, @invalid_attrs)
+      assert maklumat_pekerja == Accounts.get_maklumat_pekerja!(maklumat_pekerja.id)
+    end
+
+    test "delete_maklumat_pekerja/1 deletes the maklumat_pekerja" do
+      maklumat_pekerja = maklumat_pekerja_fixture()
+      assert {:ok, %MaklumatPekerja{}} = Accounts.delete_maklumat_pekerja(maklumat_pekerja)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_maklumat_pekerja!(maklumat_pekerja.id) end
+    end
+
+    test "change_maklumat_pekerja/1 returns a maklumat_pekerja changeset" do
+      maklumat_pekerja = maklumat_pekerja_fixture()
+      assert %Ecto.Changeset{} = Accounts.change_maklumat_pekerja(maklumat_pekerja)
+    end
+  end
 end

@@ -7,6 +7,11 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
   end
 
   @impl true
+  def handle_params(_params, uri, socket) do
+    {:noreply, assign(socket, :current_path, URI.parse(uri).path)}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
@@ -15,6 +20,9 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
         current_view={@socket.view}
+        role={@current_user.role}
+        current_user={@current_user}
+        current_path={@current_path}
       />
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
@@ -25,10 +33,10 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-              
+
               <h1 class="text-xl font-semibold text-gray-800">Kursus Hub</h1>
             </div>
-            
+
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
               <button class="text-gray-600 hover:text-gray-800">Logout</button>
@@ -49,7 +57,7 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
               </svg>
               <h2 class="text-3xl font-semibold text-gray-800">Dashboard Admin Kursus</h2>
             </div>
-            
+
             <div class="text-sm text-gray-500">Tetapan admin</div>
           </div>
           <!-- Tukar Kata Laluan Section -->
@@ -65,7 +73,7 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
                   placeholder="Masukkan kata laluan lama"
                 />
               </div>
-              
+
               <div>
                 <label class="block text-xl font-semibold text-gray-800 mb-2">Kata Laluan Baru</label>
                 <input
@@ -74,7 +82,7 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
                   placeholder="Masukkan kata laluan baru"
                 />
               </div>
-              
+
               <div>
                 <label class="block text-xl font-semibold text-gray-800 mb-2">
                   Sahkan Kata Laluan Baru

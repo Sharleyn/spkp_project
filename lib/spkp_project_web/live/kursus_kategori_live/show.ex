@@ -5,7 +5,8 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    role = socket.assigns.current_user.role
+    {:ok, assign(socket, :role, role)}
   end
 
   @impl true
@@ -25,7 +26,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Show do
     <.header>
       Kursus kategori {@kursus_kategori.id}
       <:subtitle>This is a kursus_kategori record from your database.</:subtitle>
-      
+
       <:actions>
         <.link
           patch={~p"/admin/kursus_kategori/#{@kursus_kategori}/show/edit"}
