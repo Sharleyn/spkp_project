@@ -183,13 +183,13 @@ defmodule SpkpProjectWeb.SidebarComponent do
                   </.link>
                 <% else %>
                   <.link
-                    navigate={~p"/pekerja/elaun_saya"}
+                    navigate={~p"/pekerja/elaun_pekerja"}
                     class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/elaun_saya", do: "bg-gray-600 font-bold"}"}
                   >
                     Tuntutan Saya
                   </.link>
                   <.link
-                    navigate={~p"/pekerja/elaun_saya/baru"}
+                    navigate={~p"/pekerja/item_elaun_pekerja"}
                     class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/elaun_saya/baru", do: "bg-gray-600 font-bold"}"}
                   >
                     Buat Tuntutan Baru

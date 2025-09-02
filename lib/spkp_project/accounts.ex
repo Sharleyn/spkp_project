@@ -225,11 +225,6 @@ defmodule SpkpProject.Accounts do
     User.update_changeset(user, attrs)
   end
 
-  def update_user(%User{} = user, attrs) do
-    user
-    |> User.update_changeset(attrs)
-    |> Repo.update()
-  end
 
    # Dapatkan changeset untuk ubah role (guna dalam form)
    def change_user_role(%User{} = user, attrs \\ %{}) do

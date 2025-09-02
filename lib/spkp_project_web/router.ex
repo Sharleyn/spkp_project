@@ -83,7 +83,7 @@ defmodule SpkpProjectWeb.Router do
       live "/kursus_kategori/:id", KursusKategoriLive.Show, :show
       live "/kursus_kategori/:id/show/edit", KursusKategoriLive.Show, :edit
 
-      live "/peserta/senaraipeserta", SenaraiPesertaLive
+      live "/senaraipeserta", SenaraiPesertaLive
 
       live "/elaun_pekerja", ElaunPekerjaLive.Index, :index
       live "/elaun_pekerja/new", ElaunPekerjaLive.Index, :new
@@ -106,7 +106,7 @@ defmodule SpkpProjectWeb.Router do
       live "/maklumat_pekerja/:id", MaklumatPekerjaLive.Show, :show
       live "/maklumat_pekerja/:id/show/edit", MaklumatPekerjaLive.Show, :edit
 
-      live "/editprofile", EditProfileLive.Show
+      live "/editprofile", EditProfileLive
       live "/tukarkatalaluan", TukarKataLaluanLive
       live "/assignstaff", AssignStaffLive, :index
       live "/assignstaff/:id/edit", AssignStaffLive, :edit
@@ -127,14 +127,39 @@ defmodule SpkpProjectWeb.Router do
 
       live "/dashboard", DashboardLive, :index
 
-      live "/elaun_saya", TuntutanSayaLive
+      live "/kursus_kategori", KursusKategoriLive.Index, :index
+      live "/kursus_kategori/new", KursusKategoriLive.Index, :new
+      live "/kursus_kategori/:id/edit", KursusKategoriLive.Index, :edit
 
-      live "/elaun_pekerja", ElaunPekerjaLive.Index, :index
-      live "/elaun_pekerja/new", ElaunPekerjaLive.Index, :new
-      live "/elaun_pekerja/:id/edit", ElaunPekerjaLive.Index, :edit
+      live "/kursus_kategori/:id", KursusKategoriLive.Show, :show
+      live "/kursus_kategori/:id/show/edit", KursusKategoriLive.Show, :edit
 
-      live "/elaun_pekerja/:id", ElaunPekerjaLive.Show, :show
-      live "/elaun_pekerja/:id/show/edit", ElaunPekerjaLive.Show, :edit
+      live "/kursus", KursussLive.Index, :index
+      live "/kursus/new", KursussLive.Index, :new
+      live "/kursus/:id/edit", KursussLive.Index, :edit
+
+      live "/kursus/:id", KursussLive.Show, :show
+      live "/kursus/:id/show/edit", KursussLive.Show, :edit
+
+      live "/permohonan", PermohonanLive
+
+      live "/senaraipekerja", SenaraiPesertaLive
+
+      live "/elaun_pekerja", TuntutanSayaLive.Index, :index
+      live "/elaun_pekerja/new", TuntutanSayaLive.Index, :new
+      live "/elaun_pekerja/:id/edit", TuntutanSayaLive.Index, :edit
+
+      live "/elaun_pekerja/:id", TuntutanSayaLive.Show, :show
+      live "/elaun_pekerja/:id/show/edit", TuntutanSayaLive.Show, :edit
+
+      live "/item_elaun_pekerja", TuntutanSayaLive.Index, :index
+      live "/item_elaun_pekerja/new", TuntutanSayaLive.Index, :new
+      live "/item_elaun_pekerja/:id/edit", TuntutanSayaLive.Index, :edit
+
+      live "/item_elaun_pekerja/:id", TuntutanSayaLive.Show, :show
+      live "/item_elaun_pekerja/:id/show/edit", TuntutanSayaLive.Show, :edit
+
+      live "/editprofile", EditProfileLive
     end
   end
 
