@@ -120,6 +120,7 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
             Objektif
           </button>
         </div>
+
         <!-- Tab Content -->
         <div id="latar" class="tab-content">
           <h2 class="text-xl font-bold mb-4">Latar Belakang</h2>
@@ -131,22 +132,25 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
         </div>
 
         <div id="carta" class="tab-content hidden">
-          <h2 class="text-xl font-bold mb-4">Carta Organisasi</h2>
+          <h2 class="text-2xl flex justify-center font-bold mb-4">Carta Organisasi</h2>
 
-          <p>Carta organisasi syarikat akan dipaparkan di sini.</p>
+          <img src={~p"/images/carta1.png"} alt="Carta Organisasi" class="flex justify-center w-full">
+
         </div>
 
         <div id="visi" class="tab-content hidden">
+
           <!-- VISI -->
-          <div class="bg-white bg-opacity-50 rounded-lg p-20 mb-6">
+          <div class="bg-sky-50 rounded-lg p-20 mb-6">
             <h3 class="text-center text-xl font-bold mb-12">VISI</h3>
 
             <p>
               Menjadi sebuah organisasi terunggul dan bestari dalam menawarkan perkhidmatan di Negeri Sabah yang dikendalikan sepenuhnya oleh anak muda.
             </p>
           </div>
+
           <!-- MISI -->
-          <div class="bg-white bg-opacity-50 rounded-lg p-14">
+          <div class="bg-sky-50 rounded-lg p-14">
             <h3 class="text-center text-xl font-bold mb-12">MISI</h3>
 
             <ul class="list-disc list-inside space-y-1">
@@ -170,6 +174,7 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
             Objektif syarikat adalah untuk memberi perkhidmatan terbaik kepada pelanggan dan membina hubungan yang berkekalan.
           </p>
         </div>
+
         <!-- CSS untuk Tab -->
         <style>
           .tab-link {
@@ -180,6 +185,7 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
             color: #09033F;
           }
         </style>
+
         <!-- JS untuk Tukar Paparan -->
         <script>
           document.addEventListener("DOMContentLoaded", function () {
@@ -201,6 +207,7 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
           });
         </script>
       </div>
+
       <!-- Footer -->
       <section id="hubungi">
         <footer class="bg-[#09033F] text-white mt-10 py-2 text-center">
@@ -208,6 +215,7 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
 
           <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
             <div class="flex items-center justify-between gap-6">
+
               <!-- Alamat -->
               <div class="flex items-center gap-4">
                 <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6" />
@@ -215,22 +223,26 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
                   Alamat: Block G. 2ND Floor, Lot 9, Lintas Jaya Uptownship Penampang, 88200 Sabah
                 </p>
               </div>
+
               <!-- Telefon & Faks -->
               <div class="flex items-center gap-4">
                 <img src={~p"/images/fax.png"} alt="Telefon & Faks" class="h-6 w-6" />
                 <p class="text-sm">No. Tel: 011-3371 7129<br /> Faks: 088 729717</p>
               </div>
+
               <!-- Email -->
               <div class="flex items-center gap-4">
                 <img src={~p"/images/email.png"} alt="Email" class="h-6 w-6" />
                 <p class="text-sm">Email: sharifperchaya@gmail.com</p>
               </div>
+
               <!-- FB -->
               <div class="flex items-center gap-4">
                 <img src={~p"/images/fb.png"} alt="Facebook" class="h-6 w-6" />
                 <p class="text-sm">Sharif Perchaya Sdn Bhd</p>
               </div>
             </div>
+
             <!-- Waktu Operasi -->
             <p class="text-sm text-center font-bold">MASA OPERASI</p>
 
