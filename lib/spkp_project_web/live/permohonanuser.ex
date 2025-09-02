@@ -2,6 +2,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
   use SpkpProjectWeb, :live_view
 
 
+  @impl true
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
 
@@ -22,7 +23,8 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
 }
 end
 
-  def render(assigns) do
+@impl true
+def render(assigns) do
     ~H"""
     <div class="bg-white-100 min-h-screen antialiased text-gray-800">
       <!-- Burger Button -->
