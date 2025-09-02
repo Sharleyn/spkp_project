@@ -1,40 +1,85 @@
 defmodule SpkpProjectWeb.ProgramKursusLive do
   use SpkpProjectWeb, :live_view
 
-  def mount(_params, _session, socket) do
-    # Data statik contoh
-    long_courses = [
-      %{
-        id: 1,
-        title: "Diploma Pengurusan Perniagaan",
-        description:
-          "Program komprehensif selama 2 tahun untuk mempersiapkan pelajar dalam bidang perniagaan.",
-        start: "01-09-2025",
-        end: "31-08-2027"
-      },
-      %{
-        id: 2,
-        title: "Diploma Sains Komputer",
-        description: "Fokus pada pembangunan perisian, pangkalan data, dan rangkaian komputer.",
-        start: "01-09-2025",
-        end: "31-08-2027"
-      }
-    ]
+  alias SpkpProject.Kursus.Kursuss
+  alias SpkpProject.Repo
+  import Ecto.Query
 
-    short_courses = [
-      %{
-        id: 3,
-        title: "Kursus Kemahiran Digital",
-        description: "Kursus 2 minggu untuk meningkatkan kemahiran teknologi maklumat.",
-        start: "15-09-2025",
-        end: "30-09-2025"
-      }
-    ]
+  # -------- MOUNT --------
+   # ----------- MOUNT ------------
+   def mount(_params, _session, socket) do
+    total_short = count_short_courses()
 
     {:ok,
      socket
-     |> assign(:long_courses, long_courses)
-     |> assign(:short_courses, short_courses)}
+     |> assign(:page, 1)          # page mula
+     |> assign(:per_page, 5)      # bilangan kursus setiap page
+     |> assign(:total_short_courses, total_short)
+     |> assign(:long_courses, get_long_courses())
+     |> assign(:short_courses, get_short_courses(1, 5))}
+  end
+
+  # ----------- QUERY ------------
+  defp get_long_courses do
+    from(k in Kursuss,
+      where: fragment("? - ? > 30", k.tarikh_akhir, k.tarikh_mula),
+      order_by: [desc: k.tarikh_mula],
+      limit: 5
+    )
+    |> Repo.all()
+  end
+
+  defp get_short_courses(page, per_page) do
+    offset = (page - 1) * per_page
+
+    from(k in Kursuss,
+      where: fragment("? - ? <= 30", k.tarikh_akhir, k.tarikh_mula),
+      order_by: [desc: k.tarikh_mula],
+      limit: ^per_page,
+      offset: ^offset
+    )
+    |> Repo.all()
+  end
+
+  defp count_short_courses do
+    from(k in Kursuss,
+      where: fragment("? - ? <= 30", k.tarikh_akhir, k.tarikh_mula),
+      select: count(k.id)
+    )
+    |> Repo.one()
+  end
+
+  defp max_page(total, per_page) do
+    Float.ceil(total / per_page) |> trunc()
+  end
+
+  # ----------- EVENTS ------------
+  def handle_event("next_page", _params, socket) do
+    page = socket.assigns.page
+    per_page = socket.assigns.per_page
+    total = socket.assigns.total_short_courses
+    max_page = max_page(total, per_page)
+
+    new_page = if page < max_page, do: page + 1, else: page
+
+    {:noreply,
+     assign(socket,
+       page: new_page,
+       short_courses: get_short_courses(new_page, per_page)
+     )}
+  end
+
+  def handle_event("prev_page", _params, socket) do
+    page = socket.assigns.page
+    per_page = socket.assigns.per_page
+
+    new_page = if page > 1, do: page - 1, else: 1
+
+    {:noreply,
+     assign(socket,
+       page: new_page,
+       short_courses: get_short_courses(new_page, per_page)
+     )}
   end
 
   def render(assigns) do
@@ -42,36 +87,30 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
     <head>
       <style>
         body {
-        background-image: url("/images/background.jpg");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
+          background-image: url("/images/background.jpg");
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: center;
         }
-
         html {
-        scroll-behavior: smooth;
-        }
+          scroll-behavior: smooth;}
       </style>
     </head>
 
-    <!-- Header -->
-    <header class="transparent">
-      <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
-        <!-- Logo kiri -->
-        <div class="flex items-center">
-
-      <!-- Logo 1 -->
-        <img src={~p"/images/logo 1.png"} alt="Logo 1" style="height:90px;" class="mr-6">
-
-      <!-- Logo 2–6 rapat -->
-        <div class="flex gap-1 mt-10">
-          <img src={~p"/images/logo 2.png"} alt="Logo 2" class="h-10">
-          <img src={~p"/images/logo 3.png"} alt="Logo 3" class="h-10">
-          <img src={~p"/images/logo 4.png"} alt="Logo 4" class="h-10">
-          <img src={~p"/images/logo 5.png"} alt="Logo 5" class="h-10">
-          <img src={~p"/images/logo 6.png"} alt="Logo 6" class="h-16">
-        </div>
-      </div>
+    <div class="font-sans">
+      <!-- Header -->
+      <header class="transparent">
+        <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+          <div class="flex items-center">
+            <img src={~p"/images/logo 1.png"} alt="Logo 1" style="height:90px;" class="mr-6" />
+            <div class="flex gap-1 mt-10">
+              <img src={~p"/images/logo 2.png"} alt="Logo 2" class="h-10" />
+              <img src={~p"/images/logo 3.png"} alt="Logo 3" class="h-10" />
+              <img src={~p"/images/logo 4.png"} alt="Logo 4" class="h-10" />
+              <img src={~p"/images/logo 5.png"} alt="Logo 5" class="h-10" />
+              <img src={~p"/images/logo 6.png"} alt="Logo 6" class="h-16" />
+            </div>
+          </div>
 
         <!-- Ikon kanan -->
         <div class="flex space-x-6">
@@ -100,7 +139,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
         <a
           href={~p"/"}
           class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
-          Laman Utama
+          Halaman Utama
         </a>
         <a
           href={~p"/mengenaikami"}
@@ -120,62 +159,99 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto p-6">
-      <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">Program</h1>
+    <div class="max-w-8xl mx-auto p-8">
+      <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Kursus Ditawarkan</h1>
+
       <!-- Kursus Jangka Panjang -->
-      <section class="mb-12">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Panjang</h2>
+         <h3 class="text-lg font-semibold mb-4">Kursus Jangka Panjang</h3>
+             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-10">
+                 <%= for course <- @long_courses do %>
+                    <div class="bg-white shadow-lg rounded-xl p-3 border border-gray-200 hover:shadow-xl transition flex flex-col justify-between">
 
-        <div class="grid md:grid-cols-2 gap-6">
-          <%= for course <- @long_courses do %>
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
-              <h3 class="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
+      <!-- Bahagian atas -->
+           <div>
+            <!-- Gambar Kursus -->
+              <img src={course.gambar_kursus || "/images/default-course.jpg"} alt={"Gambar #{course.nama_kursus}"} class="w-full h-40 object-cover rounded-lg mb-4"/>
 
-              <p class="text-sm text-gray-600 mb-3">{course.description}</p>
+               <h3 class="text-sm font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
 
-              <p class="text-xs text-gray-500">Tarikh: {course.start} &rarr; {course.end}</p>
+               <!-- Gambar Anjuran + Nama -->
+                  <div class="flex items-center space-x-2 mt-3">
+                    <img src={course.gambar_anjuran || "/images/default-logo.png"} alt="Logo Anjuran" class="w-12 h-12 rounded-full object-cover border"/>
+                      <span class="text-xs text-gray-600">Tajaan: <%= course.anjuran %></span>
+                 </div>
 
-              <div class="mt-4">
-                <!-- Belum login, redirect ke login -->
-                <.link
-                  navigate={~p"/users/log_in"}
-                  class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  Mohon
-                </.link>
-              </div>
+                 <p class="text-sm text-gray-600 mt-2 mb-2">Tempat: <%= course.tempat %></p>
+
+                 <p class="text-xs text-gray-600">Tarikh: <%= course.tarikh_mula %> → <%= course.tarikh_akhir %></p>
             </div>
-          <% end %>
-        </div>
-      </section>
+
+            <!-- Button di bawah -->
+               <div class="mt-4">
+                   <.link navigate={~p"/senaraikursususer"} class="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                      Lihat lagi
+                  </.link>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+       <!-- Garis Pemisah -->
+          <hr class="my-8 border-t-4 border-gray-300" />
 
       <!-- Kursus Jangka Pendek -->
-      <section>
-        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Kursus Jangka Pendek</h2>
+         <h3 class="text-lg font-semibold mb-4">Kursus Jangka Pendek</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+               <%= for course <- @short_courses do %>
+                  <div class="bg-white shadow-lg rounded-xl p-3 border border-gray-200 hover:shadow-xl transition flex flex-col justify-between">
 
-        <div class="grid md:grid-cols-2 gap-6">
-          <%= for course <- @short_courses do %>
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition">
-              <h3 class="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
+      <!-- Bahagian atas -->
+           <div>
+            <!-- Gambar Kursus -->
+             <img src={course.gambar_kursus || "/images/default-course.jpg"} alt={"Gambar #{course.nama_kursus}"} class="w-full h-40 object-cover rounded-lg mb-4"/>
 
-              <p class="text-sm text-gray-600 mb-3">{course.description}</p>
+               <h3 class="text-sm font-bold text-gray-900 mb-2"><%= course.nama_kursus %></h3>
 
-              <p class="text-xs text-gray-500">Tarikh: {course.start} &rarr; {course.end}</p>
+               <!-- Gambar Anjuran + Nama -->
+                  <div class="flex items-center space-x-2 mt-3">
+                   <img src={course.gambar_anjuran || "/images/default-logo.png"} alt="Logo Anjuran" class="w-12 h-12 rounded-full object-cover border"/>
+                    <span class="text-xs text-gray-600">Tajaan: <%= course.anjuran %></span>
+                 </div>
 
-              <div class="mt-4">
-                <!-- Belum login, redirect ke login -->
-                <.link
-                  navigate={~p"/users/log_in"}
-                  class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  Mohon
-                </.link>
-              </div>
-            </div>
-          <% end %>
+                  <p class="text-sm text-gray-600 mt-2 mb-2">Tempat: <%= course.tempat %></p>
+
+                  <p class="text-xs text-gray-600">Tarikh: <%= course.tarikh_mula %> → <%= course.tarikh_akhir %></p>
+           </div>
+
+      <!-- Button di bawah -->
+          <div class="mt-4">
+            <.link navigate={~p"/senaraikursususer"} class="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+               Lihat lagi
+            </.link>
+         </div>
         </div>
-      </section>
-    </div>
+       <% end %>
+      </div>
+
+      <!-- Pagination Controls -->
+         <div class="flex justify-center space-x-4 mt-6">
+            <button phx-click="prev_page" disabled={@page == 1}
+               class="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50">
+                 <i class="fa fa-chevron-left" aria-hidden="true"></i>
+           </button>
+
+              <span class="px-4 py-1 bg-white shadow rounded">
+                Page <%= @page %> of <%= max_page(@total_short_courses, @per_page) %>
+             </span>
+
+           <button phx-click="next_page"
+              disabled={@page == max_page(@total_short_courses, @per_page)}
+               class="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50">
+                <i class="	fa fa-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+       </div>
+      </div>
 
     <!-- FOOTER -->
     <section id="hubungi">

@@ -22,8 +22,6 @@ defmodule SpkpProjectWeb.Router do
 
     live "/", LamanUtamaLive
 
-
-
     live "/mengenaikami", MengenaiKamiLive
 
     live "/programkursus", ProgramKursusLive

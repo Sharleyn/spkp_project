@@ -1,57 +1,53 @@
 defmodule SpkpProjectWeb.UserDashboardLive do
   use SpkpProjectWeb, :live_view
 
+  import Ecto.Query
+
 
   @impl true
-  # 'mount' digunakan untuk menetapkan data awal (initial state)
-def mount(_params, _session, socket) do
-  current_user = socket.assigns.current_user
+  def mount(_params, _session, socket) do
+   current_user = socket.assigns.current_user
 
-    socket =
-      socket
-      |> assign(:current_user_name, current_user.full_name)
-      |> assign(:sidebar_open, true)
-      |> assign(:user_menu_open, false)
-      |> assign(:active_applications_count, 3)
-      |> assign(:available_courses_count, 3)
-      |> assign(:completed_courses_count, 0)
-      |> assign(:recent_applications, [
-        %{
-          name: "Kursus Komputer Asas",
-          date: "2025-01-24",
-          status: "Diterima",
-          status_class: "bg-green-100 text-green-600"
-        },
-        %{
-          name: "Kursus Bahasa Inggeris",
-          date: "2025-02-17",
-          status: "Dalam Proses",
-          status_class: "bg-yellow-100 text-yellow-600"
-        },
-        %{
-          name: "Kursus Kemahiran Digital",
-          date: "2025-02-21",
-          status: "Ditolak",
-          status_class: "bg-red-100 text-red-600"
-        }
-      ])
-      |> assign(:available_courses, [
-        %{name: "Kursus Komputer Asas", duration: "4 minggu", slots: "15 tempat"},
-        %{name: "Kursus Bahasa Inggeris", duration: "2 minggu", slots: "8 tempat"},
-        %{name: "Kursus Kemahiran Digital", duration: "3 minggu", slots: "20 tempat"}
-      ])
+   # ✅ Kursus Tersedia (kira jumlah dengan status aktif / akan datang)
+  available_courses_count =
+    from(k in SpkpProject.Kursus.Kursuss,
+      where: k.status_kursus in ^["Aktif", "Akan Datang"])
+    |> SpkpProject.Repo.aggregate(:count, :id)
 
-    {:ok, socket}
-  end
+  # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini"
+  available_courses =
+    from(k in SpkpProject.Kursus.Kursuss,
+      where: k.status_kursus in ^["Aktif", "Akan Datang"],
+      order_by: [desc: k.inserted_at],
+      limit: 3
+    )
+    |> SpkpProject.Repo.all()
 
+   socket =
+    socket
+    |> assign(:current_user_name, current_user.full_name)
+    |> assign(:sidebar_open, true)
+    |> assign(:user_menu_open, false)
+    |> assign(:available_courses, available_courses)            # 👉 senarai untuk "Kursus Terkini"
+    |> assign(:available_courses_count, available_courses_count) # 👉 total untuk "Kursus Tersedia"
+    |> assign(:active_applications_count, 3) # (boleh tukar ikut permohonan user)
+    |> assign(:completed_courses_count, 0)   # (boleh tukar ikut DB)
+    |> assign(:recent_applications, [
+      %{name: "Kursus Komputer Asas", date: "2025-01-24", status: "Diterima", status_class: "bg-green-100 text-green-600"},
+      %{name: "Kursus Bahasa Inggeris", date: "2025-02-17", status: "Dalam Proses", status_class: "bg-yellow-100 text-yellow-600"},
+      %{name: "Kursus Kemahiran Digital", date: "2025-02-21", status: "Ditolak", status_class: "bg-red-100 text-red-600"}
+    ])
 
-# Hook untuk inject current_path dan sidebar_open
-def on_mount(:default, _params, _session, socket) do
-  {:cont,
-     socket
-     |> assign(:current_path, socket.host_uri.path)
-     |> assign_new(:sidebar_open, fn -> true end)  # default sidebar terbuka
-}
+  {:ok, socket}
+end
+
+   # Hook untuk inject current_path dan sidebar_open
+    def on_mount(:default, _params, _session, socket) do
+    {:cont,
+       socket
+       |> assign(:current_path, socket.host_uri.path)
+       |> assign_new(:sidebar_open, fn -> true end)  # default sidebar terbuka
+  }
 end
 
   # 'render' berfungsi sebagai template HTML LiveView
@@ -61,11 +57,11 @@ end
     ~H"""
     <div class="bg-white-100 min-h-screen antialiased text-gray-800">
       <!-- Burger Button -->
-      <button
-        class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
-        phx-click="toggle_sidebar">
-        <img src={~p"/images/burger3.png"} alt="Burger Icon" class="w-6 h-6" />
-      </button>
+
+            <button class="p-2 rounded-lg text-white absolute top-4 left-4 focus:outline-none z-50"
+               phx-click="toggle_sidebar">
+                   <i class="fa fa-bars fa-lg text-indigo-300" aria-hidden="true"></i>
+           </button>
 
       <!-- Sidebar -->
       <aside class={"fixed inset-y-0 left-0 z-40 w-64 p-6 flex flex-col items-start shadow-lg transition-transform duration-300 ease-in-out " <>
@@ -83,8 +79,7 @@ end
               <nav class="w-full flex-grow">
                 <ul class="space-y-4">
                   <li>
-                      <.link navigate={~p"/userdashboard"}
-                   class={nav_class(@live_action, :dashboard)}
+                    <.link navigate={~p"/userdashboard"} class={nav_class(@live_action, :dashboard)}
                    aria-current={if @live_action == :dashboard, do: "page", else: nil}>
               <img src={~p"/images/right.png"} alt="Laman Utama" class="w-5 h-5" />
               <span>Laman Utama</span>
@@ -92,8 +87,7 @@ end
           </li>
 
           <li>
-            <.link navigate={~p"/userprofile"}
-                   class={nav_class(@live_action, :profile)}
+            <.link navigate={~p"/userprofile"} class={nav_class(@live_action, :profile)}
                    aria-current={if @live_action == :profile, do: "page", else: nil}>
               <img src={~p"/images/right.png"} alt="Profil Saya" class="w-5 h-5" />
               <span>Profil Saya</span>
@@ -101,8 +95,7 @@ end
           </li>
 
           <li>
-            <.link navigate={~p"/senaraikursususer"}
-                   class={nav_class(@live_action, :courses)}
+            <.link navigate={~p"/senaraikursususer"} class={nav_class(@live_action, :courses)}
                    aria-current={if @live_action == :courses, do: "page", else: nil}>
               <img src={~p"/images/right.png"} alt="Senarai Kursus" class="w-5 h-5" />
               <span>Senarai Kursus</span>
@@ -110,8 +103,7 @@ end
           </li>
 
           <li>
-            <.link navigate={~p"/permohonanuser"}
-                   class={nav_class(@live_action, :applications)}
+            <.link navigate={~p"/permohonanuser"} class={nav_class(@live_action, :applications)}
                    aria-current={if @live_action == :applications, do: "page", else: nil}>
               <img src={~p"/images/right.png"} alt="Permohonan Saya" class="w-5 h-5" />
               <span>Permohonan Saya</span>
@@ -165,12 +157,16 @@ end
                     <!-- Summary Cards Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-orange-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
+
+                        <!-- Permohonan Aktif -->
                             <div>
                                 <p class="text-orange-700 text-sm font-medium">Permohonan Aktif</p>
                                 <h3 class="text-3xl font-bold mt-1"><%= @active_applications_count %></h3>
                             </div>
                                 <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
                         </div>
+
+                        <!-- Kursus Tersedia -->
                         <div class="bg-green-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
                             <div>
                                 <p class="text-green-700 text-sm font-medium">Kursus Tersedia</p>
@@ -178,6 +174,8 @@ end
                             </div>
                                 <img src={~p"/images/book.png"} alt="Book Icon" class="w-10 h-10" />
                         </div>
+
+                        <!-- Kursus Selesai -->
                         <div class="bg-blue-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
                             <div>
                                 <p class="text-blue-700 text-sm font-medium">Kursus Selesai</p>
@@ -187,9 +185,9 @@ end
                         </div>
                     </div>
 
-            <!-- Status Profil and Permohonan Terkini Section -->
+            <!-- Status Profil Section -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-sky-50 p-6 rounded-3xl shadow-lg">
+                        <div class="bg-sky-50 border border-sky-100 p-6 rounded-3xl shadow-lg">
                             <h4 class="flex justify-center px-8 mt-6 items-center text-lg font-semibold mb-4 text-black-700">
                                 <img src={~p"/images/tableuser.png"} alt="Certificate Icon" class="w-10 h-10 mr-2" />
                                 Status Profil
@@ -204,7 +202,8 @@ end
                             </div>
                         </div>
 
-                        <div class="bg-[#C8C4DF] bg-opacity-20 p-6 rounded-3xl shadow-lg">
+              <!-- Permohonan Terkini Section -->
+                        <div class="bg-[#C8C4DF] bg-opacity-20 border border-indigo-100 p-6 rounded-3xl shadow-lg">
                             <h4 class="flex items-center text-lg font-bold gap-4 mb-4 text-gray-700">
                                 <img src={~p"/images/bookclock.png"} alt="Bookclock Icon" class="w-8 h-8" />
                                 Permohonan Terkini
@@ -230,68 +229,76 @@ end
                         </div>
                     </div>
 
-                    <!-- Kursus Tersedia Section -->
-                    <div class="bg-indigo-50 p-6 rounded-3xl shadow-lg">
-                        <h4 class="flex items-center text-lg font-bold mb-4 gap-4 text-gray-700">
-                            <img src={~p"/images/book.png"} alt="Book Icon" class="w-10 h-10" />
-                            Kursus Tersedia
-                        </h4>
-                        <p class="text-gray-700 font-medium mb-4">Kursus Yang Boleh Anda Mohon</p>
-                        <div class="space-y-4">
-                            <%= for course <- @available_courses do %>
-                                <div class="flex items-center justify-between p-4 bg-white rounded-2xl">
-                                    <div>
-                                        <p class="font-medium"><%= course.name %></p>
-                                        <p class="text-xs text-gray-400"><%= course.duration %> &bull; <%= course.slots %></p>
-                                    </div>
-                                    <a href="#" class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200">MOHON</a>
-                                </div>
-                            <% end %>
-                        </div>
-                        <div class="mt-6 text-center">
-                            <.link navigate={~p"/senaraikursususer"}
-                                      class="inline-block border border-violet-500 text-black-600 px-6 py-2 rounded-lg font-medium hover:bg-[#C8C4DF] bg-opacity-30 hover:text-black transition-colors duration-200">
-                                         Lihat Semua Kursus
-                                 </.link>
-                        </div>
+                    <!-- Kursus Terkini Section -->
+                        <div class="mb-8">
+                           <div class="bg-blue-50 border border-indigo-100 p-6 rounded-3xl shadow-lg">
+                              <h4 class="flex items-center text-lg font-bold gap-4 mb-4 text-gray-700">
+                                  <img src={~p"/images/book.png"} alt="Book Icon" class="w-8 h-8" />
+                                    Kursus Terkini
+                            </h4>
+
+                       <div class="space-y-4">
+                         <%= for course <- @available_courses do %>
+                       <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl shadow hover:shadow-md transition-shadow duration-200">
+                       <div>
+                         <p class="font-medium text-gray-800"><%= course.nama_kursus %></p>
+                         <p class="text-xs text-gray-500">
+                            <%= course.tarikh_mula %> - <%= course.tarikh_akhir %> &bull; Kuota: <%= course.kuota %>
+                         </p>
+                       </div>
+                            <.link navigate={~p"/senaraikursususer"} class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200">
+                              Lihat
+                      </.link>
                     </div>
+                  <% end %>
+                </div>
+
+                 <div class="mt-6 text-center">
+                    <.link navigate={~p"/senaraikursususer"} class="inline-block border border-violet-500 text-black-600 px-6 py-2 rounded-lg font-medium hover:bg-[#C8C4DF] bg-opacity-80 hover:text-black transition-colors duration-200">
+                       Lihat Semua Kursus
+                    </.link>
+                 </div>
+               </div>
+             </div>
+
                 </main>
             </div>
         </div>
-
     """
   end
 
   @impl true
   def handle_event("logout", _params, socket) do
-    {:noreply,
-     socket
-     |> put_flash(:info, "Anda telah log keluar.")
-     |> redirect(to: ~p"/lamanutama")}
+
+  {:noreply,
+   socket
+   |> put_flash(:info, "Anda telah log keluar.")
+   |> redirect(to: ~p"/lamanutama")}
+end
+
+# 'handle_event' digunakan untuk menguruskan interaksi pengguna
+# ========== EVENTS ==========
+
+  def handle_event("toggle_sidebar", _params, socket) do
+    {:noreply, assign(socket, :sidebar_open, !socket.assigns.sidebar_open)}
   end
 
-  # 'handle_event' digunakan untuk menguruskan interaksi pengguna
-  # ========== EVENTS ==========
+  def handle_event("toggle_user_menu", _params, socket) do
+    {:noreply, assign(socket, :user_menu_open, !socket.assigns.user_menu_open)}
+  end
 
-    def handle_event("toggle_sidebar", _params, socket) do
-      {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
+  def handle_event("close_user_menu", _params, socket) do
+    {:noreply, assign(socket, :user_menu_open, false)}
+  end
+
+  defp nav_class(current, expected) do
+    base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
+
+    if current == expected do
+      base <> " bg-indigo-700 text-white"  # aktif
+    else
+      base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
     end
+  end
 
-    def handle_event("toggle_user_menu", _params, socket) do
-      {:noreply, update(socket, :user_menu_open, &(!&1))}
-    end
-
-    def handle_event("close_user_menu", _params, socket) do
-      {:noreply, assign(socket, :user_menu_open, false)}
-    end
-
-    defp nav_class(current, expected) do
-      base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
-
-      if current == expected do
-        base <> " bg-indigo-700 text-white"  # aktif
-      else
-        base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
-      end
-    end
 end

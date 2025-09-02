@@ -6,6 +6,7 @@ defmodule SpkpProject.Kursus do
   import Ecto.Query, warn: false
   alias SpkpProject.Repo
 
+  alias SpkpProject.Kursus.Kursuss
   alias SpkpProject.Kursus.KursusKategori
 
   @doc """
@@ -113,9 +114,16 @@ defmodule SpkpProject.Kursus do
       [%Kursuss{}, ...]
 
   """
-  def list_kursus do
-    Repo.all(Kursuss) |> Repo.preload(:kursus_kategori)
-  end
+def list_kursus do
+  Repo.all(Kursuss) |> Repo.preload(:kursus_kategori)
+end
+
+def list_all_courses do
+  Kursuss
+  |> order_by([k], asc: k.tarikh_mula)  # ikut tarikh mula kalau mahu
+  |> Repo.all()
+end
+
 
   @doc """
   Gets a single kursuss.

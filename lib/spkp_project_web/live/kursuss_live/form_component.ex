@@ -61,7 +61,7 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
           prompt="-- Pilih tajaan --"
           options={[
             {"Jabatan Pembangunan Sumber Manusia", "Jabatan Pembangunan Sumber Manusia"},
-            {"Kementerian Belia & Sukan", "Kementerian Belia & Sukan"}
+            {"Kementerian Belia & Sukan Sabah", "Kementerian Belia & Sukan Sabah"}
           ]}
         />
         <!-- Upload Gambar Tajaan -->
