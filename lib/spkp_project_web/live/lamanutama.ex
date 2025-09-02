@@ -38,6 +38,8 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     "/images/8.jpg"
   ]
 
+  ## ───── Lifecycle ─────
+
   def mount(_params, _session, socket) do
     if connected?(socket) do
       schedule_slide()
@@ -78,15 +80,8 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
     end
   end
 
-    # Auto-slide galeri
-    def handle_info(:next_gallery, socket) do
-      schedule_gallery_slide()
-      total = gallery_total(socket)
-      new_index = rem(socket.assigns.gallery_index + 1, total)
-      {:noreply, assign(socket, :gallery_index, new_index)}
-    end
+  ## ───── Handle Event ─────
 
-  # Manual slider utama
   def handle_event("goto_slide", %{"index" => idx}, socket) do
     {:noreply, assign(socket, :current_index, String.to_integer(idx))}
   end
@@ -99,7 +94,6 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
   def handle_event("prev_slide", _params, socket) do
     schedule_slide()
-
     new_index =
       rem(
         socket.assigns.current_index - 1 + length(socket.assigns.slides),
@@ -107,12 +101,6 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
       )
 
     {:noreply, assign(socket, :current_index, new_index)}
-  end
-
-  # Helper untuk galeri
-  defp schedule_gallery_slide() do
-    # tukar setiap 3s
-    Process.send_after(self(), :next_gallery, 3000)
   end
 
   defp gallery_total(socket) do
@@ -154,8 +142,9 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
           <div class="flex space-x-6 items-center text-sm hover:opacity-80">
              <%= if @current_user do %>
+
                 <!-- Sudah login: pergi ke dashboard -->
-                   <.link navigate={~p"/userdashboard"}>
+                   <.link navigate={~p"/userdashboard"} class="flex flex-col items-center text-sm hover:opacity-80">
                      <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
                        <span>Pengguna</span>
                    </.link>
@@ -163,15 +152,16 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
               <% else %>
 
                 <!-- Belum login: pergi ke login page -->
-                  <.link href={~p"/users/log_in"}>
+                  <.link href={~p"/users/log_in"} class="flex flex-col items-center text-sm hover:opacity-80">
                     <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
                       <span>Pengguna</span>
                   </.link>
               <% end %>
 
             <.link href={~p"/users/log_in"} class="flex flex-col items-center text-sm hover:opacity-80">
-              <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-8 mb-1" /> <span>Admin</span>
-            </.link>
+                <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-8 mb-1" />
+                  <span>Admin</span>
+             </.link>
 
           </div>
         </div>
@@ -182,7 +172,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
         <div class="max-w-7xl mx-auto flex space-x-2">
 
           <a href={~p"/"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">
-            Laman Utama
+            Halaman Utama
           </a>
 
           <a href={~p"/mengenaikami"} class="px-1 py-1 bg-[#09033F] text-white font-medium hover:bg-[#1a155f] rounded">

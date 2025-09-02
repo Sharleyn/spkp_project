@@ -60,7 +60,7 @@ defmodule SpkpProjectWeb.UserSessionController do
   defp redirect_user_by_role(conn, user) do
     case user.role do
       "admin" -> redirect(conn, to: ~p"/admin/dashboard")
-      "user" -> redirect(conn, to: ~p"/user")
+      "user" -> redirect(conn, to: ~p"/userdashboard")
       _ -> redirect(conn, to: ~p"/")
     end
   end
