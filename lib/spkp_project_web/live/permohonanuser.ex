@@ -164,20 +164,41 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
         </header>
 
         <!-- ========== PERMOHONAN LIST ========== -->
-        <div class="p-6 bg-gray-100 min-h-screen">
-          <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-semibold">Permohonan Saya</h1>
-          </div>
+            <h1 class="text-2xl font-bold">Permohonan Saya</h1>
+             <p class="text-gray-500 mb-6">Temui kursus yang sesuai untuk meningkatkan kemahiran anda</p>
 
           <!-- Statistik -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-lg shadow flex items-center justify-between">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+            <div class="bg-sky-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
               <div>
-                <p class="text-gray-500">Jumlah Permohonan</p>
-                <p class="text-2xl font-bold"><%= length(@applications) %></p>
+                <h2 class="text-l font-semibold text-gray-600">Jumlah Permohonan</h2>
+                <p class="text-2xl font-bold text-gray-900"><%= length(@applications) %></p>
               </div>
             </div>
-          </div>
+
+            <div class="bg-green-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
+              <div>
+                <h2 class="text-l font-semibold text-gray-600">Diterima</h2>
+                <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Diterima")) %></p>
+                <>
+              </div>
+            </div>
+
+            <div class="bg-orange-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
+              <div>
+                <h2 class="text-l font-semibold text-gray-600">Dalam Proses</h2>
+                <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Dalam Proses")) %></p>
+              </div>
+            </div>
+
+            <div class="bg-red-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
+              <div>
+                <h2 class="text-l font-semibold text-gray-600">Ditolak</h2>
+                <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Ditolak")) %></p>
+              </div>
+            </div>
+        </div>
 
           <!-- Search + Filter -->
           <div class="flex flex-col sm:flex-row items-center gap-4 mb-6">
@@ -226,7 +247,6 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
             <% end %>
           </div>
         </div>
-      </div>
     </div>
     """
   end
