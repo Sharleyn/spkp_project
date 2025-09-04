@@ -1,22 +1,44 @@
 defmodule SpkpProject.Userpermohonan do
-  use Ecto.Schema
-  import Ecto.Changeset
+  import Ecto.Query, warn: false
+  alias SpkpProject.Repo
+  alias SpkpProject.Userpermohonan.Userpermohonan
 
-  schema "userpermohonan" do
-    field :status, :string
-    field :nota_kursus, :string
-    field :jadual_kursus, :string
+  # Senarai permohonan ikut user
+  def list_user_applications(user_id, filter \\ "Semua Keputusan") do
+    query =
+      from p in Userpermohonan,
+        where: p.user_id == ^user_id,
+        join: k in assoc(p, :kursus),
+        preload: [kursus: k],
+        order_by: [desc: p.inserted_at]
 
-    belongs_to :user, SpkpProject.Accounts.User
-    belongs_to :kursus, SpkpProject.Kursus.Kursuss
+    query =
+      case filter do
+        "Diterima" -> from p in query, where: p.status == "Diterima"
+        "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
+        "Ditolak" -> from p in query, where: p.status == "Ditolak"
+        _ -> query
+      end
 
-    timestamps(type: :utc_datetime)
+    Repo.all(query)
   end
 
-  @doc false
-  def changeset(userpermohonan, attrs) do
-    userpermohonan
-    |> cast(attrs, [:user_id, :kursus_id, :status, :nota_kursus, :jadual_kursus])
-    |> validate_required([:user_id, :kursus_id, :status])
+  # Cari kursus ikut nama
+  def search_user_applications(user_id, term) do
+    from(p in Userpermohonan,
+      join: k in assoc(p, :kursus),
+      where: p.user_id == ^user_id and ilike(k.nama_kursus, ^"%#{term}%"),
+      preload: [kursus: k],
+      order_by: [desc: p.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  # Padam permohonan
+  def delete_application(id) do
+    case Repo.get(Userpermohonan, id) do
+      nil -> {:error, :not_found}
+      permohonan -> Repo.delete(permohonan)
+    end
   end
 end
