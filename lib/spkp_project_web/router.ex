@@ -157,6 +157,8 @@ defmodule SpkpProjectWeb.Router do
       live "/item_elaun_pekerja/:id", TuntutanSayaLive.Show, :show
       live "/item_elaun_pekerja/:id/show/edit", TuntutanSayaLive.Show, :edit
 
+      live "/maklumat_saya", MaklumatSayaLive
+
       live "/editprofile", EditProfileLive
     end
   end

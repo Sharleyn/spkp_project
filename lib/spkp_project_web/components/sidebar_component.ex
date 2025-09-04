@@ -194,6 +194,12 @@ defmodule SpkpProjectWeb.SidebarComponent do
                   >
                     Buat Tuntutan Baru
                   </.link>
+                  <.link
+                    navigate={~p"/pekerja/maklumat_saya"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/maklumat_saya", do: "bg-gray-600 font-bold"}"}
+                  >
+                    Maklumat Saya
+                  </.link>
                 <% end %>
               </div>
             <% end %>

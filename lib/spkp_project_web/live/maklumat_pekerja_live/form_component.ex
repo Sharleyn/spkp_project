@@ -19,8 +19,6 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:full_name]} type="text" label="Nama Penuh" />
-        <.input field={@form[:email]} type="text" label="Emel" />
         <.input field={@form[:no_ic]} type="text" label="No ic" />
         <.input field={@form[:no_tel]} type="text" label="No tel" />
         <.input field={@form[:nama_bank]} type="text" label="Nama bank" />

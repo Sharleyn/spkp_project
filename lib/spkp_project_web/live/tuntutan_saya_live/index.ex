@@ -11,7 +11,6 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
 
   @impl true
   def handle_params(params, uri, socket) do
-
     {:noreply,
      socket
      |> assign(:current_path, URI.parse(uri).path)
@@ -37,9 +36,26 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
   end
 
   @impl true
-  def handle_info({SpkpProjectWeb.ItemElaunPekerjaLive.FormComponent, {:saved, item_elaun_pekerja}}, socket) do
-    {:noreply, stream_insert(socket, :item_elaun_pekerja_collection, item_elaun_pekerja)}
+  def handle_info({SpkpProjectWeb.TuntutanSayaLive.FormComponent, {:saved, item}}, socket) do
+    # masukkan item ke senarai pekerja
+    socket = stream_insert(socket, :item_elaun_pekerja_collection, item)
+
+    # ambil elaun_pekerja penuh + preload user
+    elaun =
+      Elaun.get_elaun_pekerja!(item.elaun_pekerja_id)
+      |> SpkpProject.Repo.preload(:user)
+
+    # hantar mesej supaya admin Index boleh tangkap
+    send(self(), {:elaun_saved, elaun})
+
+    {:noreply, socket}
   end
+
+
+  # Atau versi generic
+  # def handle_info({_, {:saved, item}}, socket) do
+  #   {:noreply, stream_insert(socket, :item_elaun_pekerja_collection, item)}
+  # end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
@@ -68,92 +84,89 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
         <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
-              </div>
-
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
             </div>
 
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">admin@gmail.com</span>
-
-                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-              Logout
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
               </.link>
-
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
+
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Item Tuntutan</h1>
-
             <p class="text-gray-600">Tambah item tuntutan baru</p>
           </div>
-           <.link patch={~p"/pekerja/item_elaun_pekerja/new"}><.button>Item tuntutan</.button></.link>
+          <.link patch={~p"/pekerja/item_elaun_pekerja/new"}
+                class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700">
+            + Buat tuntutan baru
+          </.link>
         </div>
 
-    <.table
-      id="item_elaun_pekerja"
-      rows={@streams.item_elaun_pekerja_collection}
-      row_click={fn {_id, item_elaun_pekerja} ->
-        JS.navigate(~p"/pekerja/item_elaun_pekerja/#{item_elaun_pekerja}")
-      end}
-    >
-      <:col :let={{_id, item_elaun_pekerja}} label="Kenyataan tuntutan">
-        <%= item_elaun_pekerja.kenyataan_tuntutan %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Tarikh tuntutan">
-        <%= item_elaun_pekerja.tarikh_tuntutan %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Masa mula">
-        <%= item_elaun_pekerja.masa_mula %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Masa tamat">
-        <%= item_elaun_pekerja.masa_tamat %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Keterangan">
-        <%= item_elaun_pekerja.keterangan %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Jumlah">
-        <%= item_elaun_pekerja.jumlah %>
-      </:col>
-
-      <:action :let={{_id, item_elaun_pekerja}}>
-        <div class="sr-only">
-          <.link navigate={~p"/pekerja/item_elaun_pekerja/#{item_elaun_pekerja}"}>Show</.link>
-        </div>
-        <.link patch={~p"/pekerja/item_elaun_pekerja/#{item_elaun_pekerja}/edit"}>Edit</.link>
-      </:action>
-
-      <:action :let={{id, item_elaun_pekerja}}>
-        <.link
-          phx-click={JS.push("delete", value: %{id: item_elaun_pekerja.id}) |> hide("##{id}")}
-          data-confirm="Are you sure?"
+        <.table
+          id="item_elaun_pekerja"
+          rows={@streams.item_elaun_pekerja_collection}
+          row_click={fn {_id, item} -> JS.navigate(~p"/pekerja/item_elaun_pekerja/#{item}") end}
         >
-          Delete
-        </.link>
-      </:action>
-    </.table>
+          <:col :let={{_id, item}} label="Kenyataan tuntutan">
+            <%= item.kenyataan_tuntutan %>
+          </:col>
+          <:col :let={{_id, item}} label="Tarikh tuntutan">
+            <%= item.tarikh_tuntutan %>
+          </:col>
+          <:col :let={{_id, item}} label="Masa mula">
+            <%= item.masa_mula %>
+          </:col>
+          <:col :let={{_id, item}} label="Masa tamat">
+            <%= item.masa_tamat %>
+          </:col>
+          <:col :let={{_id, item}} label="Keterangan">
+            <%= item.keterangan %>
+          </:col>
+          <:col :let={{_id, item}} label="Jumlah">
+            <%= item.jumlah %>
+          </:col>
 
-    <.modal
-      :if={@live_action in [:new, :edit]}
-      id="item_elaun_pekerja-modal"
-      show
-      on_cancel={JS.patch(~p"/pekerja/item_elaun_pekerja")}
-    >
-      <.live_component
-        module={SpkpProjectWeb.ItemElaunPekerjaLive.FormComponent}
-        id={@item_elaun_pekerja.id || :new}
-        title={@page_title}
-        action={@live_action}
-        item_elaun_pekerja={@item_elaun_pekerja}
-        patch={~p"/pekerja/item_elaun_pekerja"}
-      />
-    </.modal>
-    </div>
+          <:action :let={{_id, item}}>
+            <div class="sr-only">
+              <.link navigate={~p"/pekerja/item_elaun_pekerja/#{item}"}>Show</.link>
+            </div>
+            <.link patch={~p"/pekerja/item_elaun_pekerja/#{item}/edit"}>Edit</.link>
+          </:action>
+
+          <:action :let={{id, item}}>
+            <.link
+              phx-click={JS.push("delete", value: %{id: item.id}) |> hide("##{id}")}
+              data-confirm="Are you sure?"
+            >
+              Delete
+            </.link>
+          </:action>
+        </.table>
+
+        <.modal
+          :if={@live_action in [:new, :edit]}
+          id="item_elaun_pekerja-modal"
+          show
+          on_cancel={JS.patch(~p"/pekerja/item_elaun_pekerja")}
+        >
+          <.live_component
+            module={SpkpProjectWeb.TuntutanSayaLive.FormComponent}
+            id={@item_elaun_pekerja.id || :new}
+            title={@page_title}
+            action={@live_action}
+            item_elaun_pekerja={@item_elaun_pekerja}
+            patch={~p"/pekerja/item_elaun_pekerja"}
+            current_user={@current_user}
+          />
+        </.modal>
+      </div>
     </div>
     """
   end

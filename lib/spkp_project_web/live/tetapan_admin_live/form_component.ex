@@ -25,7 +25,7 @@ defmodule SpkpProjectWeb.EditProfileLive.FormComponent do
 
   @impl true
   def handle_event("save", %{"user" => user_params}, socket) do
-    case Accounts.update_user(socket.assigns.user, user_params) do
+    case Accounts.update_user_profile(socket.assigns.user, user_params) do
       {:ok, _user} ->
         {:noreply,
          socket
@@ -49,7 +49,7 @@ defmodule SpkpProjectWeb.EditProfileLive.FormComponent do
         </div>
          <button class="text-xl font-semibold text-gray-800 hover:text-gray-600">Edit</button>
       </div>
-      
+
       <.form
         for={@changeset}
         id="profile-form"
@@ -62,22 +62,22 @@ defmodule SpkpProjectWeb.EditProfileLive.FormComponent do
           <label class="block text-xl font-semibold text-gray-800 mb-2">Nama Penuh</label>
           <.input field={@changeset[:name]} type="text" placeholder="Masukkan nama penuh" />
         </div>
-        
+
         <div>
           <label class="block text-xl font-semibold text-gray-800 mb-2">Emel</label>
           <.input field={@changeset[:email]} type="email" placeholder="Masukkan emel" />
         </div>
-        
+
         <div>
           <label class="block text-xl font-semibold text-gray-800 mb-2">No Telefon</label>
           <.input field={@changeset[:phone]} type="tel" placeholder="Masukkan nombor telefon" />
         </div>
-        
+
         <div>
           <label class="block text-xl font-semibold text-gray-800 mb-2">Password Baru</label>
           <.input field={@changeset[:password]} type="password" placeholder="Masukkan password baru" />
         </div>
-        
+
         <div class="flex justify-center pt-4">
           <button
             type="submit"

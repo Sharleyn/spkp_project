@@ -389,10 +389,7 @@ defmodule SpkpProject.Accounts do
 
   """
   def list_maklumat_pekerja do
-    SpkpProject.Repo.all(
-    from m in SpkpProject.Accounts.MaklumatPekerja,
-      preload: [:user]
-  )
+    Repo.all(from m in MaklumatPekerja, preload: [:user])
   end
 
   @doc """
@@ -412,6 +409,12 @@ defmodule SpkpProject.Accounts do
   def get_maklumat_pekerja!(id), do:
     Repo.get!(MaklumatPekerja, id)
     |> Repo.preload(:user)
+
+    def get_maklumat_pekerja_by_user_id(user_id) do
+      Repo.get_by(MaklumatPekerja, user_id: user_id)
+      |> Repo.preload(:user)
+    end
+
 
 
 
@@ -433,6 +436,10 @@ defmodule SpkpProject.Accounts do
     %MaklumatPekerja{}
     |> MaklumatPekerja.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, maklumat} -> {:ok, Repo.preload(maklumat, :user)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """
@@ -451,6 +458,10 @@ defmodule SpkpProject.Accounts do
     maklumat_pekerja
     |> MaklumatPekerja.changeset(attrs)
     |> Repo.update()
+    |> case do
+      {:ok, maklumat} -> {:ok, Repo.preload(maklumat, :user)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """

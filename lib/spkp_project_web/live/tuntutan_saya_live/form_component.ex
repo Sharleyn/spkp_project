@@ -2,33 +2,76 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
   use SpkpProjectWeb, :live_component
 
   alias SpkpProject.Elaun
+  alias SpkpProject.Elaun.{ElaunPekerja, ItemElaunPekerja}
 
   @impl true
   def render(assigns) do
     ~H"""
     <div>
-      <.header>
-        {@title}
-        <:subtitle>Use this form to manage item_elaun_pekerja records in your database.</:subtitle>
-      </.header>
+      <!-- Step 1: Tarikh mula/akhir -->
+      <div :if={@step == 1} class="fixed inset-0 bg-black/40 z-50">
+        <div class="mx-auto mt-32 w-full max-w-2xl rounded-lg bg-white p-8 shadow-lg">
+          <h3 class="text-center text-sm font-semibold tracking-wide text-gray-700">
+            TUNTUTAN ELAUN
+          </h3>
 
-      <.simple_form
-        for={@form}
-        id="item_elaun_pekerja-form"
-        phx-target={@myself}
-        phx-change="validate"
-        phx-submit="save"
-      >
-        <.input field={@form[:kenyataan_tuntutan]} type="text" label="Kenyataan tuntutan" />
-        <.input field={@form[:tarikh_tuntutan]} type="date" label="Tarikh tuntutan" />
-        <.input field={@form[:masa_mula]} type="time" label="Masa mula" />
-        <.input field={@form[:masa_tamat]} type="time" label="Masa tamat" />
-        <.input field={@form[:keterangan]} type="text" label="Keterangan" />
-        <.input field={@form[:jumlah]} type="number" label="Jumlah" step="any" />
-        <:actions>
-          <.button phx-disable-with="Saving...">Save Item elaun pekerja</.button>
-        </:actions>
-      </.simple_form>
+          <form phx-submit="set_tarikh" phx-target={@myself} class="mt-6 space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tarikh Mula</label>
+              <input type="date" name="tarikh_mula" value={@tarikh_mula}
+                     class="w-full rounded-md border border-gray-300 px-3 py-2
+                            focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tarikh Akhir</label>
+              <input type="date" name="tarikh_akhir" value={@tarikh_akhir}
+                     class="w-full rounded-md border border-gray-300 px-3 py-2
+                            focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div class="mt-8 flex justify-center">
+              <button type="submit"
+                class="rounded-md bg-blue-600 px-5 py-2 text-white hover:bg-blue-700">
+                Seterusnya
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Step 2: Butiran item -->
+      <div :if={@step == 2} class="fixed inset-0 bg-black/40 z-50">
+        <div class="mx-auto mt-20 w-full max-w-4xl rounded-lg bg-white p-8 shadow-lg">
+          <h3 class="text-center text-sm font-semibold tracking-wide text-gray-700">
+            TUNTUTAN ELAUN
+          </h3>
+
+          <.simple_form
+            for={@form}
+            id="item_elaun_pekerja-form"
+            phx-target={@myself}
+            phx-change="validate"
+            phx-submit="save"
+            class="mt-6"
+          >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <.input field={@form[:kenyataan_tuntutan]} type="text" label="Kenyataan / Jenis kerja" class="md:col-span-2" />
+              <.input field={@form[:tarikh_tuntutan]} type="date" label="Tarikh" />
+              <div></div>
+              <.input field={@form[:masa_mula]} type="time" label="Masa mula" />
+              <.input field={@form[:masa_tamat]} type="time" label="Masa tamat" />
+              <.input field={@form[:keterangan]} type="text" label="Keterangan" class="md:col-span-2" />
+              <.input field={@form[:jumlah]} type="number" step="0.01" label="Jumlah (RM)" class="md:col-span-2" />
+            </div>
+
+            <:actions>
+              <button type="button" phx-click="prev_step" phx-target={@myself}
+                class="rounded-md bg-gray-500 px-5 py-2 text-white hover:bg-gray-600">Kembali</button>
+              <.button phx-disable-with="Saving...">Simpan</.button>
+            </:actions>
+          </.simple_form>
+        </div>
+      </div>
     </div>
     """
   end
@@ -38,48 +81,92 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign_new(:step, fn -> 1 end)
+     |> assign_new(:tarikh_mula, fn -> nil end)
+     |> assign_new(:tarikh_akhir, fn -> nil end)
      |> assign_new(:form, fn ->
        to_form(Elaun.change_item_elaun_pekerja(item_elaun_pekerja))
      end)}
   end
 
-  @impl true
-  def handle_event("validate", %{"item_elaun_pekerja" => item_elaun_pekerja_params}, socket) do
-    changeset = Elaun.change_item_elaun_pekerja(socket.assigns.item_elaun_pekerja, item_elaun_pekerja_params)
+   # Step 1 → set tarikh
+   @impl true
+  def handle_event("set_tarikh", %{"tarikh_mula" => mula, "tarikh_akhir" => akhir}, socket) do
+    {:noreply,
+     socket
+     |> assign(:tarikh_mula, mula)
+     |> assign(:tarikh_akhir, akhir)
+     |> assign(:step, 2)}
+  end
+
+  # Step 2 → validate item
+  def handle_event("validate", %{"item_elaun_pekerja" => params}, socket) do
+    changeset =
+      Elaun.change_item_elaun_pekerja(socket.assigns.item_elaun_pekerja, params)
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
-  def handle_event("save", %{"item_elaun_pekerja" => item_elaun_pekerja_params}, socket) do
-    save_item_elaun_pekerja(socket, socket.assigns.action, item_elaun_pekerja_params)
+  def handle_event("prev_step", _params, socket) do
+    {:noreply, assign(socket, :step, 1)}
   end
 
-  defp save_item_elaun_pekerja(socket, :edit, item_elaun_pekerja_params) do
-    case Elaun.update_item_elaun_pekerja(socket.assigns.item_elaun_pekerja, item_elaun_pekerja_params) do
-      {:ok, item_elaun_pekerja} ->
-        notify_parent({:saved, item_elaun_pekerja})
+  # Simpan kedua-dua table
+  def handle_event("save", %{"item_elaun_pekerja" => item_params}, socket) do
+    save_tuntutan(socket, socket.assigns.action, item_params)
+  end
 
-        {:noreply,
-         socket
-         |> put_flash(:info, "Item elaun pekerja updated successfully")
-         |> push_patch(to: socket.assigns.patch)}
+  defp save_tuntutan(socket, :new, item_params) do
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
+     # cari rekod maklumat_pekerja untuk user yang sedang login
+  maklumat_pekerja =
+    SpkpProject.Accounts.get_maklumat_pekerja_by_user_id(socket.assigns.current_user.id)
+
+    # buat elaun_pekerja dulu
+    elaun_params = %{
+      "tarikh_mula" => socket.assigns.tarikh_mula,
+      "tarikh_akhir" => socket.assigns.tarikh_akhir,
+      "status_permohonan" => "baru",
+      "jumlah_keseluruhan" => item_params["jumlah"],
+      "maklumat_pekerja_id" => maklumat_pekerja.id   # ✅ guna id maklumat_pekerja
+
+    }
+
+    case Elaun.create_elaun_pekerja(elaun_params) do
+      {:ok, elaun} ->
+        # kaitkan item dengan elaun
+        item_params = Map.put(item_params, "elaun_pekerja_id", elaun.id)
+
+        case Elaun.create_item_elaun_pekerja(item_params) do
+          {:ok, item} ->
+            notify_parent({:saved, item})
+
+            {:noreply,
+             socket
+             |> put_flash(:info, "Tuntutan berjaya disimpan")
+             |> push_patch(to: socket.assigns.patch)}
+
+          {:error, cs} ->
+            {:noreply, assign(socket, form: to_form(cs))}
+        end
+
+      {:error, _cs} ->
+        {:noreply, put_flash(socket, :error, "Gagal simpan elaun")}
     end
   end
 
-  defp save_item_elaun_pekerja(socket, :new, item_elaun_pekerja_params) do
-    case Elaun.create_item_elaun_pekerja(item_elaun_pekerja_params) do
-      {:ok, item_elaun_pekerja} ->
-        notify_parent({:saved, item_elaun_pekerja})
+  defp save_tuntutan(socket, :edit, item_params) do
+    case Elaun.update_item_elaun_pekerja(socket.assigns.item_elaun_pekerja, item_params) do
+      {:ok, item} ->
+        notify_parent({:saved, item})
 
         {:noreply,
          socket
-         |> put_flash(:info, "Item elaun pekerja created successfully")
+         |> put_flash(:info, "Item elaun pekerja dikemaskini")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
+      {:error, cs} ->
+        {:noreply, assign(socket, form: to_form(cs))}
     end
   end
 

@@ -11,6 +11,7 @@ defmodule SpkpProject.Elaun.ItemElaunPekerja do
     field :jumlah, :decimal
 
     belongs_to :elaun_pekerja, SpkpProject.Elaun.ElaunPekerja
+    has_one :user, through: [:elaun_pekerja, :user]
 
     timestamps(type: :utc_datetime)
   end

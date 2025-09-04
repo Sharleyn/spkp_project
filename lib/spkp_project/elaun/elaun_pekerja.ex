@@ -10,6 +10,7 @@ defmodule SpkpProject.Elaun.ElaunPekerja do
 
     belongs_to :maklumat_pekerja, SpkpProject.Accounts.MaklumatPekerja
 
+
     timestamps(type: :utc_datetime)
   end
 

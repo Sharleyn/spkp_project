@@ -41,6 +41,12 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Index do
   end
 
   @impl true
+  def handle_info({:elaun_saved, elaun}, socket) do
+    {:noreply, stream_insert(socket, :elaun_pekerja_collection, elaun)}
+  end
+
+
+  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     elaun_pekerja = Elaun.get_elaun_pekerja!(id)
     {:ok, _} = Elaun.delete_elaun_pekerja(elaun_pekerja)
