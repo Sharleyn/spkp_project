@@ -174,6 +174,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               <div>
                 <h2 class="text-l font-semibold text-gray-600">Jumlah Permohonan</h2>
                 <p class="text-2xl font-bold text-gray-900"><%= length(@applications) %></p>
+                <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
               </div>
             </div>
 
@@ -181,7 +182,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               <div>
                 <h2 class="text-l font-semibold text-gray-600">Diterima</h2>
                 <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Diterima")) %></p>
-                <>
+                <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
               </div>
             </div>
 
@@ -189,6 +190,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               <div>
                 <h2 class="text-l font-semibold text-gray-600">Dalam Proses</h2>
                 <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Dalam Proses")) %></p>
+                <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
               </div>
             </div>
 
@@ -196,6 +198,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               <div>
                 <h2 class="text-l font-semibold text-gray-600">Ditolak</h2>
                 <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Ditolak")) %></p>
+                <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
               </div>
             </div>
         </div>
