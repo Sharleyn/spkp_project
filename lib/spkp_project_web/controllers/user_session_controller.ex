@@ -4,22 +4,23 @@ defmodule SpkpProjectWeb.UserSessionController do
   alias SpkpProject.Accounts
   alias SpkpProjectWeb.UserAuth
 
-  def create(conn, %{"_action" => action} = params) do
+   # Login dengan _action (register, password_updated, dsb.)
+   def create(conn, %{"_action" => action} = params) do
     case action do
       "registered" ->
-        create(conn, params, "Account created successfully!")
+        create(conn, params, "Akaun Berjaya Dibuat!")
 
       "password_updated" ->
         conn
         |> put_session(:user_return_to, ~p"/users/settings")
-        |> create(params, "Password updated successfully!")
+        |> create(params, "Kata Laluan Berjaya Di Kemaskini!")
 
       _ ->
-        create(conn, params, "Welcome back!")
+        create(conn, params, "Selamat Kembali!")
     end
   end
 
-  # Create: Login biasa
+  # Login biasa
   def create(conn, %{"user" => %{"email" => email, "password" => password}}) do
     case Accounts.get_user_by_email_and_password(email, password) do
       nil ->
@@ -30,18 +31,13 @@ defmodule SpkpProjectWeb.UserSessionController do
       user ->
         conn
         |> put_flash(:info, "Welcome back!")
-        |> UserAuth.log_in_user(user)
-        |> redirect_user_by_role(user)
+        |> UserAuth.log_in_user(user)   # login tanpa redirect
+        |> redirect_user_by_role(user)  # controller tentukan redirect
     end
   end
 
-  # Create: Fungsi helper jika ada info tambahan (contoh flash message)
-  defp create(
-         conn,
-         %{"user" => %{"email" => email, "password" => password}} =
-           user_params,
-         info
-       ) do
+  # 🔑 Helper login dengan flash tambahan
+  defp create(conn, %{"user" => %{"email" => email, "password" => password}} = user_params, info) do
     case Accounts.get_user_by_email_and_password(email, password) do
       nil ->
         conn
@@ -53,16 +49,23 @@ defmodule SpkpProjectWeb.UserSessionController do
         conn
         |> put_flash(:info, info)
         |> UserAuth.log_in_user(user, user_params)
-        |> redirect_user_by_role(user)
+        |> redirect_user_by_role(user)  # redirect ikut role
     end
   end
 
-  # Redirect berdasarkan role user
+  # Redirect ikut role
   defp redirect_user_by_role(conn, user) do
-    case user.role do
-      "admin" -> redirect(conn, to: ~p"/admin/dashboard")
-      "user" -> redirect(conn, to: ~p"/userdashboard")
-      _ -> redirect(conn, to: ~p"/")
+    case get_session(conn, :user_return_to) do
+      nil ->
+        case user.role do
+          "admin"   -> redirect(conn, to: ~p"/admin/dashboard")
+          "pekerja" -> redirect(conn, to: ~p"/pekerja/dashboard")
+          "user"    -> redirect(conn, to: ~p"/userdashboard")
+          _         -> redirect(conn, to: ~p"/")
+        end
+
+      return_to ->
+        redirect(conn, to: return_to)
     end
   end
 
