@@ -1,4 +1,4 @@
-defmodule SpkpProjectWeb.TuntutanSayaLive do
+defmodule SpkpProjectWeb.TuntutanSayaaLive do
   use SpkpProjectWeb, :live_view
 
   alias SpkpProject.Repo

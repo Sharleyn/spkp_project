@@ -7,6 +7,7 @@ defmodule SpkpProject.Elaun do
   alias SpkpProject.Repo
 
   alias SpkpProject.Elaun.ElaunPekerja
+  alias SpkpProject.Elaun.ItemElaunPekerja
 
   @doc """
   Returns the list of elaun_pekerja.
@@ -17,14 +18,11 @@ defmodule SpkpProject.Elaun do
       [%ElaunPekerja{}, ...]
 
   """
-  def list_elaun_pekerja do
-    Repo.all(
-      from e in ElaunPekerja,
-        join: m in assoc(e, :maklumat_pekerja),
-        join: u in assoc(m, :user),
-        preload: [maklumat_pekerja: {m, user: u}]
-    )
-  end
+ def list_elaun_pekerja do
+  Repo.all(ElaunPekerja)
+  |> Repo.preload(maklumat_pekerja: :user)
+end
+
 
   @doc """
   Gets a single elaun_pekerja.
@@ -40,7 +38,11 @@ defmodule SpkpProject.Elaun do
       ** (Ecto.NoResultsError)
 
   """
-  def get_elaun_pekerja!(id), do: Repo.get!(ElaunPekerja, id)
+  def get_elaun_pekerja!(id) do
+    Repo.get!(ElaunPekerja, id)
+    |> Repo.preload(maklumat_pekerja: :user)
+  end
+
 
   @doc """
   Creates a elaun_pekerja.
@@ -121,6 +123,17 @@ defmodule SpkpProject.Elaun do
   def list_item_elaun_pekerja do
     Repo.all(ItemElaunPekerja)
   end
+
+  def list_item_elaun_pekerja_by_user(user_id) do
+    from(i in ItemElaunPekerja,
+      join: e in assoc(i, :elaun_pekerja),
+      join: m in assoc(e, :maklumat_pekerja),
+      where: m.user_id == ^user_id,
+      preload: [elaun_pekerja: [maklumat_pekerja: :user]]
+    )
+    |> Repo.all()
+  end
+
 
   @doc """
   Gets a single item_elaun_pekerja.

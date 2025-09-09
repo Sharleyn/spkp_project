@@ -19,10 +19,25 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:full_name]} type="text" label="Nama Penuh" />
+        <.input
+          field={@form[:nama_pekerja]}
+          type="text"
+          label="Nama Pekerja"
+          value={@elaun_pekerja.maklumat_pekerja.user.full_name}
+        />
         <.input field={@form[:tarikh_mula]} type="date" label="Tarikh mula" />
         <.input field={@form[:tarikh_akhir]} type="date" label="Tarikh akhir" />
-        <.input field={@form[:status_permohonan]} type="text" label="Status permohonan" />
+        <.input
+          field={@form[:status_permohonan]}
+          type="select"
+          label="Status Permohonan"
+          prompt="-- Pilih status --"
+          options={[
+            {"Menunggu Kelulusan", "Menunggu Kelulusan"},
+            {"Diterima", "Diterima"},
+            {"Ditolak", "Ditolak"}
+          ]}
+        />
         <.input field={@form[:jumlah_keseluruhan]} type="number" label="Jumlah keseluruhan" step="any" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Elaun pekerja</.button>

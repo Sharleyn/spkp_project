@@ -6,8 +6,10 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :item_elaun_pekerja_collection, Elaun.list_item_elaun_pekerja())}
+    items = Elaun.list_item_elaun_pekerja_by_user(socket.assigns.current_user.id)
+    {:ok, stream(socket, :item_elaun_pekerja_collection, items)}
   end
+
 
   @impl true
   def handle_params(params, uri, socket) do
@@ -17,10 +19,26 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
      |> apply_action(socket.assigns.live_action, params)}
   end
 
+  @impl true
+  def handle_params(%{"id" => id, "live_action" => "edit"}, _uri, socket) do
+    item = Elaun.get_item_elaun_pekerja!(id)
+    |> SpkpProject.Repo.preload(:elaun_pekerja)
+
+    {:noreply,
+    socket
+    |> assign(:page_title, "Edit Item Tuntutan Elaun")
+    |> assign(:item_elaun_pekerja, item)}
+  end
+
+
   defp apply_action(socket, :edit, %{"id" => id}) do
+    item =
+      Elaun.get_item_elaun_pekerja!(id)
+      |> SpkpProject.Repo.preload(:elaun_pekerja)
+
     socket
     |> assign(:page_title, "Edit Item elaun pekerja")
-    |> assign(:item_elaun_pekerja, Elaun.get_item_elaun_pekerja!(id))
+    |> assign(:item_elaun_pekerja, item)
   end
 
   defp apply_action(socket, :new, _params) do

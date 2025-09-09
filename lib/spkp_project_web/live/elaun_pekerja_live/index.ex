@@ -106,7 +106,7 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Index do
       rows={@streams.elaun_pekerja_collection}
       row_click={fn {_id, elaun_pekerja} -> JS.navigate(~p"/admin/elaun_pekerja/#{elaun_pekerja}") end}
     >
-      <:col :let={{_id, elaun_pekerja}} label="Nama Penuh">{elaun_pekerja.user.full_name}</:col>
+      <:col :let={{_id, elaun_pekerja}} label="Nama Penuh">{elaun_pekerja.maklumat_pekerja.user.full_name}</:col>
       <:col :let={{_id, elaun_pekerja}} label="Tarikh mula">{elaun_pekerja.tarikh_mula}</:col>
       <:col :let={{_id, elaun_pekerja}} label="Tarikh akhir">{elaun_pekerja.tarikh_akhir}</:col>
       <:col :let={{_id, elaun_pekerja}} label="Status permohonan">{elaun_pekerja.status_permohonan}</:col>

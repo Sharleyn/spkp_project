@@ -2,7 +2,6 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
   use SpkpProjectWeb, :live_component
 
   alias SpkpProject.Elaun
-  alias SpkpProject.Elaun.{ElaunPekerja, ItemElaunPekerja}
 
   @impl true
   def render(assigns) do
@@ -81,9 +80,21 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign_new(:step, fn -> 1 end)
-     |> assign_new(:tarikh_mula, fn -> nil end)
-     |> assign_new(:tarikh_akhir, fn -> nil end)
+     |> assign(:step, if(assigns.action == :edit, do: 2, else: 1))
+     |> assign_new(:tarikh_mula, fn ->
+      if assigns.action == :edit do
+        item_elaun_pekerja.elaun_pekerja.tarikh_mula
+      else
+        nil
+      end
+    end)
+    |> assign_new(:tarikh_akhir, fn ->
+      if assigns.action == :edit do
+        item_elaun_pekerja.elaun_pekerja.tarikh_akhir
+      else
+        nil
+      end
+    end)
      |> assign_new(:form, fn ->
        to_form(Elaun.change_item_elaun_pekerja(item_elaun_pekerja))
      end)}
@@ -126,7 +137,7 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
     elaun_params = %{
       "tarikh_mula" => socket.assigns.tarikh_mula,
       "tarikh_akhir" => socket.assigns.tarikh_akhir,
-      "status_permohonan" => "baru",
+      "status_permohonan" => "Menunggu Kelulusan",
       "jumlah_keseluruhan" => item_params["jumlah"],
       "maklumat_pekerja_id" => maklumat_pekerja.id   # ✅ guna id maklumat_pekerja
 

@@ -33,6 +33,7 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Show do
     </.header>
 
     <.list>
+      <:item title="Nama Penuh">{@elaun_pekerja.maklumat_pekerja.user.full_name}</:item>
       <:item title="Tarikh mula">{@elaun_pekerja.tarikh_mula}</:item>
       <:item title="Tarikh akhir">{@elaun_pekerja.tarikh_akhir}</:item>
       <:item title="Status permohonan">{@elaun_pekerja.status_permohonan}</:item>

@@ -9,7 +9,10 @@ defmodule SpkpProject.Elaun.ElaunPekerja do
     field :jumlah_keseluruhan, :decimal
 
     belongs_to :maklumat_pekerja, SpkpProject.Accounts.MaklumatPekerja
-
+        # ✅ Hubungan dengan item tuntutan
+    has_many :item_elaun_pekerja, SpkpProject.Elaun.ItemElaunPekerja,
+    foreign_key: :elaun_pekerja_id,
+    on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end
