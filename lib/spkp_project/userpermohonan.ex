@@ -5,7 +5,7 @@ defmodule SpkpProject.Userpermohonan do
 
   # Senarai permohonan ikut user
   def list_user_applications(user_id, filter \\ "Semua Keputusan") do
-    query =
+    base =
       from p in Userpermohonan,
         where: p.user_id == ^user_id,
         join: k in assoc(p, :kursus),
@@ -14,10 +14,10 @@ defmodule SpkpProject.Userpermohonan do
 
     query =
       case filter do
-        "Diterima" -> from p in query, where: p.status == "Diterima"
-        "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
-        "Ditolak" -> from p in query, where: p.status == "Ditolak"
-        _ -> query
+        "Diterima" -> from p in base, where: p.status == "Diterima"
+        "Dalam Proses" -> from p in base, where: p.status == "Dalam Proses"
+        "Ditolak" -> from p in base, where: p.status == "Ditolak"
+        _ -> base
       end
 
     Repo.all(query)
@@ -32,6 +32,16 @@ defmodule SpkpProject.Userpermohonan do
       order_by: [desc: p.inserted_at]
     )
     |> Repo.all()
+  end
+
+  def create_application(user_id, kursus_id) do
+    %Userpermohonan{}
+    |> Userpermohonan.changeset(%{
+      user_id: user_id,
+      kursus_id: kursus_id,
+      status: "Dalam Proses"
+    })
+    |> Repo.insert()
   end
 
   # Padam permohonan

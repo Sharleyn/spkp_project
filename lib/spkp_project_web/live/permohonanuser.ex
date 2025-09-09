@@ -1,71 +1,117 @@
 defmodule SpkpProjectWeb.PermohonanUserLive do
   use SpkpProjectWeb, :live_view
 
+  import Ecto.Query
   alias SpkpProject.Userpermohonan
 
   # ========== MOUNT ==========
-  @impl true
-  def mount(_params, _session, socket) do
-    current_user = socket.assigns.current_user
+    @impl true
+    def mount(_params, _session, socket) do
+      current_user = socket.assigns.current_user
+      page = 1
+      per_page = 5
+      filter = "Semua Keputusan"
 
-    applications = Userpermohonan.list_user_applications(current_user.id)
+      apps = Userpermohonan.list_user_applications(current_user.id, filter, page, per_page)
 
-    {:ok,
-     socket
-     |> assign(:current_user, current_user)
-     |> assign(:current_user_name, current_user.full_name)
-     |> assign(:sidebar_open, true)
-     |> assign(:user_menu_open, false)
-     |> assign(:applications, applications)
-     |> assign(:filter, "Semua Keputusan")}
+      {:ok,
+       socket
+       |> assign(:current_user, current_user)
+       |> assign(:current_user_name, current_user.full_name)
+       |> assign(:sidebar_open, true)
+       |> assign(:user_menu_open, false)
+       |> assign(:applications, apps)
+       |> assign(:filter, filter)
+       |> assign(:page, page)
+       |> assign(:per_page, per_page)}
+    end
+
+    # === EVENTS ===
+
+    def handle_event("filter", %{"filter" => filter}, socket) do
+      apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, filter, socket.assigns.page, socket.assigns.per_page)
+      {:noreply, assign(socket, applications: apps, filter: filter)}
+    end
+
+    def handle_event("search", %{"value" => term}, socket) do
+      apps = Userpermohonan.search_user_applications(socket.assigns.current_user.id, term, socket.assigns.filter, socket.assigns.page, socket.assigns.per_page)
+      {:noreply, assign(socket, applications: apps)}
+    end
+
+    def handle_event("next_page", _params, socket) do
+      page = socket.assigns.page + 1
+      apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, socket.assigns.filter, page, socket.assigns.per_page)
+      {:noreply, assign(socket, applications: apps, page: page)}
+    end
+
+    def handle_event("prev_page", _params, socket) do
+      page = max(socket.assigns.page - 1, 1)
+      apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, socket.assigns.filter, page, socket.assigns.per_page)
+      {:noreply, assign(socket, applications: apps, page: page)}
+    end
+
+    def handle_event("delete", %{"id" => id}, socket) do
+      case Userpermohonan.delete_application(id) do
+        {:ok, _} ->
+          apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, socket.assigns.filter, socket.assigns.page, socket.assigns.per_page)
+          {:noreply, assign(socket, applications: apps)}
+        {:error, _} ->
+          {:noreply, put_flash(socket, :error, "Gagal memadam permohonan.")}
+      end
+    end
+
+  # Filter
+  def list_user_applications(user_id, filter \\ "Semua Keputusan", page \\ 1, per_page \\ 5) do
+    query =
+      from(p in SpkpProject.Userpermohonan.Userpermohonan,
+        where: p.user_id == ^user_id,
+        join: k in assoc(p, :kursus),
+        preload: [kursus: k],
+        order_by: [desc: p.inserted_at]
+      )
+
+    query =
+      case filter do
+        "Diterima" -> from p in query, where: p.status == "Diterima"
+        "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
+        "Ditolak" -> from p in query, where: p.status == "Ditolak"
+        _ -> query
+      end
+
+    query
+    |> limit(^per_page)
+    |> offset(^(per_page * (page - 1)))
+    |> SpkpProject.Repo.all()
   end
 
-  # ========== EVENTS ==========
+  def search_user_applications(user_id, term, filter \\ "Semua Keputusan", page \\ 1, per_page \\ 5) do
+    query =
+      from(p in SpkpProject.Userpermohonan.Userpermohonan,
+        where: p.user_id == ^user_id,
+        join: k in assoc(p, :kursus),
+        preload: [kursus: k],
+        where: ilike(k.nama_kursus, ^"%#{term}%"),
+        order_by: [desc: p.inserted_at]
+      )
 
-  # Logout
-  @impl true
-  def handle_event("logout", _params, socket) do
-    {:noreply,
-     socket
-     |> put_flash(:info, "Anda telah log keluar.")
-     |> redirect(to: ~p"/lamanutama")}
+    query =
+      case filter do
+        "Diterima" -> from p in query, where: p.status == "Diterima"
+        "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
+        "Ditolak" -> from p in query, where: p.status == "Ditolak"
+        _ -> query
+      end
+
+    query
+    |> limit(^per_page)
+    |> offset(^(per_page * (page - 1)))
+    |> SpkpProject.Repo.all()
   end
 
-  # Toggle Sidebar
-  def handle_event("toggle_sidebar", _params, socket) do
-    {:noreply, assign(socket, :sidebar_open, !socket.assigns.sidebar_open)}
-  end
-
-  # Toggle User Menu
-  def handle_event("toggle_user_menu", _params, socket) do
-    {:noreply, assign(socket, :user_menu_open, !socket.assigns.user_menu_open)}
-  end
-
-  def handle_event("close_user_menu", _params, socket) do
-    {:noreply, assign(socket, :user_menu_open, false)}
-  end
-
-  # Filter permohonan
-  def handle_event("filter", %{"filter" => filter_by}, socket) do
-    apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, filter_by)
-    {:noreply, assign(socket, applications: apps, filter: filter_by)}
-  end
-
-  # Cari kursus
-  def handle_event("search", %{"value" => term}, socket) do
-    apps = Userpermohonan.search_user_applications(socket.assigns.current_user.id, term)
-    {:noreply, assign(socket, applications: apps)}
-  end
-
-  # Delete permohonan
-  def handle_event("delete", %{"id" => id}, socket) do
-    case Userpermohonan.delete_application(id) do
-      {:ok, _} ->
-        apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, socket.assigns.filter)
-        {:noreply, assign(socket, applications: apps)}
-
-      {:error, _} ->
-        {:noreply, put_flash(socket, :error, "Gagal memadam permohonan.")}
+  def delete_application(id) do
+    case SpkpProject.Repo.get(SpkpProject.Userpermohonan.Userpermohonan, id) do
+      nil -> {:error, :not_found}
+      record -> SpkpProject.Repo.delete(record)
     end
   end
 
@@ -182,7 +228,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               <div>
                 <h2 class="text-l font-semibold text-gray-600">Diterima</h2>
                 <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Diterima")) %></p>
-                <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
+                <img src={~p"/images/diterima.png"} alt="Diterima Icon" class="w-8 h-8" />
               </div>
             </div>
 
@@ -190,7 +236,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               <div>
                 <h2 class="text-l font-semibold text-gray-600">Dalam Proses</h2>
                 <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Dalam Proses")) %></p>
-                <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
+                <img src={~p"/images/dalam_proses.png"} alt="Dalam Proses Icon" class="w-8 h-8" />
               </div>
             </div>
 
@@ -198,7 +244,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               <div>
                 <h2 class="text-l font-semibold text-gray-600">Ditolak</h2>
                 <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Ditolak")) %></p>
-                <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
+                <img src={~p"/images/ditolak.png"} alt="Ditolak Icon" class="w-8 h-8" />
               </div>
             </div>
         </div>
@@ -221,35 +267,78 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
             </div>
           </div>
 
-          <!-- Senarai Permohonan -->
-          <div class="space-y-4">
-            <%= for application <- @applications do %>
-              <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div>
-                  <h3 class="text-lg font-semibold"><%= application.kursus.nama_kursus %></h3>
-                  <p class="text-sm text-gray-500">
-                    Mohon: <%= application.inserted_at %>
-                  </p>
-                </div>
+        <!-- Senarai Permohonan (Card Style) -->
+          <div class="space-y-6">
+             <%= for permohonan <- @applications do %>
+                <div class="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md transition">
 
-                <div class="mt-4 md:mt-0 flex flex-wrap gap-2 items-center">
-                  <%= if application.status == "Diterima" do %>
-                    <span class="px-3 py-1 text-xs font-semibold text-white bg-green-500 rounded-full">Diterima</span>
-                    <a href={application.nota_kursus} class="btn-primary">Muat Turun Nota</a>
-                    <a href={application.jadual_kursus} class="btn-primary">Muat Turun Jadual</a>
-                  <% else %>
-                    <%= if application.status == "Dalam Proses" do %>
-                      <span class="px-3 py-1 text-xs font-semibold text-white bg-yellow-500 rounded-full">Dalam Proses</span>
-                    <% else %>
-                      <span class="px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded-full">Ditolak</span>
-                    <% end %>
-                    <button class="btn-danger" phx-click="delete" phx-value-id={application.id}>Padam</button>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
+          <!-- Header -->
+             <div class="flex justify-between items-start">
+                <div class="flex items-center space-x-2">
+
+          <!-- Nama kursus -->
+            <h3 class="text-lg font-bold"><%= permohonan.kursus.nama_kursus %></h3>
           </div>
+
+          <!-- Status Badge -->
+            <span class={case permohonan.status do
+              "Diterima" -> "px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold"
+              "Dalam Proses" -> "px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold"
+              "Ditolak" -> "px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-semibold"
+                 _ -> "px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-semibold"
+             end}>
+              <%= permohonan.status %>
+           </span>
+         </div>
+
+        <!-- Tarikh -->
+           <p class="text-sm text-gray-500 mt-1">
+              Mohon: <%= permohonan.inserted_at |> Calendar.strftime("%d-%m-%Y") %>
+          </p>
+
+        <!-- Butiran Kursus -->
+           <div class="mt-4 text-sm text-gray-700 space-y-1">
+             <p><strong>Tarikh Mula:</strong> <%= permohonan.kursus.tarikh_mula %></p>
+             <p><strong>Tarikh Akhir:</strong> <%= permohonan.kursus.tarikh_akhir %></p>
+             <p><strong>Tempat:</strong> <%= permohonan.kursus.tempat %></p>
+             <p><strong>Anjuran:</strong> <%= permohonan.kursus.anjuran %></p>
+         </div>
+
+        <!-- Actions -->
+           <div class="mt-4 flex gap-2">
+             <button class="px-4 py-2 rounded-lg border text-gray-700 font-medium hover:bg-gray-100">
+               Lihat
+           </button>
+
+           <%= if permohonan.status == "Diterima" do %>
+             <a href={permohonan.tawaran_url} class="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600">
+               Muat Turun Surat Tawaran
+            </a>
+          <% end %>
+          </div>
+         </div>
+        <% end %>
+
+        <!-- Pagination -->
+          <div class="flex justify-center mt-6 space-x-1">
+            <button phx-click="prev_page"
+              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+               disabled={@page == 1}>
+                &laquo; Prev
+            </button>
+
+            <span class="px-3 py-1 text-gray-700 font-medium">
+              Page <%= @page %>
+           </span>
+
+            <button phx-click="next_page"
+              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100">
+               Next &raquo;
+           </button>
+          </div>
+
         </div>
+      </div>
     </div>
     """
   end
