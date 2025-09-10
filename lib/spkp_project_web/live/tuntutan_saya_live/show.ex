@@ -139,8 +139,8 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Show do
                 <tbody class="divide-y divide-gray-200 bg-white">
                   <%= for item <- @elaun_pekerja.item_elaun_pekerja do %>
                     <tr>
-                      <td class="px-4 py-2 text-sm text-gray-900"><%= item.jenis_kerja %></td>
-                      <td class="px-4 py-2 text-sm text-gray-900"><%= item.tarikh %></td>
+                      <td class="px-4 py-2 text-sm text-gray-900"><%= item.kenyataan_tuntutan %></td>
+                      <td class="px-4 py-2 text-sm text-gray-900"><%= item.tarikh_tuntutan %></td>
                       <td class="px-4 py-2 text-sm text-gray-900"><%= item.masa_mula %></td>
                       <td class="px-4 py-2 text-sm text-gray-900"><%= item.masa_tamat %></td>
                       <td class="px-4 py-2 text-sm text-gray-900"><%= item.keterangan %></td>

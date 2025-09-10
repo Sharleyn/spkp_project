@@ -66,7 +66,7 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
             <:actions>
               <button type="button" phx-click="prev_step" phx-target={@myself}
                 class="rounded-md bg-gray-500 px-5 py-2 text-white hover:bg-gray-600">Kembali</button>
-              <.button phx-disable-with="Saving...">Simpan</.button>
+                   <.button phx-disable-with="Saving...">Simpan</.button>
             </:actions>
           </.simple_form>
         </div>
@@ -77,6 +77,16 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
 
   @impl true
   def update(%{item_elaun_pekerja: item_elaun_pekerja} = assigns, socket) do
+  # ✅ pastikan preload
+  item_elaun_pekerja =
+    if assigns.action == :edit do
+      # reload dengan preload relation
+      Elaun.get_item_elaun_pekerja!(item_elaun_pekerja.id)
+    else
+      # kalau :new, jangan call Repo.get!
+      item_elaun_pekerja
+    end
+
     {:ok,
      socket
      |> assign(assigns)

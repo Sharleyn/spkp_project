@@ -7,9 +7,11 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     items = Elaun.list_item_elaun_pekerja_by_user(socket.assigns.current_user.id)
-    {:ok, stream(socket, :item_elaun_pekerja_collection, items)}
-  end
 
+    {:ok,
+     socket
+     |> stream(:item_elaun_pekerja_collection, items)}
+  end
 
   @impl true
   def handle_params(params, uri, socket) do
@@ -19,22 +21,8 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
      |> apply_action(socket.assigns.live_action, params)}
   end
 
-  @impl true
-  def handle_params(%{"id" => id, "live_action" => "edit"}, _uri, socket) do
-    item = Elaun.get_item_elaun_pekerja!(id)
-    |> SpkpProject.Repo.preload(:elaun_pekerja)
-
-    {:noreply,
-    socket
-    |> assign(:page_title, "Edit Item Tuntutan Elaun")
-    |> assign(:item_elaun_pekerja, item)}
-  end
-
-
   defp apply_action(socket, :edit, %{"id" => id}) do
-    item =
-      Elaun.get_item_elaun_pekerja!(id)
-      |> SpkpProject.Repo.preload(:elaun_pekerja)
+    item = Elaun.get_item_elaun_pekerja!(id)
 
     socket
     |> assign(:page_title, "Edit Item elaun pekerja")
@@ -55,25 +43,28 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
 
   @impl true
   def handle_info({SpkpProjectWeb.TuntutanSayaLive.FormComponent, {:saved, item}}, socket) do
-    # masukkan item ke senarai pekerja
     socket = stream_insert(socket, :item_elaun_pekerja_collection, item)
 
-    # ambil elaun_pekerja penuh + preload user
-    elaun =
-      Elaun.get_elaun_pekerja!(item.elaun_pekerja_id)
-      |> SpkpProject.Repo.preload(:user)
+    # ambil elaun_pekerja penuh (dengan maklumat_pekerja + user)
+    elaun = Elaun.get_elaun_pekerja!(item.elaun_pekerja_id, [:item_elaun_pekerja])
 
-    # hantar mesej supaya admin Index boleh tangkap
+    # kalau kamu mahu hantar ke parent LiveView, boleh guna send(self(), ...)
     send(self(), {:elaun_saved, elaun})
 
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_info({:elaun_saved, _elaun_pekerja}, socket) do
+    {:noreply, socket}
+  end
 
-  # Atau versi generic
-  # def handle_info({_, {:saved, item}}, socket) do
-  #   {:noreply, stream_insert(socket, :item_elaun_pekerja_collection, item)}
-  # end
+
+  # fallback for unmatched messages (to avoid crashing)
+  @impl true
+  def handle_info(_msg, socket) do
+    {:noreply, socket}
+  end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
@@ -106,7 +97,7 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
+              <span class="text-gray-600"><%= @current_user.email %></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
