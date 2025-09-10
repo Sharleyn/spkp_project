@@ -160,16 +160,16 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                      phx-debounce="500" phx-keyup="search">
             </div>
             <div class="relative w-full sm:w-auto">
-  <form phx-change="filter">
-    <select name="filter"
-            class="block appearance-none w-full bg-white border border-gray-300 py-2 px-4 pr-8 rounded-lg">
-      <option value="Semua Keputusan" selected={@filter == "Semua Keputusan"}>Semua Keputusan</option>
-      <option value="Diterima" selected={@filter == "Diterima"}>Diterima</option>
-      <option value="Dalam Proses" selected={@filter == "Dalam Proses"}>Dalam Proses</option>
-      <option value="Ditolak" selected={@filter == "Ditolak"}>Ditolak</option>
-    </select>
-  </form>
-</div>
+               <form phx-change="filter">
+                 <select name="filter"
+                   class="block appearance-none w-full bg-white border border-gray-300 py-2 px-4 pr-8 rounded-lg">
+                     <option value="Semua Keputusan" selected={@filter == "Semua Keputusan"}>Semua Keputusan</option>
+                     <option value="Diterima" selected={@filter == "Diterima"}>Diterima</option>
+                     <option value="Dalam Proses" selected={@filter == "Dalam Proses"}>Dalam Proses</option>
+                     <option value="Ditolak" selected={@filter == "Ditolak"}>Ditolak</option>
+               </select>
+             </form>
+           </div>
           </div>
 
         <!-- Senarai Permohonan (Card Style) -->
