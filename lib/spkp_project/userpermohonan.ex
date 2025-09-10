@@ -71,6 +71,36 @@ defmodule SpkpProject.Userpermohonan do
     |> Repo.insert()
   end
 
+  def get_user_stats(user_id) do
+    query =
+      from p in SpkpProject.Userpermohonan.Userpermohonan,
+        where: p.user_id == ^user_id
+
+    all = Repo.aggregate(query, :count, :id)
+
+    diterima =
+      query
+      |> where([p], p.status == "Diterima")
+      |> Repo.aggregate(:count, :id)
+
+    ditolak =
+      query
+      |> where([p], p.status == "Ditolak")
+      |> Repo.aggregate(:count, :id)
+
+    dalam_proses =
+      query
+      |> where([p], p.status == "Dalam Proses")
+      |> Repo.aggregate(:count, :id)
+
+    %{
+      total: all,
+      diterima: diterima,
+      ditolak: ditolak,
+      dalam_proses: dalam_proses
+    }
+  end
+
   # Padam permohonan
   def delete_application(id) do
     case Repo.get(Userpermohonan, id) do

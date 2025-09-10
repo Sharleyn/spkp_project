@@ -15,6 +15,10 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
       {apps, has_more} =
         Userpermohonan.list_user_applications(current_user.id, filter, page, per_page)
 
+      stats = Userpermohonan.get_user_stats(socket.assigns.current_user.id)
+      {:noreply, assign(socket, applications: apps, has_more: has_more, stats: stats)}
+
+
       {:ok,
        socket
        |> assign(:current_user, current_user)
@@ -22,6 +26,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
        |> assign(:sidebar_open, true)
        |> assign(:user_menu_open, false)
        |> assign(:applications, apps)
+       |> assign(:stats, stats)
        |> assign(:filter, filter)
        |> assign(:page, page)
        |> assign(:per_page, per_page)
@@ -120,35 +125,27 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
             <div class="bg-sky-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
-              <div>
-                <h2 class="text-l font-semibold text-gray-600">Jumlah Permohonan</h2>
-                <p class="text-2xl font-bold text-gray-900"><%= length(@applications) %></p>
+              <h2 class="text-l font-semibold text-gray-600">Jumlah Permohonan</h2>
+               <p class="text-2xl font-bold text-gray-900"><%= @stats.total %></p>
                 <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
-              </div>
             </div>
 
             <div class="bg-green-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
-              <div>
-                <h2 class="text-l font-semibold text-gray-600">Diterima</h2>
-                <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Diterima")) %></p>
-                <img src={~p"/images/diterima.png"} alt="Diterima Icon" class="w-8 h-8" />
-              </div>
+              <h2 class="text-l font-semibold text-gray-600">Diterima</h2>
+                <p class="text-2xl font-bold text-gray-900"><%= @stats.diterima %></p>
+                  <img src={~p"/images/diterima.png"} alt="Diterima Icon" class="w-8 h-8" />
             </div>
 
             <div class="bg-orange-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
-              <div>
-                <h2 class="text-l font-semibold text-gray-600">Dalam Proses</h2>
-                <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Dalam Proses")) %></p>
-                <img src={~p"/images/dalam_proses.png"} alt="Dalam Proses Icon" class="w-8 h-8" />
-              </div>
+              <h2 class="text-l font-semibold text-gray-600">Dalam Proses</h2>
+                <p class="text-2xl font-bold text-gray-900"><%= @stats.dalam_proses %></p>
+                  <img src={~p"/images/dalam_proses.png"} alt="Dalam Proses Icon" class="w-8 h-8" />
             </div>
 
             <div class="bg-red-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
-              <div>
-                <h2 class="text-l font-semibold text-gray-600">Ditolak</h2>
-                <p class="text-2xl font-bold text-gray-900"><%= Enum.count(@applications, &(&1.status == "Ditolak")) %></p>
-                <img src={~p"/images/ditolak.png"} alt="Ditolak Icon" class="w-8 h-8" />
-              </div>
+              <h2 class="text-l font-semibold text-gray-600">Ditolak</h2>
+                <p class="text-2xl font-bold text-gray-900"><%= @stats.ditolak %></p>
+                  <img src={~p"/images/ditolak.png"} alt="Ditolak Icon" class="w-8 h-8" />
             </div>
         </div>
 
@@ -381,10 +378,27 @@ def list_user_applications(user_id, filter \\ "Semua Keputusan", page \\ 1, per_
   {Enum.take(results, per_page), has_more}
 end
 
-def delete_application(id) do
-  case SpkpProject.Repo.get(SpkpProject.Userpermohonan.Userpermohonan, id) do
-    nil -> {:error, :not_found}
-    record -> SpkpProject.Repo.delete(record)
+def handle_event("delete", %{"id" => id}, socket) do
+  case Userpermohonan.delete_application(id) do
+    {:ok, _} ->
+      {apps, has_more} =
+        Userpermohonan.list_user_applications(
+          socket.assigns.current_user.id,
+          socket.assigns.filter,
+          socket.assigns.page,
+          socket.assigns.per_page
+        )
+
+      stats = Userpermohonan.get_user_stats(socket.assigns.current_user.id)
+
+      {:noreply, assign(socket,
+        applications: apps,
+        has_more: has_more,
+        stats: stats
+      )}
+
+    {:error, _} ->
+      {:noreply, put_flash(socket, :error, "Gagal memadam permohonan.")}
   end
 end
 
