@@ -16,6 +16,7 @@ defmodule SpkpProject.Kursus.Kursuss do
     field :syarat_pendidikan, :string
     field :kuota, :integer
     field :tarikh_tutup, :date
+    field :kaedah, :string   # <── kolum baru
 
     belongs_to :kursus_kategori, SpkpProject.Kursus.KursusKategori,
       foreign_key: :kursus_kategori_id
@@ -40,7 +41,8 @@ defmodule SpkpProject.Kursus.Kursuss do
       :syarat_pendidikan,
       :kuota,
       :tarikh_tutup,
-      :kursus_kategori_id
+      :kursus_kategori_id,
+      :kaedah
     ])
     |> validate_required([
       :nama_kursus,
@@ -56,7 +58,10 @@ defmodule SpkpProject.Kursus.Kursuss do
       :syarat_pendidikan,
       :kuota,
       :tarikh_tutup,
-      :kursus_kategori_id
+      :kursus_kategori_id,
+      :kaedah
     ])
+    |> validate_number(:had_umur, greater_than: 0)
+    |> validate_number(:kuota, greater_than: 0)
   end
 end

@@ -7,6 +7,12 @@ defmodule SpkpProjectWeb.PermohonanLive do
   end
 
   @impl true
+def handle_params(_params, uri, socket) do
+  {:noreply, assign(socket, :current_path, URI.parse(uri).path)}
+end
+
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
@@ -14,7 +20,10 @@ defmodule SpkpProjectWeb.PermohonanLive do
       <.live_component
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
-        uri_path="/admin/permohonan"
+        current_view={@socket.view}
+        role={@current_user.role}
+        current_user={@current_user}
+        current_path={@current_path}
       />
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
