@@ -4,8 +4,6 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
   import Ecto.Query
 
   alias SpkpProject.Repo
-  alias SpkpProject.Kursus.Kursuss
-  alias SpkpProject.Accounts.User
 
   schema "userpermohonan" do
     field :status, :string, default: "Dalam Proses"
@@ -35,7 +33,7 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
   # -------- LIST PERMOHONAN --------
   def list_user_applications(user_id, filter \\ "Semua Keputusan") do
     query =
-      from(p in Userpermohonan,
+      from(p in SpkpProject.Userpermohonan.Userpermohonan,
         where: p.user_id == ^user_id,
         join: k in assoc(p, :kursus),
         preload: [kursus: k],

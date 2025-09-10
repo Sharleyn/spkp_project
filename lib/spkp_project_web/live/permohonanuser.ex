@@ -4,15 +4,16 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
   import Ecto.Query
   alias SpkpProject.Userpermohonan
 
-  # ========== MOUNT ==========
+   # ========== MOUNT ==========
     @impl true
     def mount(_params, _session, socket) do
       current_user = socket.assigns.current_user
       page = 1
-      per_page = 5
+      per_page = 10
       filter = "Semua Keputusan"
 
-      apps = Userpermohonan.list_user_applications(current_user.id, filter, page, per_page)
+      {apps, has_more} =
+        Userpermohonan.list_user_applications(current_user.id, filter, page, per_page)
 
       {:ok,
        socket
@@ -23,107 +24,9 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
        |> assign(:applications, apps)
        |> assign(:filter, filter)
        |> assign(:page, page)
-       |> assign(:per_page, per_page)}
+       |> assign(:per_page, per_page)
+       |> assign(:has_more, has_more)}
     end
-
-    # === EVENTS ===
-
-    def handle_event("filter", %{"filter" => filter}, socket) do
-      apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, filter, socket.assigns.page, socket.assigns.per_page)
-      {:noreply, assign(socket, applications: apps, filter: filter)}
-    end
-
-    def handle_event("search", %{"value" => term}, socket) do
-      apps = Userpermohonan.search_user_applications(socket.assigns.current_user.id, term, socket.assigns.filter, socket.assigns.page, socket.assigns.per_page)
-      {:noreply, assign(socket, applications: apps)}
-    end
-
-    def handle_event("next_page", _params, socket) do
-      page = socket.assigns.page + 1
-      apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, socket.assigns.filter, page, socket.assigns.per_page)
-      {:noreply, assign(socket, applications: apps, page: page)}
-    end
-
-    def handle_event("prev_page", _params, socket) do
-      page = max(socket.assigns.page - 1, 1)
-      apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, socket.assigns.filter, page, socket.assigns.per_page)
-      {:noreply, assign(socket, applications: apps, page: page)}
-    end
-
-    def handle_event("delete", %{"id" => id}, socket) do
-      case Userpermohonan.delete_application(id) do
-        {:ok, _} ->
-          apps = Userpermohonan.list_user_applications(socket.assigns.current_user.id, socket.assigns.filter, socket.assigns.page, socket.assigns.per_page)
-          {:noreply, assign(socket, applications: apps)}
-        {:error, _} ->
-          {:noreply, put_flash(socket, :error, "Gagal memadam permohonan.")}
-      end
-    end
-
-  # Filter
-  def list_user_applications(user_id, filter \\ "Semua Keputusan", page \\ 1, per_page \\ 5) do
-    query =
-      from(p in SpkpProject.Userpermohonan.Userpermohonan,
-        where: p.user_id == ^user_id,
-        join: k in assoc(p, :kursus),
-        preload: [kursus: k],
-        order_by: [desc: p.inserted_at]
-      )
-
-    query =
-      case filter do
-        "Diterima" -> from p in query, where: p.status == "Diterima"
-        "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
-        "Ditolak" -> from p in query, where: p.status == "Ditolak"
-        _ -> query
-      end
-
-    query
-    |> limit(^per_page)
-    |> offset(^(per_page * (page - 1)))
-    |> SpkpProject.Repo.all()
-  end
-
-  def search_user_applications(user_id, term, filter \\ "Semua Keputusan", page \\ 1, per_page \\ 5) do
-    query =
-      from(p in SpkpProject.Userpermohonan.Userpermohonan,
-        where: p.user_id == ^user_id,
-        join: k in assoc(p, :kursus),
-        preload: [kursus: k],
-        where: ilike(k.nama_kursus, ^"%#{term}%"),
-        order_by: [desc: p.inserted_at]
-      )
-
-    query =
-      case filter do
-        "Diterima" -> from p in query, where: p.status == "Diterima"
-        "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
-        "Ditolak" -> from p in query, where: p.status == "Ditolak"
-        _ -> query
-      end
-
-    query
-    |> limit(^per_page)
-    |> offset(^(per_page * (page - 1)))
-    |> SpkpProject.Repo.all()
-  end
-
-  def delete_application(id) do
-    case SpkpProject.Repo.get(SpkpProject.Userpermohonan.Userpermohonan, id) do
-      nil -> {:error, :not_found}
-      record -> SpkpProject.Repo.delete(record)
-    end
-  end
-
-  # ========== HELPERS ==========
-  defp nav_class(current, expected) do
-    base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
-    if current == expected do
-      base <> " bg-indigo-700 text-white"  # aktif
-    else
-      base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
-    end
-  end
 
   # ========== RENDER ==========
   @impl true
@@ -257,14 +160,16 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                      phx-debounce="500" phx-keyup="search">
             </div>
             <div class="relative w-full sm:w-auto">
-              <select class="block appearance-none w-full bg-white border border-gray-300 py-2 px-4 pr-8 rounded-lg"
-                      phx-change="filter">
-                <option value="Semua Keputusan">Semua Keputusan</option>
-                <option value="Diterima">Diterima</option>
-                <option value="Dalam Proses">Dalam Proses</option>
-                <option value="Ditolak">Ditolak</option>
-              </select>
-            </div>
+  <form phx-change="filter">
+    <select name="filter"
+            class="block appearance-none w-full bg-white border border-gray-300 py-2 px-4 pr-8 rounded-lg">
+      <option value="Semua Keputusan" selected={@filter == "Semua Keputusan"}>Semua Keputusan</option>
+      <option value="Diterima" selected={@filter == "Diterima"}>Diterima</option>
+      <option value="Dalam Proses" selected={@filter == "Dalam Proses"}>Dalam Proses</option>
+      <option value="Ditolak" selected={@filter == "Ditolak"}>Ditolak</option>
+    </select>
+  </form>
+</div>
           </div>
 
         <!-- Senarai Permohonan (Card Style) -->
@@ -320,26 +225,167 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
         <% end %>
 
         <!-- Pagination -->
-          <div class="flex justify-center mt-6 space-x-1">
-            <button phx-click="prev_page"
-              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-               disabled={@page == 1}>
-                &laquo; Prev
-            </button>
+    <div class="flex justify-center mt-6 space-x-1">
+      <button phx-click="prev_page"
+        class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+        disabled={@page == 1}>
+          &laquo; Prev
+      </button>
 
-            <span class="px-3 py-1 text-gray-700 font-medium">
-              Page <%= @page %>
-           </span>
+      <span class="px-3 py-1 text-gray-700 font-medium">
+        Page <%= @page %>
+      </span>
 
-            <button phx-click="next_page"
-              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100">
-               Next &raquo;
-           </button>
-          </div>
+      <button phx-click="next_page"
+        class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+        disabled={!@has_more}>
+          Next &raquo;
+      </button>
+    </div>
 
         </div>
       </div>
     </div>
     """
   end
+
+  @impl true
+ # ========== EVENTS ==========
+  def handle_event("filter", %{"filter" => filter}, socket) do
+    {apps, has_more} =
+      Userpermohonan.list_user_applications(
+        socket.assigns.current_user.id,
+        filter,
+        socket.assigns.page,
+        socket.assigns.per_page
+      )
+
+    {:noreply, assign(socket, applications: apps, filter: filter, has_more: has_more)}
+  end
+
+  def handle_event("search", %{"value" => term}, socket) do
+    {apps, has_more} =
+      Userpermohonan.search_user_applications(
+        socket.assigns.current_user.id,
+        term,
+        socket.assigns.filter,
+        socket.assigns.page,
+        socket.assigns.per_page
+      )
+
+    {:noreply, assign(socket, applications: apps, has_more: has_more)}
+  end
+
+  def handle_event("next_page", _params, socket) do
+    page = socket.assigns.page + 1
+    {apps, has_more} =
+      Userpermohonan.list_user_applications(
+        socket.assigns.current_user.id,
+        socket.assigns.filter,
+        page,
+        socket.assigns.per_page
+      )
+
+    {:noreply, assign(socket, applications: apps, page: page, has_more: has_more)}
+  end
+
+  def handle_event("prev_page", _params, socket) do
+    page = max(socket.assigns.page - 1, 1)
+    {apps, has_more} =
+      Userpermohonan.list_user_applications(
+        socket.assigns.current_user.id,
+        socket.assigns.filter,
+        page,
+        socket.assigns.per_page
+      )
+
+    {:noreply, assign(socket, applications: apps, page: page, has_more: has_more)}
+  end
+
+  def handle_event("delete", %{"id" => id}, socket) do
+    case Userpermohonan.delete_application(id) do
+      {:ok, _} ->
+        {apps, has_more} =
+          Userpermohonan.list_user_applications(
+            socket.assigns.current_user.id,
+            socket.assigns.filter,
+            socket.assigns.page,
+            socket.assigns.per_page
+          )
+
+        {:noreply, assign(socket, applications: apps, has_more: has_more)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Gagal memadam permohonan.")}
+    end
+  end
+
+   # Toggle sidebar
+   def handle_event("toggle_sidebar", _params, socket) do
+    {:noreply, assign(socket, :sidebar_open, !socket.assigns.sidebar_open)}
+  end
+
+  # Toggle user menu
+  def handle_event("toggle_user_menu", _params, socket) do
+    {:noreply, assign(socket, :user_menu_open, !socket.assigns.user_menu_open)}
+  end
+
+  # Tutup user menu
+  def handle_event("close_user_menu", _params, socket) do
+    {:noreply, assign(socket, :user_menu_open, false)}
+  end
+
+  # Logout
+  def handle_event("logout", _params, socket) do
+    {:noreply,
+     socket
+     |> put_flash(:info, "Anda telah log keluar.")
+     |> redirect(to: ~p"/lamanutama")}
+  end
+
+  # ========== HELPERS ==========
+    defp nav_class(current, expected) do
+      base = "flex items-center space-x-3 font-semibold p-3 rounded-xl transition-colors duration-200"
+      if current == expected do
+        base <> " bg-indigo-700 text-white"
+      else
+        base <> " hover:bg-indigo-700 text-gray-300"
+      end
+    end
+
+# Filter
+def list_user_applications(user_id, filter \\ "Semua Keputusan", page \\ 1, per_page \\ 10) do
+  query =
+    from(p in SpkpProject.Userpermohonan.Userpermohonan,
+      where: p.user_id == ^user_id,
+      join: k in assoc(p, :kursus),
+      preload: [kursus: k],
+      order_by: [desc: p.inserted_at]
+    )
+
+  query =
+    case filter do
+      "Diterima" -> from p in query, where: p.status == "Diterima"
+      "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
+      "Ditolak" -> from p in query, where: p.status == "Ditolak"
+      _ -> query
+    end
+
+  results =
+    query
+    |> limit(^(per_page + 1))
+    |> offset(^(per_page * (page - 1)))
+    |> SpkpProject.Repo.all()
+
+  has_more = length(results) > per_page
+  {Enum.take(results, per_page), has_more}
+end
+
+def delete_application(id) do
+  case SpkpProject.Repo.get(SpkpProject.Userpermohonan.Userpermohonan, id) do
+    nil -> {:error, :not_found}
+    record -> SpkpProject.Repo.delete(record)
+  end
+end
+
 end
