@@ -77,7 +77,7 @@ defmodule SpkpProjectWeb.UserSettingsLive do
             />
           </svg>
           <h2 class="mt-4 text-2xl font-bold">Tetapan Pengguna</h2>
-          
+
           <p class="text-sm text-center text-gray-700">
             Sila masukkan email atau kata laluan baru anda untuk dikemaskini.
           </p>

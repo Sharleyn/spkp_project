@@ -225,11 +225,21 @@ defmodule SpkpProject.Accounts do
     User.update_changeset(user, attrs)
   end
 
-  def update_user(%User{} = user, attrs) do
+
+   # Dapatkan changeset untuk ubah role (guna dalam form)
+   def change_user_role(%User{} = user, attrs \\ %{}) do
+    User.role_changeset(user, attrs)
+  end
+
+  # Update role (guna dalam handle_event save)
+  def update_user_role(%User{} = user, role) when role in ["admin", "pekerja", "user"] do
     user
-    |> User.update_changeset(attrs)
+    |> Ecto.Changeset.change(%{role: role})
     |> Repo.update()
   end
+
+
+
 
   ## Session
 
@@ -367,6 +377,121 @@ defmodule SpkpProject.Accounts do
     end
   end
 
+  alias SpkpProject.Accounts.MaklumatPekerja
+
+  @doc """
+  Returns the list of maklumat_pekerja.
+
+  ## Examples
+
+      iex> list_maklumat_pekerja()
+      [%MaklumatPekerja{}, ...]
+
+  """
+  def list_maklumat_pekerja do
+    Repo.all(from m in MaklumatPekerja, preload: [:user])
+  end
+
+  @doc """
+  Gets a single maklumat_pekerja.
+
+  Raises `Ecto.NoResultsError` if the Maklumat pekerja does not exist.
+
+  ## Examples
+
+      iex> get_maklumat_pekerja!(123)
+      %MaklumatPekerja{}
+
+      iex> get_maklumat_pekerja!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_maklumat_pekerja!(id), do:
+    Repo.get!(MaklumatPekerja, id)
+    |> Repo.preload(:user)
+
+    def get_maklumat_pekerja_by_user_id(user_id) do
+      Repo.get_by(MaklumatPekerja, user_id: user_id)
+      |> Repo.preload(:user)
+    end
+
+
+
+
+
+    @doc """
+    Creates a maklumat_pekerja.
+
+    ## Examples
+
+      iex> create_maklumat_pekerja(%{field: value})
+      {:ok, %MaklumatPekerja{}}
+
+      iex> create_maklumat_pekerja(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+
+  def create_maklumat_pekerja(attrs \\ %{}) do
+    %MaklumatPekerja{}
+    |> MaklumatPekerja.changeset(attrs)
+    |> Repo.insert()
+    |> case do
+      {:ok, maklumat} -> {:ok, Repo.preload(maklumat, :user)}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  @doc """
+  Updates a maklumat_pekerja.
+
+  ## Examples
+
+      iex> update_maklumat_pekerja(maklumat_pekerja, %{field: new_value})
+      {:ok, %MaklumatPekerja{}}
+
+      iex> update_maklumat_pekerja(maklumat_pekerja, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_maklumat_pekerja(%MaklumatPekerja{} = maklumat_pekerja, attrs) do
+    maklumat_pekerja
+    |> MaklumatPekerja.changeset(attrs)
+    |> Repo.update()
+    |> case do
+      {:ok, maklumat} -> {:ok, Repo.preload(maklumat, :user)}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  @doc """
+  Deletes a maklumat_pekerja.
+
+  ## Examples
+
+      iex> delete_maklumat_pekerja(maklumat_pekerja)
+      {:ok, %MaklumatPekerja{}}
+
+      iex> delete_maklumat_pekerja(maklumat_pekerja)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_maklumat_pekerja(%MaklumatPekerja{} = maklumat_pekerja) do
+    Repo.delete(maklumat_pekerja)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking maklumat_pekerja changes.
+
+  ## Examples
+
+      iex> change_maklumat_pekerja(maklumat_pekerja)
+      %Ecto.Changeset{data: %MaklumatPekerja{}}
+
+  """
+  def change_maklumat_pekerja(%MaklumatPekerja{} = maklumat_pekerja, attrs \\ %{}) do
+    MaklumatPekerja.changeset(maklumat_pekerja, attrs)
+  end
   ## User Profile Management
 
   alias SpkpProject.Accounts.UserProfile

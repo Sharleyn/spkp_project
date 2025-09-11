@@ -62,6 +62,18 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
           options={[
             {"Jabatan Pembangunan Sumber Manusia", "Jabatan Pembangunan Sumber Manusia"},
             {"Kementerian Belia & Sukan Sabah", "Kementerian Belia & Sukan Sabah"}
+
+          ]}
+        />
+        <.input
+          field={@form[:kaedah]}
+          type="select"
+          label="Kaedah Pembelajaran"
+          prompt="-- Pilih Kaedah Pembelajaran --"
+          options={[
+            {"Dalam Talian", "Dalam Talian"},
+            {"Bersemuka", "Bersemuka"}
+
           ]}
         />
         <!-- Upload Gambar Tajaan -->
@@ -178,9 +190,12 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
 
   # Simpan fail ke priv/static/uploads + guna gambar lama kalau tiada upload baru
   defp save_uploads(socket, params) do
+
     gambar_anjuran =
       consume_uploaded_entries(socket, :gambar_anjuran, fn %{path: path}, _entry ->
-        dest = Path.join(["priv/static/uploads", Path.basename(path)])
+        uploads_dir = Path.expand("./uploads")
+        File.mkdir_p!(uploads_dir)
+        dest = Path.join(uploads_dir, Path.basename(path))
         File.cp!(path, dest)
         {:ok, "/uploads/#{Path.basename(dest)}"}
       end)
@@ -188,7 +203,9 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
 
     gambar_kursus =
       consume_uploaded_entries(socket, :gambar_kursus, fn %{path: path}, _entry ->
-        dest = Path.join(["priv/static/uploads", Path.basename(path)])
+        uploads_dir = Path.expand("./uploads")
+        File.mkdir_p!(uploads_dir)
+        dest = Path.join(uploads_dir, Path.basename(path))
         File.cp!(path, dest)
         {:ok, "/uploads/#{Path.basename(dest)}"}
       end)
