@@ -31,7 +31,8 @@ defmodule SpkpProjectWeb.UserSessionController do
       user ->
         conn
         |> put_flash(:info, "Welcome back!")
-        |> UserAuth.log_in_user(user)
+        |> UserAuth.log_in_user(user)   # login tanpa redirect
+        |> redirect_user_by_role(user)  # controller tentukan redirect
     end
   end
 

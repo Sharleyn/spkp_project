@@ -310,6 +310,8 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
             socket.assigns.per_page
           )
 
+          stats = Userpermohonan.get_user_stats(socket.assigns.current_user.id)
+
         {:noreply, assign(socket, applications: apps, has_more: has_more)}
 
       {:error, _} ->
@@ -378,28 +380,6 @@ def list_user_applications(user_id, filter \\ "Semua Keputusan", page \\ 1, per_
   {Enum.take(results, per_page), has_more}
 end
 
-def handle_event("delete", %{"id" => id}, socket) do
-  case Userpermohonan.delete_application(id) do
-    {:ok, _} ->
-      {apps, has_more} =
-        Userpermohonan.list_user_applications(
-          socket.assigns.current_user.id,
-          socket.assigns.filter,
-          socket.assigns.page,
-          socket.assigns.per_page
-        )
 
-      stats = Userpermohonan.get_user_stats(socket.assigns.current_user.id)
-
-      {:noreply, assign(socket,
-        applications: apps,
-        has_more: has_more,
-        stats: stats
-      )}
-
-    {:error, _} ->
-      {:noreply, put_flash(socket, :error, "Gagal memadam permohonan.")}
-  end
-end
 
 end
