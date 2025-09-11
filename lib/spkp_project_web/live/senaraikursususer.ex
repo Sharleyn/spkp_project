@@ -2,6 +2,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
   use SpkpProjectWeb, :live_view
 
   alias SpkpProject.Kursus.Kursuss
+  alias SpkpProject.Userpermohonan
   alias SpkpProject.Repo
 
   import Ecto.Query
@@ -341,12 +342,6 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     {:noreply, assign(socket, :user_menu_open, false)}
   end
 
-  # Bila user tekan "Mohon"
-  def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
-    IO.puts("Pengguna memohon kursus dengan ID: #{kursus_id}")
-    {:noreply, socket}
-  end
-
   # Logout
   def handle_event("logout", _params, socket) do
     {:noreply,
@@ -402,6 +397,26 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
   def handle_event("pilih_kursus", %{"kursus" => value}, socket) do
     {:noreply, assign(socket, :kursus, value)}
+    end
+
+    def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
+      user_id = socket.assigns.current_user.id
+      kursus_id = String.to_integer(kursus_id)   # 🔥 convert ke integer
+
+      case Userpermohonan.create_application(user_id, kursus_id) do
+        {:ok, _application} ->
+          IO.puts("✅ Permohonan berjaya disimpan!")
+          {:noreply,
+           socket
+           |> put_flash(:info, "Permohonan berjaya dihantar.")
+           |> redirect(to: ~p"/permohonanuser")}
+
+        {:error, changeset} ->
+          IO.inspect(changeset.errors, label: "❌ Gagal simpan")
+          {:noreply,
+           socket
+           |> put_flash(:error, "Gagal menghantar permohonan.")}
+      end
     end
 
   # Fungsi filter kursus
