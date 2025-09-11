@@ -307,8 +307,6 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
             socket.assigns.per_page
           )
 
-          stats = Userpermohonan.get_user_stats(socket.assigns.current_user.id)
-
         {:noreply, assign(socket, applications: apps, has_more: has_more)}
 
       {:error, _} ->
