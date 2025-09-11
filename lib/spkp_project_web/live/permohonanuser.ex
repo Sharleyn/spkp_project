@@ -208,9 +208,6 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
 
         <!-- Actions -->
            <div class="mt-4 flex gap-2">
-             <button class="px-4 py-2 rounded-lg border text-gray-700 font-medium hover:bg-gray-100">
-               Lihat
-           </button>
 
            <%= if permohonan.status == "Diterima" do %>
              <a href={permohonan.tawaran_url} class="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600">
