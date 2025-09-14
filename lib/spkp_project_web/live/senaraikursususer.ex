@@ -261,7 +261,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                   <%= if kursus.id in @applied_ids do %>
                     <button disabled
                       class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed
-                             shadow-md hover:shadow-lg animate-pulse">
+                             shadow-md hover:shadow-lg">
                       ✅ Kursus sudah dimohon
                     </button>
                   <% else %>
