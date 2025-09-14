@@ -369,28 +369,37 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
   end
 
   # <!-- Slider untuk LOGO, VISI, MISI -->
-  defp render_slide(assigns) do
-    ~H"""
-    <div class="w-full h-[320px] flex items-center justify-center bg-white bg-opacity-50 rounded-lg p-6">
-      <%= case @slide do %>
-        <% %{type: :image, src: src} -> %>
-          <img src={src} alt="logo" class="max-h-full max-w-full object-contain" />
-        <% %{type: :text, title: title, body: body} -> %>
-          <div class="flex flex-col justify-center text-center w-full h-full">
-            <h2 class="text-xl font-bold mb-4">{title}</h2>
+    attr :slide, :map, required: true
+    defp render_slide(assigns) do
+     ~H"""
+       <div class="w-full h-[320px] flex items-center justify-center">
+         <%= case @slide do %>
+           <% %{type: :image, src: src} -> %>
+             <img src={src} alt="logo" class="max-h-full max-w-full object-contain" />
 
-            <p class="mx-auto max-w-xl">{body}</p>
-          </div>
-        <% %{type: :list, title: title, items: items} -> %>
-          <div class="flex flex-col justify-center w-full h-full">
-            <h2 class="text-xl font-bold mb-4 text-center">{title}</h2>
+              <% %{type: :text, title: title, body: body} -> %>
+                <div class="flex flex-col justify-center text-center w-full h-full
+                    bg-white bg-opacity-70 rounded-xl p-6 shadow
+                    border border-transparent
+                    transition duration-300 ease-in-out
+                    hover:border-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.7)]">
+               <h2 class="text-xl font-bold mb-4 text-[#09033F]">{title}</h2>
+                <p class="mx-auto max-w-xl text-gray-700">{body}</p>
+        </div>
 
-            <ul class="list-disc list-inside space-y-1 text-left mx-auto max-w-xl">
-              <%= for item <- items do %>
-                <li>{item}</li>
-              <% end %>
-            </ul>
-          </div>
+          <% %{type: :list, title: title, items: items} -> %>
+            <div class="flex flex-col justify-center w-full h-full
+                    bg-white bg-opacity-70 rounded-xl p-6 shadow
+                    border border-transparent
+                    transition duration-300 ease-in-out
+                    hover:border-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.7)]">
+              <h2 class="text-xl font-bold mb-4 text-center text-[#09033F]">{title}</h2>
+               <ul class="list-disc list-inside space-y-1 text-left mx-auto max-w-xl text-gray-700">
+            <%= for item <- items do %>
+              <li>{item}</li>
+            <% end %>
+          </ul>
+        </div>
       <% end %>
     </div>
     """
