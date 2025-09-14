@@ -2,7 +2,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
   use SpkpProjectWeb, :live_view
 
   alias SpkpProject.Kursus.Kursuss
-  alias SpkpProject.Userpermohonan
+  alias SpkpProject.Userpermohonan.Userpermohonan
   alias SpkpProject.Repo
 
   import Ecto.Query
@@ -13,6 +13,11 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
     # Ambil semua kursus + preload kategori
     kursus = Repo.all(Kursuss) |> Repo.preload(:kursus_kategori)
+
+    # Ambil senarai kursus_id yang user dah mohon
+    applied_ids =
+      from(p in Userpermohonan, where: p.user_id == ^current_user.id, select: p.kursus_id)
+      |> Repo.all()
 
     # Senarai kategori unik
     categories =
@@ -27,10 +32,8 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     jangka_pendek =
       Enum.filter(kursus, fn k -> Date.diff(k.tarikh_akhir, k.tarikh_mula) <= 30 end)
 
-    # 👉 Declare dulu
     per_page = 5
     total = length(kursus)
-    _total_pages = total_pages(total, per_page)
 
     {:ok,
      socket
@@ -44,14 +47,13 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:current_user_name, current_user.full_name)
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
+     |> assign(:applied_ids, applied_ids) # ✅ kursus yang sudah dimohon
      # Pagination
      |> assign(:page, 1)
      |> assign(:per_page, per_page)
      |> assign(:total, total)
      |> assign(:total_pages, total_pages(total, per_page))}
   end
-
-
 
   @impl true
   def render(assigns) do
@@ -207,123 +209,94 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
       <!-- Kalau Kursus Tiada -->
 
       <div class="max-w-8xl bg-[#F8F8FF] rounded-lg mx-auto space-y-8 p-6">
-          <%= if Enum.empty?(@kursus) do %>
-            <p class="text-gray-600">Tiada kursus yang tersedia pada saat ini.</p>
-          <% else %>
-            <%= for kursus <- paginated_courses(@kursus, @page, @per_page) do %>
+        <%= if Enum.empty?(@kursus) do %>
+          <p class="text-gray-600">Tiada kursus yang tersedia pada saat ini.</p>
+        <% else %>
+          <%= for kursus <- paginated_courses(@kursus, @page, @per_page) do %>
             <div class="bg-white rounded-2xl shadow-lg p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
 
-            <!-- Bahagian Kiri: Logo & Gambar -->
-            <div class="flex flex-col gap-4">
-              <span class="bg-blue-500 text-white text-sm font-semibold px-4 py-1 rounded-full self-center">
-                <%= kursus.kursus_kategori.kategori %>
-              </span>
-              <img src={kursus.gambar_kursus} alt="Gambar Kursus"
-                   class="rounded-xl w-full h-auto object-cover" />
-            </div>
+              <!-- Kiri: Logo & Gambar -->
+              <div class="flex flex-col gap-4">
+                <span class="bg-blue-500 text-white text-sm font-semibold px-4 py-1 rounded-full self-center">
+                  <%= kursus.kursus_kategori.kategori %>
+                </span>
+                <img src={kursus.gambar_kursus} alt="Gambar Kursus"
+                     class="rounded-xl w-full h-auto object-cover" />
+              </div>
 
-            <!-- Bahagian Kanan: Maklumat Kursus -->
-            <div class="md:col-span-2 bg-[#F8F8FF] rounded-lg border border-indigo-200 px-4 py-4 flex flex-col">
-              <div class="flex justify-between items-start mb-1">
-                <div>
-                  <h3 class="text-xl font-bold text-gray-800"><%= kursus.nama_kursus %></h3>
+              <!-- Kanan: Maklumat Kursus -->
+              <div class="md:col-span-2 bg-[#F8F8FF] rounded-lg border border-indigo-200 px-4 py-4 flex flex-col">
+                <div class="flex justify-between items-start mb-1">
+                  <div>
+                    <h3 class="text-xl font-bold text-gray-800"><%= kursus.nama_kursus %></h3>
+                  </div>
+                  <img src={kursus.gambar_anjuran} alt="Logo Penganjur"
+                       class="w-16 h-16 rounded-full" />
                 </div>
 
-                <img src={kursus.gambar_anjuran} alt="Logo Penganjur"
-                     class="w-16 h-16 rounded-full" />
-              </div>
+                <!-- Info kursus -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-gray-700">
+                  <p><strong>Tarikh:</strong> <%= kursus.tarikh_mula %> hingga <%= kursus.tarikh_akhir %></p>
+                  <p><strong>Tempat:</strong> <%= kursus.tempat %></p>
+                  <p><strong>Kuota:</strong> <%= kursus.kuota %></p>
+                  <p><strong>Status:</strong> <%= kursus.status_kursus %></p>
+                  <p><strong>Tajaan:</strong> <%= kursus.anjuran %></p>
+                  <p><strong>Kaedah:</strong> <%= kursus.anjuran %></p>
+                </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-gray-700">
-                <p class="flex items-center gap-2">
-                   <i class="fa fa-calendar" aria-hidden="true"></i>
-                    <strong>Tarikh:</strong> <%= kursus.tarikh_mula %> hingga <%= kursus.tarikh_akhir %>
-                </p>
-
-                <p class="flex items-center gap-2">
-                   <i class="fa fa-map-marker-alt" aria-hidden="true"></i>
-                    <strong>Tempat:</strong> <%= kursus.tempat %>
-                </p>
-
-                <p class="flex items-center gap-2">
-                   <i class="fa-solid fa-check-square" aria-hidden="true"></i>
-                   <strong>Kuota:</strong> <%= kursus.kuota %>
-                </p>
-
-                <p class="flex items-center gap-2">
-                   <i class="fas fa-clipboard" aria-hidden="true"></i>
-                   <strong>Status:</strong> <%= kursus.status_kursus %></p>
-
-                <p class="flex items-center gap-2">
-                   <i class="fa fa-institution" aria-hidden="true"></i>
-                   <strong>Tajaan:</strong> <%= kursus.anjuran %></p>
-
-                <p class="flex items-center gap-1">
-                   <i class="fa fa-desktop" aria-hidden="true"></i>
-                   <strong>Kaedah:</strong> <%= kursus.anjuran %></p>
-
-              </div>
-
-
-          <!-- Main -->
-              <div class="mt-4">
-                 <h4 class="font-semibold text-gray-800 mb-2">Syarat Penyertaan</h4>
-
-             <!-- Senarai syarat penyertaan -->
-                 <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                     <%= for syarat <- String.split(kursus.syarat_penyertaan || "", ["\n", "*"], trim: true) do %>
-                        <li><%= String.trim(syarat) %></li>
+                <!-- Syarat -->
+                <div class="mt-4">
+                  <h4 class="font-semibold text-gray-800 mb-2">Syarat Penyertaan</h4>
+                  <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                    <%= for syarat <- String.split(kursus.syarat_penyertaan || "", ["\n", "*"], trim: true) do %>
+                      <li><%= String.trim(syarat) %></li>
                     <% end %>
-               </ul>
+                  </ul>
+                  <p class="text-sm text-gray-700 mt-4"><strong>Syarat Pendidikan:</strong> <%= kursus.syarat_pendidikan %></p>
+                  <p class="text-sm text-gray-700 mt-1"><strong>Had Umur:</strong> <%= kursus.had_umur %> tahun</p>
+                </div>
 
-             <!-- Syarat pendidikan -->
-                 <p class="text-sm text-gray-700 mt-4">
-                      <strong>Syarat Pendidikan:</strong> <%= kursus.syarat_pendidikan %>
-                  </p>
-
-             <!-- Had umur -->
-                 <p class="text-sm text-gray-700 mt-1">
-                      <strong>Had Umur:</strong> <%= kursus.had_umur %> tahun
-                  </p>
-              </div>
-
-              <div class="mt-2 flex justify-end">
-                <button phx-click="mohon" phx-value-kursus_id={kursus.id}
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
-                  Mohon
-                </button>
-               </div>
-              </div>
-             </div>
-            <% end %>
-
-           <!-- ✅ Pagination cantik -->
-                <div class="flex justify-center mt-6 space-x-1">
-                  <!-- Prev Button -->
-                     <button
-                      phx-click="prev_page"
-                       class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={@page == 1}>
-                         &laquo; Prev
-                     </button>
-
-                  <!-- Current Page / Total Pages -->
-                     <span class="px-3 py-1 text-gray-700 font-medium">
-                        Page <%= @page %> of <%= @total_pages %>
-                    </span>
-
-                  <!-- Next Button -->
-                     <button
-                        phx-click="next_page"
-                         class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                          disabled={@page >= @total_pages}>
-                           Next &raquo;
+                <!-- Butang -->
+                <div class="mt-2 flex justify-end">
+                  <%= if kursus.id in @applied_ids do %>
+                    <button disabled
+                      class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed
+                             shadow-md hover:shadow-lg animate-pulse">
+                      ✅ Kursus sudah dimohon
                     </button>
-                 </div>
-              <% end %>
-             </div>
+                  <% else %>
+                    <button phx-click="mohon" phx-value-kursus_id={kursus.id}
+                      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg
+                             shadow-md hover:shadow-lg">
+                      Mohon
+                    </button>
+                  <% end %>
+                </div>
+              </div>
             </div>
-           </div>
+          <% end %>
+
+          <!-- Pagination -->
+          <div class="flex justify-center mt-6 space-x-1">
+            <button phx-click="prev_page"
+              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={@page == 1}>
+              &laquo; Prev
+            </button>
+            <span class="px-3 py-1 text-gray-700 font-medium">
+              Page <%= @page %> of <%= @total_pages %>
+            </span>
+            <button phx-click="next_page"
+              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={@page >= @total_pages}>
+              Next &raquo;
+            </button>
           </div>
+         <% end %>
+        </div>
+       </div>
+      </div>
+     </div>
     """
   end
 
@@ -399,27 +372,25 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     {:noreply, assign(socket, :kursus, value)}
     end
 
-    def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
-      user_id = socket.assigns.current_user.id
-      kursus_id = String.to_integer(kursus_id)   # 🔥 convert ke integer
+     # 👉 Handle klik "Mohon"
+  def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
+    user_id = socket.assigns.current_user.id
+    kursus_id = String.to_integer(kursus_id)
 
-      case Userpermohonan.create_application(user_id, kursus_id) do
-        {:ok, _application} ->
-          IO.puts("✅ Permohonan berjaya disimpan!")
-          {:noreply,
-           socket
-           |> put_flash(:info, "Permohonan berjaya dihantar.")
-           |> redirect(to: ~p"/permohonanuser")}
+    case Userpermohonan.create_application(user_id, kursus_id) do
+      {:ok, _application} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Permohonan berjaya dihantar.")
+         |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])}
 
-        {:error, changeset} ->
-          IO.inspect(changeset.errors, label: "❌ Gagal simpan")
-          {:noreply,
-           socket
-           |> put_flash(:error, "Gagal menghantar permohonan.")}
-      end
+      {:error, changeset} ->
+        IO.inspect(changeset.errors, label: "❌ Gagal simpan")
+        {:noreply, put_flash(socket, :error, "Gagal menghantar permohonan.")}
     end
+  end
 
-  # Fungsi filter kursus
+  # 🔍 Fungsi filter kursus
   defp filter_courses(search, category, type) do
     query =
       from k in Kursuss,
@@ -427,7 +398,6 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
         preload: [kursus_kategori: c],
         where: ilike(k.nama_kursus, ^"%#{search}%")
 
-    # tapis ikut kategori (kalau user pilih kategori tertentu)
     query =
       if category != "" do
         from [k, c] in query, where: c.kategori == ^category
@@ -435,7 +405,6 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
         query
       end
 
-    # tapis ikut jenis kursus (computed ikut beza tarikh)
     query =
       case type do
         "Kursus Jangka Panjang" ->
@@ -452,6 +421,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     Repo.all(query)
   end
 
+  # Pagination helpers
   defp paginated_courses(kursus, page, per_page) do
     kursus
     |> Enum.chunk_every(per_page)
