@@ -311,7 +311,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                  </button>
                 <% else %>
                    <button phx-click="mohon" phx-value-kursus_id={kursus.id}
-          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                     class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
                     Mohon
                   </button>
                 <% end %>
