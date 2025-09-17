@@ -2,7 +2,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
   use SpkpProjectWeb, :live_view
 
   alias SpkpProject.Kursus.Kursuss
-  alias SpkpProject.Userpermohonan.Userpermohonan
+  alias SpkpProject.Userpermohonan
   alias SpkpProject.Repo
 
   import Ecto.Query
@@ -32,6 +32,14 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     total = length(kursus)
     _total_pages = total_pages(total, per_page)
 
+     # ✅ Ambil semua kursus_id yang sudah dimohon user ini
+  applied_ids =
+    from(p in Userpermohonan.Userpermohonan,
+      where: p.user_id == ^current_user.id,
+      select: p.kursus_id
+    )
+    |> Repo.all()
+
     {:ok,
      socket
      |> assign(:kursus, kursus)
@@ -44,13 +52,15 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:current_user_name, current_user.full_name)
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
-
+     |> assign(:applied_ids, applied_ids)
      # Pagination
      |> assign(:page, 1)
      |> assign(:per_page, per_page)
      |> assign(:total, total)
      |> assign(:total_pages, total_pages(total, per_page))}
   end
+
+
 
   @impl true
   def render(assigns) do
@@ -234,10 +244,8 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-gray-700">
                 <p class="flex items-center gap-2">
-                  <i class="fa fa-calendar" aria-hidden="true"></i>
-                    <strong>Tarikh:</strong>
-                      <%= Calendar.strftime(kursus.tarikh_mula, "%d-%m-%Y") %> hingga
-                      <%= Calendar.strftime(kursus.tarikh_akhir, "%d-%m-%Y") %>
+                   <i class="fa fa-calendar" aria-hidden="true"></i>
+                    <strong>Tarikh:</strong> <%= kursus.tarikh_mula %> hingga <%= kursus.tarikh_akhir %>
                 </p>
 
                 <p class="flex items-center gap-2">
@@ -288,16 +296,22 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
              <!-- Tarikh Tutup Permohonan -->
                  <p class="text-sm text-gray-700 mt-4">
-                      <strong>Tarikh Tutup Permohonan:</strong>
-                       <%= Calendar.strftime(kursus.tarikh_tutup, "%d-%m-%Y") %>
-                 </p>
+                      <strong>Tarikh Tutup Permohonan:</strong> <%= kursus.tarikh_tutup %>
+                  </p>
               </div>
 
+              <!-- Button Mohon -->
               <div class="mt-2 flex justify-end">
-                <button phx-click="mohon" phx-value-kursus_id={kursus.id}
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
-                  Mohon
-                </button>
+                <%= if kursus.id in @applied_ids do %>
+                   <button class="bg-gray-400 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+                    Sudah Dimohon
+                 </button>
+                <% else %>
+                   <button phx-click="mohon" phx-value-kursus_id={kursus.id}
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                    Mohon
+                  </button>
+                <% end %>
                </div>
               </div>
              </div>
@@ -406,25 +420,28 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     {:noreply, assign(socket, :kursus, value)}
     end
 
-     # 👉 Handle klik "Mohon"
-  def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
-    user_id = socket.assigns.current_user.id
-    kursus_id = String.to_integer(kursus_id)
+    def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
+      user_id = socket.assigns.current_user.id
+      kursus_id = String.to_integer(kursus_id)   # 🔥 convert ke integer
 
-    case Userpermohonan.create_application(user_id, kursus_id) do
-      {:ok, _application} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Permohonan berjaya dihantar.")
-         |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])}
+      case Userpermohonan.create_application(user_id, kursus_id) do
+        {:ok, _application} ->
+          IO.puts("✅ Permohonan berjaya disimpan!")
+          {:noreply,
+           socket
+           |> put_flash(:info, "Permohonan berjaya dihantar.")
+           |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
+           |> redirect(to: ~p"/permohonanuser")}
 
-      {:error, changeset} ->
-        IO.inspect(changeset.errors, label: "❌ Gagal simpan")
-        {:noreply, put_flash(socket, :error, "Gagal menghantar permohonan.")}
+        {:error, changeset} ->
+          IO.inspect(changeset.errors, label: "❌ Gagal simpan")
+          {:noreply,
+           socket
+           |> put_flash(:error, "Gagal menghantar permohonan.")}
+      end
     end
-  end
 
-  # 🔍 Fungsi filter kursus
+  # Fungsi filter kursus
   defp filter_courses(search, category, type) do
     query =
       from k in Kursuss,
@@ -432,6 +449,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
         preload: [kursus_kategori: c],
         where: ilike(k.nama_kursus, ^"%#{search}%")
 
+    # tapis ikut kategori (kalau user pilih kategori tertentu)
     query =
       if category != "" do
         from [k, c] in query, where: c.kategori == ^category
@@ -439,6 +457,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
         query
       end
 
+    # tapis ikut jenis kursus (computed ikut beza tarikh)
     query =
       case type do
         "Kursus Jangka Panjang" ->
@@ -455,7 +474,6 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     Repo.all(query)
   end
 
-  # Pagination helpers
   defp paginated_courses(kursus, page, per_page) do
     kursus
     |> Enum.chunk_every(per_page)
