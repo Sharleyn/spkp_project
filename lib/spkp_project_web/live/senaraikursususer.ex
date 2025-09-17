@@ -44,6 +44,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:current_user_name, current_user.full_name)
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
+
      # Pagination
      |> assign(:page, 1)
      |> assign(:per_page, per_page)
