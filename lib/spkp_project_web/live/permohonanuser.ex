@@ -150,9 +150,14 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
         </div>
 
           <!-- Search + Filter -->
-          <div class="flex flex-col sm:flex-row items-center gap-4 mb-6">
+          <div class="flex flex-col sm:flex-row items-center bg-sky-100 border border-gray-100 rounded-lg py-2 px-2 gap-4 mb-6">
             <div class="relative w-full sm:w-1/2">
-              <input type="text" placeholder="Cari Kursus"
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                         <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                           <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                     </div>
+              <input type="text" placeholder="Cari Nama Kursus"
                      class="pl-10 pr-4 py-2 w-full rounded-lg border focus:ring-2 focus:ring-blue-500"
                      phx-debounce="500" phx-keyup="search">
             </div>
@@ -207,35 +212,50 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
          </div>
 
         <!-- Actions -->
-           <div class="mt-4 flex gap-2">
+           <div class="flex mt-4 gap-2">
+             <%= if permohonan.status == "Diterima" and permohonan.nota_kursus do %>
+               <a href={permohonan.nota_kursus}
+                 class="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600">
+                   📄 Muat Turun Nota
+              </a>
+             <% else %>
+               <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
+                   🚫 Nota Tidak Boleh Dimuat Turun
+              </button>
+             <% end %>
 
-           <%= if permohonan.status == "Diterima" do %>
-             <a href={permohonan.tawaran_url} class="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600">
-               Muat Turun Surat Tawaran
-            </a>
+             <%= if permohonan.status == "Diterima" and permohonan.jadual_kursus do %>
+               <a href={permohonan.jadual_kursus}
+                 class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                   🗓️ Muat Turun Jadual
+               </a>
+             <% else %>
+                 <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
+                   🚫 Jadual Tidak Boleh Dimuat Turun
+                 </button>
+             <% end %>
+            </div>
+           </div>
           <% end %>
-          </div>
-         </div>
-        <% end %>
 
         <!-- Pagination -->
-    <div class="flex justify-center mt-6 space-x-1">
-      <button phx-click="prev_page"
-        class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-        disabled={@page == 1}>
-          &laquo; Prev
-      </button>
+          <div class="flex justify-center mt-6 space-x-1">
+            <button phx-click="prev_page"
+              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                disabled={@page == 1}>
+                 &laquo; Prev
+           </button>
 
-      <span class="px-3 py-1 text-gray-700 font-medium">
-        Page <%= @page %>
-      </span>
+          <span class="px-3 py-1 text-gray-700 font-medium">
+             Page <%= @page %>
+         </span>
 
-      <button phx-click="next_page"
-        class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
-        disabled={!@has_more}>
-          Next &raquo;
-      </button>
-    </div>
+          <button phx-click="next_page"
+            class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+             disabled={!@has_more}>
+               Next &raquo;
+         </button>
+        </div>
 
         </div>
       </div>
