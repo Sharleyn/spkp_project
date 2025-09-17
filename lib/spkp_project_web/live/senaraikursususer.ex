@@ -209,32 +209,32 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
       <!-- Kalau Kursus Tiada -->
 
       <div class="max-w-8xl bg-[#F8F8FF] rounded-lg mx-auto space-y-8 p-6">
-        <%= if Enum.empty?(@kursus) do %>
-          <p class="text-gray-600">Tiada kursus yang tersedia pada saat ini.</p>
-        <% else %>
-          <%= for kursus <- paginated_courses(@kursus, @page, @per_page) do %>
+          <%= if Enum.empty?(@kursus) do %>
+            <p class="text-gray-600">Tiada kursus yang tersedia pada saat ini.</p>
+          <% else %>
+            <%= for kursus <- paginated_courses(@kursus, @page, @per_page) do %>
             <div class="bg-white rounded-2xl shadow-lg p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
 
-              <!-- Kiri: Logo & Gambar -->
-              <div class="flex flex-col gap-4">
-                <span class="bg-blue-500 text-white text-sm font-semibold px-4 py-1 rounded-full self-center">
-                  <%= kursus.kursus_kategori.kategori %>
-                </span>
-                <img src={kursus.gambar_kursus} alt="Gambar Kursus"
-                     class="rounded-xl w-full h-auto object-cover" />
-              </div>
+            <!-- Bahagian Kiri: Logo & Gambar -->
+            <div class="flex flex-col gap-4">
+              <span class="bg-blue-500 text-white text-sm font-semibold px-4 py-1 rounded-full self-center">
+                <%= kursus.kursus_kategori.kategori %>
+              </span>
+              <img src={kursus.gambar_kursus} alt="Gambar Kursus"
+                   class="rounded-xl w-full h-auto object-cover" />
+            </div>
 
-              <!-- Kanan: Maklumat Kursus -->
-              <div class="md:col-span-2 bg-[#F8F8FF] rounded-lg border border-indigo-200 px-4 py-4 flex flex-col">
-                <div class="flex justify-between items-start mb-1">
-                  <div>
-                    <h3 class="text-xl font-bold text-gray-800"><%= kursus.nama_kursus %></h3>
-                  </div>
-                  <img src={kursus.gambar_anjuran} alt="Logo Penganjur"
-                       class="w-16 h-16 rounded-full" />
+            <!-- Bahagian Kanan: Maklumat Kursus -->
+            <div class="md:col-span-2 bg-[#F8F8FF] rounded-lg border border-indigo-200 px-4 py-4 flex flex-col">
+              <div class="flex justify-between items-start mb-1">
+                <div>
+                  <h3 class="text-xl font-bold text-gray-800"><%= kursus.nama_kursus %></h3>
                 </div>
 
-                <!-- Info kursus -->
+                <img src={kursus.gambar_anjuran} alt="Logo Penganjur"
+                     class="w-16 h-16 rounded-full" />
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-gray-700">
                 <p class="flex items-center gap-2">
                   <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -277,9 +277,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                      <%= for syarat <- String.split(kursus.syarat_penyertaan || "", ["\n", "*"], trim: true) do %>
                         <li><%= String.trim(syarat) %></li>
                     <% end %>
-                  </ul>
-                  <p class="text-sm text-gray-700 mt-4"><strong>Syarat Pendidikan:</strong> <%= kursus.syarat_pendidikan %></p>
-                  <p class="text-sm text-gray-700 mt-1"><strong>Had Umur:</strong> <%= kursus.had_umur %> tahun</p>
+               </ul>
 
              <!-- Syarat pendidikan -->
                  <p class="text-sm text-gray-700 mt-4">
@@ -330,18 +328,12 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                           disabled={@page >= @total_pages}>
                            Next &raquo;
                     </button>
-                  <% else %>
-                    <button phx-click="mohon" phx-value-kursus_id={kursus.id}
-                      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg
-                             shadow-md hover:shadow-lg">
-                      Mohon
-                    </button>
+                 </div>
+              <% end %>
+             </div>
             </div>
-         <% end %>
-        </div>
-       </div>
-      </div>
-     </div>
+           </div>
+          </div>
     """
   end
 
