@@ -20,31 +20,35 @@ defmodule SpkpProjectWeb.DashboardLive do
       <.live_component
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
-        role={@role}
+        current_view={@socket.view}
+        role={@current_user.role}
+        current_user={@current_user}
         current_path={@current_path}
       />
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
-            <div class="flex items-center gap-4 min-w-0">
-              <img src={~p"/images/a3.png"} alt="Logo" class="h-12 w-auto" />
-              <h1 class="text-xl font-semibold text-gray-800 truncate">
-                SPKP <%= String.capitalize(@role) %> Dashboard
-              </h1>
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center gap-4">
+                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              </div>
+
+              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.email %></span>
-              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-                Logout
+              <span class="text-gray-600">admin@gmail.com</span>
+
+                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
               </.link>
+
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
-        </header>
+        </.header>
 
         <!-- Quick Actions -->
         <.quick_actions role={@role} />
@@ -80,7 +84,7 @@ defp quick_actions(assigns) do
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Box 1 -->
       <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer overflow-hidden">
-        <.link navigate={~p"/admin/kursus/new"} class="block">
+        <.link patch={~p"/admin/kursus/new?return_to=/admin/dashboard"} class="block">
           <div class="flex flex-wrap items-center justify-between min-w-0">
             <div class="min-w-0 break-words">
               <h4 class="font-semibold text-gray-800 mb-2">Tambah kursus baru</h4>

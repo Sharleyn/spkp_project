@@ -125,7 +125,15 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
           ]}
         /> <.input field={@form[:kuota]} type="number" label="Kuota" />
         <.input field={@form[:tarikh_tutup]} type="date" label="Tarikh tutup" />
-        <:actions><.button phx-disable-with="Saving...">Simpan</.button></:actions>
+        <:actions>
+        <.button phx-disable-with="Saving...">Simpan</.button>
+          <.link
+            navigate={@patch}
+            class="ml-2 inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+          >
+            Kembali
+          </.link>
+        </:actions>
       </.simple_form>
     </div>
     """

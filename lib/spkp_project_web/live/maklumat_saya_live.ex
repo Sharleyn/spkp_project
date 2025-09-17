@@ -69,56 +69,93 @@ defmodule SpkpProjectWeb.MaklumatSayaLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex min-h-screen bg-gray-100">
+    <div class="w-full min-h-screen bg-gray-100 flex">
       <!-- Sidebar -->
       <.live_component
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
+        current_view={@socket.view}
         role={@current_user.role}
+        current_user={@current_user}
         current_path={@current_path}
       />
 
       <!-- Main Content -->
-      <div class="flex-1 p-6">
-        <h1 class="text-2xl font-bold mb-6">Maklumat Saya</h1>
+      <div class="flex-1 flex flex-col">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
+          <div class="flex justify-between items-center px-6 py-4">
+            <div class="flex items-center space-x-4">
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+            </div>
 
-        <.simple_form
-          for={@changeset}
-          as={:maklumat_pekerja}
-          id="maklumat-form"
-          phx-submit="save"
-          phx-change="validate"
-          :let={f}
-        >
-          <div class="grid grid-cols-1 gap-4">
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-600"><%= @current_user.email %></span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
+              </.link>
+              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+            </div>
+          </div>
+        </.header>
 
-            <.input
-              name="user_name"
-              value={@maklumat_pekerja.user.full_name}
-              label="Nama Penuh"
-              readonly
-            />
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-6 px-10 py-6">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Maklumat Saya</h1>
+            <p class="text-gray-600">Isi maklumat peribadi anda dengan lengkap</p>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="bg-white rounded-lg shadow-md p-8 mx-10">
+          <.simple_form
+            for={@changeset}
+            as={:maklumat_pekerja}
+            id="maklumat-form"
+            phx-submit="save"
+            phx-change="validate"
+            :let={f}
+          >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Nama & Email (readonly) -->
+              <.input
+                name="user_name"
+                value={@maklumat_pekerja.user.full_name}
+                label="Nama Penuh"
+                readonly
+                class="md:col-span-2"
+              />
 
               <.input
                 name="user_email"
                 value={@maklumat_pekerja.user.email}
                 label="Email"
                 readonly
+                class="md:col-span-2"
               />
 
-            <.input field={f[:no_ic]} type="text" label="Nombor IC" class="md:col-span-2" />
-            <.input field={f[:no_tel]} type="text" label="Nombor Telefon" />
-            <.input field={f[:nama_bank]} type="text" label="Nama Bank" />
-            <.input field={f[:no_akaun]} type="text" label="Nombor Akaun" />
-          </div>
+              <!-- Input Maklumat -->
+              <.input field={f[:no_ic]} type="text" label="Nombor IC" />
+              <.input field={f[:no_tel]} type="text" label="Nombor Telefon" />
+              <.input field={f[:nama_bank]} type="text" label="Nama Bank" />
+              <.input field={f[:no_akaun]} type="text" label="Nombor Akaun" />
+            </div>
 
-
-          <:actions>
-            <.button phx-disable-with="Menyimpan...">Simpan</.button>
-          </:actions>
-        </.simple_form>
+            <:actions>
+              <div class="flex justify-end mt-6 space-x-4">
+                <.button
+                  class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700"
+                  phx-disable-with="Menyimpan..."
+                >
+                  Simpan
+                </.button>
+              </div>
+            </:actions>
+          </.simple_form>
+        </div>
       </div>
     </div>
     """
   end
+
 end

@@ -104,7 +104,7 @@ defmodule SpkpProjectWeb.Router do
       live "/maklumat_pekerja/:id", MaklumatPekerjaLive.Show, :show
       live "/maklumat_pekerja/:id/show/edit", MaklumatPekerjaLive.Show, :edit
 
-      live "/editprofile", EditProfileLive
+      live "/editprofile", EditProfileLive.Show
       live "/tukarkatalaluan", TukarKataLaluanLive
       live "/assignstaff", AssignStaffLive, :index
       live "/assignstaff/:id/edit", AssignStaffLive, :edit
@@ -144,12 +144,18 @@ defmodule SpkpProjectWeb.Router do
       live "/senaraipekerja", SenaraiPesertaLive
 
       live "/elaun", PekerjaElaunLive.Index, :index
+
+      # Tambah elaun baru (step tarikh mula/akhir)
+      live "/elaun/new", TuntutanSayaLive.Index, :new_elaun
       live "/elaun/:id", PekerjaElaunLive.Show, :show
+
+      # Pekerja tambah item tuntutan untuk elaun tertentu
+      live "/elaun/:elaun_id/item_elaun_pekerja/new", TuntutanSayaLive.Index, :new_item
+      live "/elaun/:elaun_id/item_elaun_pekerja/:id/edit", TuntutanSayaLive.Index, :edit
 
 
 
       live "/item_elaun_pekerja", TuntutanSayaLive.Index, :index
-      live "/item_elaun_pekerja/new", TuntutanSayaLive.Index, :new
       live "/item_elaun_pekerja/:id/edit", TuntutanSayaLive.Index, :edit
 
       live "/item_elaun_pekerja/:id", TuntutanSayaLive.Show, :show
@@ -157,7 +163,8 @@ defmodule SpkpProjectWeb.Router do
 
       live "/maklumat_saya", MaklumatSayaLive
 
-      live "/editprofile", EditProfileLive
+      live "/editprofile", EditProfileLive.Show
+      live "/tukarkatalaluan", TukarKataLaluanLive
     end
   end
 
