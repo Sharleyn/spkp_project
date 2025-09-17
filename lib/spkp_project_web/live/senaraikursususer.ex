@@ -47,7 +47,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:current_user_name, current_user.full_name)
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
-     |> assign(:applied_ids, applied_ids) # ✅ kursus yang sudah dimohon
+
      # Pagination
      |> assign(:page, 1)
      |> assign(:per_page, per_page)
@@ -235,34 +235,100 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                 </div>
 
                 <!-- Info kursus -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-gray-700">
-                  <p><strong>Tarikh:</strong> <%= kursus.tarikh_mula %> hingga <%= kursus.tarikh_akhir %></p>
-                  <p><strong>Tempat:</strong> <%= kursus.tempat %></p>
-                  <p><strong>Kuota:</strong> <%= kursus.kuota %></p>
-                  <p><strong>Status:</strong> <%= kursus.status_kursus %></p>
-                  <p><strong>Tajaan:</strong> <%= kursus.anjuran %></p>
-                  <p><strong>Kaedah:</strong> <%= kursus.anjuran %></p>
-                </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-gray-700">
+                <p class="flex items-center gap-2">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                    <strong>Tarikh:</strong>
+                      <%= Calendar.strftime(kursus.tarikh_mula, "%d-%m-%Y") %> hingga
+                      <%= Calendar.strftime(kursus.tarikh_akhir, "%d-%m-%Y") %>
+                </p>
 
-                <!-- Syarat -->
-                <div class="mt-4">
-                  <h4 class="font-semibold text-gray-800 mb-2">Syarat Penyertaan</h4>
-                  <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                    <%= for syarat <- String.split(kursus.syarat_penyertaan || "", ["\n", "*"], trim: true) do %>
-                      <li><%= String.trim(syarat) %></li>
+                <p class="flex items-center gap-2">
+                   <i class="fa fa-map-marker-alt" aria-hidden="true"></i>
+                    <strong>Tempat:</strong> <%= kursus.tempat %>
+                </p>
+
+                <p class="flex items-center gap-2">
+                   <i class="fa-solid fa-check-square" aria-hidden="true"></i>
+                   <strong>Kuota:</strong> <%= kursus.kuota %>
+                </p>
+
+                <p class="flex items-center gap-2">
+                   <i class="fas fa-clipboard" aria-hidden="true"></i>
+                   <strong>Status:</strong> <%= kursus.status_kursus %></p>
+
+                <p class="flex items-center gap-2">
+                   <i class="fa fa-institution" aria-hidden="true"></i>
+                   <strong>Tajaan:</strong> <%= kursus.anjuran %></p>
+
+                <p class="flex items-center gap-1">
+                   <i class="fa fa-desktop" aria-hidden="true"></i>
+                   <strong>Kaedah:</strong> <%= kursus.kaedah %></p>
+
+              </div>
+
+
+          <!-- Main -->
+              <div class="mt-4">
+                 <h4 class="font-semibold text-gray-800 mb-2">Syarat Penyertaan</h4>
+
+             <!-- Senarai syarat penyertaan -->
+                 <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                     <%= for syarat <- String.split(kursus.syarat_penyertaan || "", ["\n", "*"], trim: true) do %>
+                        <li><%= String.trim(syarat) %></li>
                     <% end %>
                   </ul>
                   <p class="text-sm text-gray-700 mt-4"><strong>Syarat Pendidikan:</strong> <%= kursus.syarat_pendidikan %></p>
                   <p class="text-sm text-gray-700 mt-1"><strong>Had Umur:</strong> <%= kursus.had_umur %> tahun</p>
-                </div>
 
-                <!-- Butang -->
-                <div class="mt-2 flex justify-end">
-                  <%= if kursus.id in @applied_ids do %>
-                    <button disabled
-                      class="bg-green-500 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed
-                             shadow-md hover:shadow-lg">
-                      ✅ Kursus sudah dimohon
+             <!-- Syarat pendidikan -->
+                 <p class="text-sm text-gray-700 mt-4">
+                      <strong>Syarat Pendidikan:</strong> <%= kursus.syarat_pendidikan %>
+                  </p>
+
+             <!-- Had umur -->
+                 <p class="text-sm text-gray-700 mt-1">
+                      <strong>Had Umur:</strong> <%= kursus.had_umur %> tahun
+                  </p>
+
+             <!-- Tarikh Tutup Permohonan -->
+                 <p class="text-sm text-gray-700 mt-4">
+                      <strong>Tarikh Tutup Permohonan:</strong>
+                       <%= Calendar.strftime(kursus.tarikh_tutup, "%d-%m-%Y") %>
+                 </p>
+              </div>
+
+              <div class="mt-2 flex justify-end">
+                <button phx-click="mohon" phx-value-kursus_id={kursus.id}
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                  Mohon
+                </button>
+               </div>
+              </div>
+             </div>
+            <% end %>
+
+           <!-- ✅ Pagination -->
+                <div class="flex justify-center mt-6 space-x-1">
+                  <!-- Prev Button -->
+                     <button
+                      phx-click="prev_page"
+                       class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={@page == 1}>
+                         &laquo; Prev
+                     </button>
+
+                  <!-- Current Page / Total Pages -->
+                     <span class="px-3 py-1 text-gray-700 font-medium">
+                        Page <%= @page %> of <%= @total_pages %>
+                    </span>
+
+                  <!-- Next Button -->
+                     <button
+                        phx-click="next_page"
+                         class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={@page >= @total_pages}>
+                           Next &raquo;
                     </button>
                   <% else %>
                     <button phx-click="mohon" phx-value-kursus_id={kursus.id}
@@ -270,28 +336,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                              shadow-md hover:shadow-lg">
                       Mohon
                     </button>
-                  <% end %>
-                </div>
-              </div>
             </div>
-          <% end %>
-
-          <!-- Pagination -->
-          <div class="flex justify-center mt-6 space-x-1">
-            <button phx-click="prev_page"
-              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={@page == 1}>
-              &laquo; Prev
-            </button>
-            <span class="px-3 py-1 text-gray-700 font-medium">
-              Page <%= @page %> of <%= @total_pages %>
-            </span>
-            <button phx-click="next_page"
-              class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={@page >= @total_pages}>
-              Next &raquo;
-            </button>
-          </div>
          <% end %>
         </div>
        </div>
