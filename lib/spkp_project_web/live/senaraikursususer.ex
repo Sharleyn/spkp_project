@@ -14,11 +14,6 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     # Ambil semua kursus + preload kategori
     kursus = Repo.all(Kursuss) |> Repo.preload(:kursus_kategori)
 
-    # Ambil senarai kursus_id yang user dah mohon
-    applied_ids =
-      from(p in Userpermohonan, where: p.user_id == ^current_user.id, select: p.kursus_id)
-      |> Repo.all()
-
     # Senarai kategori unik
     categories =
       kursus
@@ -32,8 +27,10 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     jangka_pendek =
       Enum.filter(kursus, fn k -> Date.diff(k.tarikh_akhir, k.tarikh_mula) <= 30 end)
 
+    # 👉 Declare dulu
     per_page = 5
     total = length(kursus)
+    _total_pages = total_pages(total, per_page)
 
     {:ok,
      socket
