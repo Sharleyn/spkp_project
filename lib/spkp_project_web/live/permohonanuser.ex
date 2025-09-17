@@ -150,7 +150,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
         </div>
 
           <!-- Search + Filter -->
-          <div class="flex flex-col sm:flex-row items-center bg-sky-100 border border-gray-100 rounded-lg py-2 px-2 gap-4 mb-6">
+          <div class="flex flex-col sm:flex-row items-center bg-sky-50 border border-gray-50 rounded-lg py-2 px-2 gap-4 mb-6">
             <div class="relative w-full sm:w-1/2">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                          <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

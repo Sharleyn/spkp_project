@@ -284,6 +284,11 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                  <p class="text-sm text-gray-700 mt-1">
                       <strong>Had Umur:</strong> <%= kursus.had_umur %> tahun
                   </p>
+
+             <!-- Tarikh Tutup Permohonan -->
+                 <p class="text-sm text-gray-700 mt-4">
+                      <strong>Tarikh Tutup Permohonan:</strong> <%= kursus.tarikh_tutup %>
+                  </p>
               </div>
 
               <div class="mt-2 flex justify-end">
@@ -296,7 +301,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
              </div>
             <% end %>
 
-           <!-- ✅ Pagination cantik -->
+           <!-- ✅ Pagination -->
                 <div class="flex justify-center mt-6 space-x-1">
                   <!-- Prev Button -->
                      <button
