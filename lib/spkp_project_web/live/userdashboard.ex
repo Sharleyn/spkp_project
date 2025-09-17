@@ -8,14 +8,14 @@ defmodule SpkpProjectWeb.UserDashboardLive do
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
 
-    # ✅ Kira jumlah Kursus Tersedia (hanya Aktif & Akan Datang)
+    # ✅ Kira jumlah Kursus Tersedia (hanya Aktif & Akan Datang) - (CARD KURSUS TERSEDIA)
   available_courses_count =
     from(k in SpkpProject.Kursus.Kursuss,
       where: k.status_kursus in ["Aktif", "Akan Datang"]
     )
     |> SpkpProject.Repo.aggregate(:count, :id)
 
-    # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini" (tak kacau)
+    # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini" (CARD KURSUS TERKINI)
   available_courses =
     from(k in SpkpProject.Kursus.Kursuss,
       where: k.status_kursus in ["Aktif", "Akan Datang"],
@@ -24,7 +24,7 @@ defmodule SpkpProjectWeb.UserDashboardLive do
     )
     |> SpkpProject.Repo.all()
 
-    # ✅ Ambil 3 permohonan terkini user
+    # ✅ Ambil 3 permohonan terkini user (CARD KURSUS PERMOHONAN TERKINI)
   recent_applications =
     from(p in SpkpProject.Userpermohonan.Userpermohonan,
       where: p.user_id == ^current_user.id,
