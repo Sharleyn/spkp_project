@@ -8,35 +8,35 @@ defmodule SpkpProjectWeb.UserDashboardLive do
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
 
-    # ✅ Kursus Tersedia (kira jumlah dengan status aktif / akan datang)
-    available_courses_count =
-      from(k in SpkpProject.Kursus.Kursuss,
-        where: k.status_kursus in ^["Aktif", "Akan Datang"]
-      )
-      |> SpkpProject.Repo.aggregate(:count, :id)
+    # ✅ Kira jumlah Kursus Tersedia (hanya Aktif & Akan Datang)
+  available_courses_count =
+    from(k in SpkpProject.Kursus.Kursuss,
+      where: k.status_kursus in ["Aktif", "Akan Datang"]
+    )
+    |> SpkpProject.Repo.aggregate(:count, :id)
 
-    # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini"
-    available_courses =
-      from(k in SpkpProject.Kursus.Kursuss,
-        where: k.status_kursus in ^["Aktif", "Akan Datang"],
-        order_by: [desc: k.inserted_at],
-        limit: 3
-      )
-      |> SpkpProject.Repo.all()
+    # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini" (tak kacau)
+  available_courses =
+    from(k in SpkpProject.Kursus.Kursuss,
+      where: k.status_kursus in ["Aktif", "Akan Datang"],
+      order_by: [desc: k.inserted_at],
+      limit: 3
+    )
+    |> SpkpProject.Repo.all()
 
     # ✅ Ambil 3 permohonan terkini user
-    recent_applications =
-      from(p in SpkpProject.Userpermohonan.Userpermohonan,
-        where: p.user_id == ^current_user.id,
-        join: k in assoc(p, :kursus),
-        preload: [kursus: k],
-        order_by: [desc: p.inserted_at],
-        limit: 3
-      )
-      |> SpkpProject.Repo.all()
+  recent_applications =
+    from(p in SpkpProject.Userpermohonan.Userpermohonan,
+      where: p.user_id == ^current_user.id,
+      join: k in assoc(p, :kursus),
+      preload: [kursus: k],
+      order_by: [desc: p.inserted_at],
+      limit: 3
+    )
+    |> SpkpProject.Repo.all()
 
-    # ✅ Statistik permohonan user (jumlah semua + kursus selesai)
-    stats = get_user_dashboard_stats(current_user.id)
+  # ✅ Statistik permohonan user (jumlah semua + kursus selesai)
+  stats = get_user_dashboard_stats(current_user.id)
 
     socket =
       socket
@@ -189,9 +189,9 @@ end
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-orange-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
 
-                        <!-- Permohonan Aktif -->
+                        <!-- Permohonan Pengguna -->
                             <div>
-                                <p class="text-orange-700 text-sm font-medium">Permohonan Aktif</p>
+                                <p class="text-orange-700 text-sm font-medium">Permohonan Pengguna</p>
                                 <h3 class="text-3xl font-bold mt-1"><%= @active_applications_count %></h3>
                             </div>
                                 <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
