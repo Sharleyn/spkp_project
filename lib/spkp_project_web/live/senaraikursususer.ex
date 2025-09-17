@@ -244,8 +244,10 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-gray-700">
                 <p class="flex items-center gap-2">
-                   <i class="fa fa-calendar" aria-hidden="true"></i>
-                    <strong>Tarikh:</strong> <%= kursus.tarikh_mula %> hingga <%= kursus.tarikh_akhir %>
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                    <strong>Tarikh:</strong>
+                      <%= Calendar.strftime(kursus.tarikh_mula, "%d-%m-%Y") %> hingga
+                      <%= Calendar.strftime(kursus.tarikh_akhir, "%d-%m-%Y") %>
                 </p>
 
                 <p class="flex items-center gap-2">
@@ -296,8 +298,9 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
              <!-- Tarikh Tutup Permohonan -->
                  <p class="text-sm text-gray-700 mt-4">
-                      <strong>Tarikh Tutup Permohonan:</strong> <%= kursus.tarikh_tutup %>
-                  </p>
+                      <strong>Tarikh Tutup Permohonan:</strong>
+                       <%= Calendar.strftime(kursus.tarikh_tutup, "%d-%m-%Y") %>
+                 </p>
               </div>
 
               <!-- Button Mohon -->
