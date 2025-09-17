@@ -259,7 +259,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
                 <p class="flex items-center gap-1">
                    <i class="fa fa-desktop" aria-hidden="true"></i>
-                   <strong>Kaedah:</strong> <%= kursus.anjuran %></p>
+                   <strong>Kaedah:</strong> <%= kursus.kaedah %></p>
 
               </div>
 
