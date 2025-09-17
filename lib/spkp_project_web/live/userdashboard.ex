@@ -6,40 +6,51 @@ defmodule SpkpProjectWeb.UserDashboardLive do
 
   @impl true
   def mount(_params, _session, socket) do
-   current_user = socket.assigns.current_user
+    current_user = socket.assigns.current_user
 
-   # ✅ Kursus Tersedia (kira jumlah dengan status aktif / akan datang)
-  available_courses_count =
-    from(k in SpkpProject.Kursus.Kursuss,
-      where: k.status_kursus in ^["Aktif", "Akan Datang"])
-    |> SpkpProject.Repo.aggregate(:count, :id)
+    # ✅ Kursus Tersedia (kira jumlah dengan status aktif / akan datang)
+    available_courses_count =
+      from(k in SpkpProject.Kursus.Kursuss,
+        where: k.status_kursus in ^["Aktif", "Akan Datang"]
+      )
+      |> SpkpProject.Repo.aggregate(:count, :id)
 
-  # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini"
-  available_courses =
-    from(k in SpkpProject.Kursus.Kursuss,
-      where: k.status_kursus in ^["Aktif", "Akan Datang"],
-      order_by: [desc: k.inserted_at],
-      limit: 3
-    )
-    |> SpkpProject.Repo.all()
+    # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini"
+    available_courses =
+      from(k in SpkpProject.Kursus.Kursuss,
+        where: k.status_kursus in ^["Aktif", "Akan Datang"],
+        order_by: [desc: k.inserted_at],
+        limit: 3
+      )
+      |> SpkpProject.Repo.all()
 
-   socket =
-    socket
-    |> assign(:current_user_name, current_user.full_name)
-    |> assign(:sidebar_open, true)
-    |> assign(:user_menu_open, false)
-    |> assign(:available_courses, available_courses)            # 👉 senarai untuk "Kursus Terkini"
-    |> assign(:available_courses_count, available_courses_count) # 👉 total untuk "Kursus Tersedia"
-    |> assign(:active_applications_count, 3) # (boleh tukar ikut permohonan user)
-    |> assign(:completed_courses_count, 0)   # (boleh tukar ikut DB)
-    |> assign(:recent_applications, [
-      %{name: "Kursus Komputer Asas", date: "2025-01-24", status: "Diterima", status_class: "bg-green-100 text-green-600"},
-      %{name: "Kursus Bahasa Inggeris", date: "2025-02-17", status: "Dalam Proses", status_class: "bg-yellow-100 text-yellow-600"},
-      %{name: "Kursus Kemahiran Digital", date: "2025-02-21", status: "Ditolak", status_class: "bg-red-100 text-red-600"}
-    ])
+    # ✅ Ambil 3 permohonan terkini user
+    recent_applications =
+      from(p in SpkpProject.Userpermohonan.Userpermohonan,
+        where: p.user_id == ^current_user.id,
+        join: k in assoc(p, :kursus),
+        preload: [kursus: k],
+        order_by: [desc: p.inserted_at],
+        limit: 3
+      )
+      |> SpkpProject.Repo.all()
 
-  {:ok, socket}
-end
+    # ✅ Statistik permohonan user (jumlah semua + kursus selesai)
+    stats = get_user_dashboard_stats(current_user.id)
+
+    socket =
+      socket
+      |> assign(:current_user_name, current_user.full_name)
+      |> assign(:sidebar_open, true)
+      |> assign(:user_menu_open, false)
+      |> assign(:available_courses, available_courses)            # 👉 senarai untuk "Kursus Terkini"
+      |> assign(:available_courses_count, available_courses_count) # 👉 total untuk "Kursus Tersedia"
+      |> assign(:active_applications_count, stats.total)           # 👉 jumlah semua permohonan user
+      |> assign(:completed_courses_count, stats.completed)         # 👉 kursus selesai
+      |> assign(:recent_applications, recent_applications)
+
+    {:ok, socket}
+  end
 
    # Hook untuk inject current_path dan sidebar_open
     def on_mount(:default, _params, _session, socket) do
@@ -48,6 +59,26 @@ end
        |> assign(:current_path, socket.host_uri.path)
        |> assign_new(:sidebar_open, fn -> true end)  # default sidebar terbuka
   }
+end
+
+def get_user_dashboard_stats(user_id) do
+  # 👉 jumlah semua permohonan user (apa pun statusnya)
+  total =
+    from(p in SpkpProject.Userpermohonan.Userpermohonan,
+      where: p.user_id == ^user_id
+    )
+    |> SpkpProject.Repo.aggregate(:count, :id)
+
+  # 👉 kursus selesai (permohonan diterima + kursus tamat)
+  completed =
+    from(p in SpkpProject.Userpermohonan.Userpermohonan,
+      where: p.user_id == ^user_id and p.status == "Diterima",
+      join: k in assoc(p, :kursus),
+      where: k.tarikh_akhir < ^Date.utc_today()
+    )
+    |> SpkpProject.Repo.aggregate(:count, :id)
+
+  %{total: total, completed: completed}
 end
 
   # 'render' berfungsi sebagai template HTML LiveView
@@ -211,14 +242,16 @@ end
                             <p class="text-gray-700 font-medium mb-4"> Status Permohonan Kursus Anda </p>
                             <div class="space-y-4">
                                 <%= for app <- @recent_applications do %>
-                                    <div class="flex items-center justify-between p-4 bg-[#C8C4DF] bg-opacity-50 rounded-2xl">
-                                        <div>
-                                            <p class="font-medium"><%= app.name %></p>
-                                            <p class="text-xs text-gray-500">Tarikh Mohon: <%= app.date %></p>
-                                        </div>
-                                        <span class={"text-xs font-semibold px-2 py-1 rounded-full #{app.status_class}"}><%= app.status %></span>
-                                    </div>
-                                <% end %>
+                            <div class="flex items-center justify-between p-4 bg-[#C8C4DF] bg-opacity-50 rounded-2xl">
+                             <div>
+                               <p class="font-medium"><%= app.kursus.nama_kursus %></p>
+                               <p class="text-xs text-gray-500">Tarikh Mohon: <%= Calendar.strftime(app.inserted_at, "%d-%m-%Y") %></p>
+                             </div>
+                                <span class={status_class(app.status)}>
+                                  <%= app.status %>
+                               </span>
+                         </div>
+                       <% end %>
                             </div>
                             <div class="mt-6 text-center">
                                  <.link navigate={~p"/permohonanuser"}
@@ -300,5 +333,11 @@ end
       base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
     end
   end
+
+  defp status_class("Diterima"), do: "text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-600"
+  defp status_class("Dalam Proses"), do: "text-xs font-semibold px-2 py-1 rounded-full bg-yellow-100 text-yellow-600"
+  defp status_class("Ditolak"), do: "text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-600"
+  defp status_class(_), do: "text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 text-gray-600"
+
 
 end
