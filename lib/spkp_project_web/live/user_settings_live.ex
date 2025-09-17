@@ -4,26 +4,6 @@ defmodule SpkpProjectWeb.UserSettingsLive do
   alias SpkpProject.Accounts
 
   ## Mount
-  def mount(_params, _session, socket) do
-    user = socket.assigns.current_user
-
-    {:ok,
-     socket
-     |> assign(:email_form, to_form(%{"email" => user.email}, as: "user"))
-     |> assign(:password_form, to_form(%{}, as: "user"))
-     |> assign(
-       :form,
-       to_form(
-         %{
-           "email" => user.email,
-           "password" => "",
-           "password_confirmation" => ""
-         },
-         as: "user"
-       )
-     )}
-  end
-
   def mount(%{"token" => token}, _session, socket) do
     socket =
       case Accounts.update_user_email(socket.assigns.current_user, token) do
