@@ -174,20 +174,4 @@ defmodule SpkpProjectWeb.UserSettingsLive do
   def handle_event("validate", %{"user" => params}, socket) do
     {:noreply, assign(socket, form: to_form(params, as: "user"))}
   end
-
-  ## Handle save (umum)
-  def handle_event("save", %{"user" => params}, socket) do
-    user = socket.assigns.current_user
-
-    case Accounts.update_user(user, params) do
-      {:ok, _updated_user} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Tetapan berjaya disimpan.")
-         |> push_navigate(to: ~p"/userdashboard")}
-
-      {:error, changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset, as: "user"))}
-    end
-  end
 end
