@@ -158,9 +158,10 @@ defmodule SpkpProject.Accounts.User do
   """
   def password_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:password])
+    |> cast(attrs, [:password, :password_confirmation])
     |> validate_confirmation(:password, message: "Kata laluan tidak sepadan")
     |> validate_password(opts)
+    |> maybe_hash_password(opts)
   end
 
   @doc """
