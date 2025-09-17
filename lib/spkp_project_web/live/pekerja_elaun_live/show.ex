@@ -190,11 +190,16 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
 
             <!-- Add Item Button -->
             <%= if @elaun.status_permohonan == "draft" do %>
-            <button phx-click="add_item" class="mt-4 bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-md hover:bg-gray-50">
-              <span class="text-black">+ tambah item</span>
-            </button>
+              <.link
+                navigate={~p"/pekerja/elaun/#{@elaun.id}/item_elaun_pekerja/new"}
+                class="mt-4 bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-md hover:bg-gray-50"
+              >
+                <span class="text-black">+ tambah item</span>
+              </.link>
             <% else %>
-              <p class="mt-4 text-gray-500 italic">Tuntutan sudah dihantar, item tidak boleh ditambah</p>
+              <p class="mt-4 text-gray-500 italic">
+                Tuntutan sudah dihantar, item tidak boleh ditambah
+              </p>
             <% end %>
           </div>
 

@@ -63,8 +63,9 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
   end
 
   @impl true
-  def handle_info({SpkpProjectWeb.TuntutanSayaLive.FormComponent, {:saved, _item}}, socket) do
+  def handle_info({SpkpProjectWeb.TuntutanSayaLive.ElaunFormComponent, {:saved, _elaun}}, socket) do
     user_id = socket.assigns.current_user.id
+
     result =
       Elaun.list_item_elaun_pekerja_by_user_paginated(
         user_id,
@@ -75,8 +76,11 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
     {:noreply,
      socket
      |> assign(:item_elaun_pekerja_collection, result.data)
-     |> assign(:total_pages, result.total_pages)}
+     |> assign(:total_pages, result.total_pages)
+     # tutup modal dengan patch ke index (optional)
+     |> push_patch(to: ~p"/pekerja/item_elaun_pekerja")}
   end
+
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
@@ -265,6 +269,15 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
             Next
           </button>
         </div>
+
+        <!-- Modal: Elaun Form (shown when live_action == :new_elaun) -->
+        <%= if @live_action == :new_elaun do %>
+          <.live_component
+            module={SpkpProjectWeb.TuntutanSayaLive.ElaunFormComponent}
+            id="elaun_form"
+            current_user={@current_user}
+          />
+        <% end %>
       </div>
     </div>
     """
