@@ -44,6 +44,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:current_user_name, current_user.full_name)
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
+
      # Pagination
      |> assign(:page, 1)
      |> assign(:per_page, per_page)
@@ -235,8 +236,10 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 text-gray-700">
                 <p class="flex items-center gap-2">
-                   <i class="fa fa-calendar" aria-hidden="true"></i>
-                    <strong>Tarikh:</strong> <%= kursus.tarikh_mula %> hingga <%= kursus.tarikh_akhir %>
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                    <strong>Tarikh:</strong>
+                      <%= Calendar.strftime(kursus.tarikh_mula, "%d-%m-%Y") %> hingga
+                      <%= Calendar.strftime(kursus.tarikh_akhir, "%d-%m-%Y") %>
                 </p>
 
                 <p class="flex items-center gap-2">
@@ -259,7 +262,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
                 <p class="flex items-center gap-1">
                    <i class="fa fa-desktop" aria-hidden="true"></i>
-                   <strong>Kaedah:</strong> <%= kursus.anjuran %></p>
+                   <strong>Kaedah:</strong> <%= kursus.kaedah %></p>
 
               </div>
 
@@ -284,6 +287,12 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                  <p class="text-sm text-gray-700 mt-1">
                       <strong>Had Umur:</strong> <%= kursus.had_umur %> tahun
                   </p>
+
+             <!-- Tarikh Tutup Permohonan -->
+                 <p class="text-sm text-gray-700 mt-4">
+                      <strong>Tarikh Tutup Permohonan:</strong>
+                       <%= Calendar.strftime(kursus.tarikh_tutup, "%d-%m-%Y") %>
+                 </p>
               </div>
 
               <div class="mt-2 flex justify-end">
@@ -296,7 +305,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
              </div>
             <% end %>
 
-           <!-- ✅ Pagination cantik -->
+           <!-- ✅ Pagination -->
                 <div class="flex justify-center mt-6 space-x-1">
                   <!-- Prev Button -->
                      <button
