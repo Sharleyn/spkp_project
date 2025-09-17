@@ -384,13 +384,22 @@ defmodule SpkpProjectWeb.UserProfileLive do
              <% end %>
 
              <!-- Gambar lama bila edit -->
-             <%= if @profile_changeset.data.ic_attachment && @uploads.ic_attachment.entries == [] do %>
-               <%= if String.ends_with?(@profile_changeset.data.ic_attachment, [".jpg", ".jpeg", ".png"]) do %>
-                 <img src={@profile_changeset.data.ic_attachment} class="w-32 h-32 rounded-lg border" />
-               <% else %>
-                 <a href={@profile_changeset.data.ic_attachment} target="_blank" class="text-blue-600 underline">
-                   📄 Lihat fail IC lama
-                 </a>
+             <%= if @profile_changeset.data.ic_attachment do %>
+               <% mime = MIME.from_path(@profile_changeset.data.ic_attachment) %>
+
+               <%= cond do %>
+                 <% mime in ["image/jpeg", "image/png"] -> %>
+                   <img src={@profile_changeset.data.ic_attachment} class="w-32 h-32 rounded-lg border" />
+
+                 <% mime == "application/pdf" -> %>
+                    <a href={@profile_changeset.data.ic_attachment} target="_blank" class="text-blue-600 underline">
+                      📄 Lihat PDF
+                  </a>
+
+                 <% true -> %>
+                   <a href={@profile_changeset.data.ic_attachment} target="_blank" class="text-blue-600 underline">
+                    📎 Muat Turun Fail
+                  </a>
                <% end %>
              <% end %>
 
@@ -414,25 +423,32 @@ defmodule SpkpProjectWeb.UserProfileLive do
   end
 
     # Simpan fail ke DB + guna gambar lama kalau tiada upload baru
-  defp save_uploads(socket, params, user_id) do
-    ic_attachment =
-      consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, _entry ->
-        uploads_dir = Path.expand("./uploads")
-        File.mkdir_p!(uploads_dir)
-        dest = Path.join(uploads_dir, Path.basename(path))
-        File.cp!(path, dest)
-        {:ok, "/uploads/#{Path.basename(dest)}"}
-      end)
-      |> List.first()
+    defp save_uploads(socket, params, user_id) do
+      ic_attachment =
+        consume_uploaded_entries(socket, :ic_attachment, fn %{path: path}, entry ->
+          uploads_dir = Path.expand("./uploads")
+          File.mkdir_p!(uploads_dir)
 
-    existing_profile = Accounts.get_user_profile_by_user_id(user_id) || %UserProfile{}
+          # Ambil extension asal fail (contoh: .jpg, .png, .pdf)
+          ext = Path.extname(entry.client_name)
 
-    result = params
-    |> Map.put("user_id", user_id)
-    |> maybe_put("ic_attachment", ic_attachment, existing_profile.ic_attachment)
+          # Buat nama unik tapi kekalkan extension
+          unique_name = "#{System.unique_integer([:positive])}#{ext}"
+          dest = Path.join(uploads_dir, unique_name)
 
-    result
-  end
+          File.cp!(path, dest)
+
+          # Hantar path untuk disimpan dalam DB
+          {:ok, "/uploads/#{unique_name}"}
+        end)
+        |> List.first()
+
+      existing_profile = Accounts.get_user_profile_by_user_id(user_id) || %UserProfile{}
+
+      params
+      |> Map.put("user_id", user_id)
+      |> maybe_put("ic_attachment", ic_attachment, existing_profile.ic_attachment)
+    end
 
   defp maybe_put(params, key, new_val, old_val) do
     cond do
