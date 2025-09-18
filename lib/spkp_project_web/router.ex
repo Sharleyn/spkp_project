@@ -153,8 +153,6 @@ defmodule SpkpProjectWeb.Router do
       live "/elaun/:elaun_id/item_elaun_pekerja/new", TuntutanSayaLive.Index, :new_item
       live "/elaun/:elaun_id/item_elaun_pekerja/:id/edit", TuntutanSayaLive.Index, :edit
 
-
-
       live "/item_elaun_pekerja", TuntutanSayaLive.Index, :index
       live "/item_elaun_pekerja/:id/edit", TuntutanSayaLive.Index, :edit
 

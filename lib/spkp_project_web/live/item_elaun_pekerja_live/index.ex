@@ -140,7 +140,6 @@ defmodule SpkpProjectWeb.ItemElaunPekerjaLive.Index do
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Item Tuntutan</h1>
             <p class="text-gray-600">Tambah item tuntutan baru</p>
           </div>
-          <.link patch={~p"/admin/elaun_pekerja/new"}><.button>Item tuntutan</.button></.link>
         </div>
 
         <!-- Search bar -->

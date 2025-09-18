@@ -173,13 +173,13 @@ defmodule SpkpProjectWeb.SidebarComponent do
                     navigate={~p"/admin/item_elaun_pekerja"}
                     class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/item_elaun_pekerja", do: "bg-gray-600 font-bold"}"}
                   >
-                    Buat Tuntutan Baru
+                    Item Tuntutan Staff
                   </.link>
                   <.link
                     navigate={~p"/admin/maklumat_pekerja"}
                     class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/maklumat_pekerja", do: "bg-gray-600 font-bold"}"}
                   >
-                    Senarai Pekerja
+                    Maklumat Staff
                   </.link>
 
                 <% else %>

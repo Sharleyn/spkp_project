@@ -36,7 +36,18 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
           </div>
 
           <:actions>
+
+          <div class="flex justify-end space-x-4">
+            <!-- Button Kembali -->
+            <.link
+              navigate={~p"/pekerja/elaun/#{@elaun.id}"}
+              class="bg-gray-500 text-white rounded-lg px-4 py-2 shadow-md hover:bg-gray-600"
+            >
+              Kembali
+            </.link>
+
             <.button phx-disable-with="Saving...">Simpan</.button>
+            </div>
           </:actions>
         </.simple_form>
       </div>
@@ -56,8 +67,6 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.FormComponent do
      |> assign(:item_elaun_pekerja, item)
      |> assign(:form, to_form(changeset))}
   end
-
-
 
   @impl true
   def handle_event("validate", %{"item_elaun_pekerja" => params}, socket) do

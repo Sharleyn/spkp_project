@@ -3,22 +3,34 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
 
   alias SpkpProject.Elaun
   alias SpkpProject.Repo
-
+  alias SpkpProject.Elaun.ItemElaunPekerja
 
   @impl true
-  def handle_params(%{"id" => id}, uri, socket) do
+  def handle_params(%{"id" => id} = params, _uri, socket) do
     elaun =
       Elaun.get_elaun_pekerja!(id)
       |> Repo.preload(:item_elaun_pekerja)
 
-    today = Date.utc_today()
-    can_edit = Date.compare(today, elaun.tarikh_mula) != :lt and Date.compare(today, elaun.tarikh_akhir) != :gt
+    modal_action =
+      case params["action"] do
+        "new_item" -> :new
+        "edit_item" -> :edit
+        _ -> nil
+      end
+
+    modal_item =
+      case modal_action do
+        :new -> %ItemElaunPekerja{}
+        :edit -> Elaun.get_item_elaun_pekerja!(params["id_item"])
+        _ -> nil
+      end
 
     {:noreply,
-    socket
-    |> assign(:elaun, elaun)
-    |> assign(:can_edit, can_edit)
-    |> assign(:current_path, URI.parse(uri).path)}
+     socket
+     |> assign(:elaun, elaun)
+     |> assign(:modal_item_action, modal_action)
+     |> assign(:modal_item_item, modal_item)
+     |> assign(:current_path, "/pekerja/elaun/#{id}")}
   end
 
   @impl true
@@ -45,7 +57,6 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
          |> put_flash(:error, "Gagal simpan draf")}
     end
   end
-
 
   def handle_event("submit", _params, socket) do
     case SpkpProject.Elaun.update_elaun_pekerja(socket.assigns.elaun, %{status_permohonan: "submitted"}) do
@@ -92,10 +103,8 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
-
         </.header>
 
-        <!-- Main Content -->
         <div class="flex-1 bg-white p-8">
           <!-- Title Section -->
           <div class="mb-8">
@@ -131,55 +140,29 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
             <div class="border border-gray-400 rounded overflow-hidden">
               <!-- Table Header -->
               <div class="bg-gray-200 flex">
-                <div class="flex-1 p-3 border-r border-gray-400">
-                  <span class="text-black font-bold text-xs">KENYATAAN / JENIS KERJA</span>
-                </div>
-                <div class="flex-1 p-3 border-r border-gray-400">
-                  <span class="text-black font-bold text-xs">TARIKH</span>
-                </div>
-                <div class="flex-1 p-3 border-r border-gray-400">
-                  <span class="text-black font-bold text-xs">MASA MULA</span>
-                </div>
-                <div class="flex-1 p-3 border-r border-gray-400">
-                  <span class="text-black font-bold text-xs">MASA TAMAT</span>
-                </div>
-                <div class="flex-1 p-3 border-r border-gray-400">
-                  <span class="text-black font-bold text-xs">KETERANGAN</span>
-                </div>
-                <div class="flex-1 p-3 border-r border-gray-400">
-                  <span class="text-black font-bold text-xs">JUMLAH</span>
-                </div>
-                <div class="flex-1 p-3">
-                  <span class="text-black font-bold text-xs">TINDAKAN</span>
-                </div>
+                <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black font-bold text-xs">KENYATAAN / JENIS KERJA</span></div>
+                <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black font-bold text-xs">TARIKH</span></div>
+                <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black font-bold text-xs">MASA MULA</span></div>
+                <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black font-bold text-xs">MASA TAMAT</span></div>
+                <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black font-bold text-xs">KETERANGAN</span></div>
+                <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black font-bold text-xs">JUMLAH</span></div>
+                <div class="flex-1 p-3"><span class="text-black font-bold text-xs">TINDAKAN</span></div>
               </div>
 
               <!-- Table Rows -->
               <%= for item <- @elaun.item_elaun_pekerja do %>
                 <div class="bg-white flex border-b border-gray-400">
-                  <div class="flex-1 p-3 border-r border-gray-400">
-                    <span class="text-black text-xs"><%= item.kenyataan_tuntutan %></span>
-                  </div>
-                  <div class="flex-1 p-3 border-r border-gray-400">
-                    <span class="text-black text-xs"><%= item.tarikh_tuntutan %></span>
-                  </div>
-                  <div class="flex-1 p-3 border-r border-gray-400">
-                    <span class="text-black text-xs"><%= item.masa_mula %></span>
-                  </div>
-                  <div class="flex-1 p-3 border-r border-gray-400">
-                    <span class="text-black text-xs"><%= item.masa_tamat %></span>
-                  </div>
-                  <div class="flex-1 p-3 border-r border-gray-400">
-                    <span class="text-black text-xs"><%= item.keterangan %></span>
-                  </div>
-                  <div class="flex-1 p-3 border-r border-gray-400">
-                    <span class="text-black text-xs">RM <%= item.jumlah %></span>
-                  </div>
+                  <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black text-xs"><%= item.kenyataan_tuntutan %></span></div>
+                  <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black text-xs"><%= item.tarikh_tuntutan %></span></div>
+                  <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black text-xs"><%= item.masa_mula %></span></div>
+                  <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black text-xs"><%= item.masa_tamat %></span></div>
+                  <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black text-xs"><%= item.keterangan %></span></div>
+                  <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black text-xs">RM <%= item.jumlah %></span></div>
                   <div class="flex-1 p-3">
-                  <%= if @elaun.status_permohonan == "draft" do %>
-                    <button phx-click="edit_item" phx-value-id={item.id} class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">
-                      Edit
-                    </button>
+                    <%= if @elaun.status_permohonan == "draft" do %>
+                      <button phx-click="edit_item" phx-value-id={item.id} class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">
+                        Edit
+                      </button>
                     <% else %>
                       <span class="text-gray-400 italic text-xs">Locked</span>
                     <% end %>
@@ -190,11 +173,9 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
 
             <!-- Add Item Button -->
             <%= if @elaun.status_permohonan == "draft" do %>
-              <.link
-                navigate={~p"/pekerja/elaun/#{@elaun.id}/item_elaun_pekerja/new"}
-                class="mt-4 bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-md hover:bg-gray-50"
-              >
-                <span class="text-black">+ tambah item</span>
+             <.link patch={~p"/pekerja/elaun/#{@elaun.id}?action=new_item"}
+                    class="mt-4 inline-block bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-md hover:bg-gray-50">
+                + tambah item
               </.link>
             <% else %>
               <p class="mt-4 text-gray-500 italic">
@@ -204,24 +185,34 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex space-x-4">
-          <%= if @elaun.status_permohonan == "draft" do %>
-            <button phx-click="save_draft" class="bg-white border border-gray-300 rounded-lg px-6 py-2 shadow-md hover:bg-gray-50">
-              <span class="text-black">Simpan sebagai draf</span>
-            </button>
-            <button phx-click="submit" class="bg-blue-600 text-white rounded-lg px-6 py-2 shadow-md hover:bg-blue-700">
-              <span class="text-white">Hantar</span>
-            </button>
+          <div class="flex space-x-4 mb-8">
+            <%= if @elaun.status_permohonan == "draft" do %>
+              <button phx-click="save_draft" class="bg-white border border-gray-300 rounded-lg px-6 py-2 shadow-md hover:bg-gray-50">
+                <span class="text-black">Simpan sebagai draf</span>
+              </button>
+              <button phx-click="submit" class="bg-blue-600 text-white rounded-lg px-6 py-2 shadow-md hover:bg-blue-700">
+                <span class="text-white">Hantar</span>
+              </button>
             <% else %>
               <p class="text-gray-500 italic">Tuntutan telah dihantar dan tidak boleh diedit lagi</p>
             <% end %>
 
-            <!-- ✅ Button Kembali -->
-              <.link navigate={~p"/pekerja/elaun"}
-                    class="bg-gray-500 text-white rounded-lg px-6 py-2 shadow-md hover:bg-gray-600">
-                Kembali
-              </.link>
+            <.link navigate={~p"/pekerja/elaun"} class="bg-gray-500 text-white rounded-lg px-6 py-2 shadow-md hover:bg-gray-600">
+              Kembali
+            </.link>
           </div>
+
+          <!-- Modal: Item form (shown when live_action == :new_item or :edit_item) -->
+          <%= if @modal_item_action in [:new, :edit] do %>
+            <.live_component
+              module={SpkpProjectWeb.TuntutanSayaLive.FormComponent}
+              id="item_elaun_pekerja_form"
+              item_elaun_pekerja={@modal_item_item}
+              elaun={@elaun}
+              action={@modal_item_action}
+              modal={true}
+            />
+          <% end %>
         </div>
       </div>
     </div>

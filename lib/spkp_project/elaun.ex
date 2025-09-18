@@ -21,22 +21,36 @@ defmodule SpkpProject.Elaun do
     |> Repo.preload([:item_elaun_pekerja, maklumat_pekerja: :user])
   end
 
-  # ✅ Pagination function
-  def list_elaun_pekerja_paginated(page \\ 1, per_page \\ 5) do
+  #Supaya admin tidak nampak status draft dalam panel admin
+  def list_elaun_pekerja_paginated(page \\ 1, per_page \\ 5, for_admin \\ false) do
     offset = (page - 1) * per_page
 
-    query =
+    base_query =
       from e in ElaunPekerja,
-        order_by: [desc: e.inserted_at],
-        offset: ^offset,
-        limit: ^per_page
+        order_by: [desc: e.inserted_at]
+
+    # Kalau for_admin true, tapis draft
+    base_query =
+      if for_admin do
+        from e in base_query,
+          where: e.status_permohonan != "draft"
+      else
+        base_query
+      end
 
     data =
-      query
+      base_query
+      |> offset(^offset)
+      |> limit(^per_page)
       |> Repo.all()
       |> Repo.preload(maklumat_pekerja: :user)
 
-    total_count = Repo.aggregate(ElaunPekerja, :count, :id)
+    total_count =
+      base_query
+      |> exclude(:offset)
+      |> exclude(:limit)
+      |> exclude(:preload)
+      |> Repo.aggregate(:count, :id)
 
     %{
       data: data,
@@ -46,6 +60,9 @@ defmodule SpkpProject.Elaun do
       total_pages: div(total_count + per_page - 1, per_page)
     }
   end
+
+
+
 
   # -------------------------
   # PAGINATION UNTUK ELAUN MENGIKUT PEKERJA
@@ -161,7 +178,8 @@ defmodule SpkpProject.Elaun do
     ElaunPekerja.changeset(elaun_pekerja, attrs)
   end
 
-  def search_elaun_pekerja(query, page, per_page) do
+  #Searchbar elaun_pekerja panel admin dan tapis supaya status draft tidak nampak
+  def search_elaun_pekerja(query, page, per_page, for_admin \\ false) do
     offset = (page - 1) * per_page
 
     base_query =
@@ -174,14 +192,21 @@ defmodule SpkpProject.Elaun do
         offset: ^offset,
         limit: ^per_page
 
+    # tapis draft kalau for_admin true
+    base_query =
+      if for_admin do
+        from e in base_query,
+          where: e.status_permohonan != "draft"
+      else
+        base_query
+      end
+
     data = Repo.all(base_query)
 
     total_count =
-      from(e in ElaunPekerja,
-        join: m in assoc(e, :maklumat_pekerja),
-        join: u in assoc(m, :user),
-        where: ilike(u.full_name, ^"%#{query}%")
-      )
+      base_query
+      |> exclude(:preload)
+      |> exclude(:order_by)
       |> Repo.aggregate(:count, :id)
 
     %{
@@ -192,6 +217,8 @@ defmodule SpkpProject.Elaun do
       total_pages: div(total_count + per_page - 1, per_page)
     }
   end
+
+
 
   # -------------------------
   # ITEM ELAUN PEKERJA

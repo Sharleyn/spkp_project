@@ -6,7 +6,7 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    result = Elaun.list_elaun_pekerja_paginated(1,5)
+    result = Elaun.list_elaun_pekerja_paginated(1,5, true)
 
     {:ok,
      socket
@@ -80,7 +80,7 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Index do
 
     results =
       if socket.assigns.query == "" do
-        Elaun.list_elaun_pekerja_paginated(page, socket.assigns.per_page)
+        Elaun.list_elaun_pekerja_paginated(page, socket.assigns.per_page, true)
       else
         Elaun.search_elaun_pekerja(socket.assigns.query, page, socket.assigns.per_page)
       end
@@ -97,9 +97,9 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Index do
   def handle_event("search", %{"q" => query}, socket) do
     results =
       if query == "" do
-        Elaun.list_elaun_pekerja_paginated(1, socket.assigns.per_page)
+        Elaun.list_elaun_pekerja_paginated(1, socket.assigns.per_page, true)
       else
-        Elaun.search_elaun_pekerja(query, 1, socket.assigns.per_page)
+        Elaun.search_elaun_pekerja(query, 1, socket.assigns.per_page, true)
       end
 
     {:noreply,
@@ -149,9 +149,6 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Index do
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Senarai Tuntutan</h1>
             <p class="text-gray-600">Semak dan urus tuntutan elaun pekerja</p>
           </div>
-          <.link patch={~p"/admin/elaun_pekerja/new"}>
-            <.button>Elaun Pekerja</.button>
-          </.link>
         </div>
 
           <!-- Search bar -->
