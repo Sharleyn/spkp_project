@@ -276,7 +276,9 @@ end
                        <div>
                          <p class="font-medium text-gray-800"><%= course.nama_kursus %></p>
                          <p class="text-xs text-gray-500">
-                            <%= course.tarikh_mula %> - <%= course.tarikh_akhir %> &bull; Kuota: <%= course.kuota %>
+                            <%= Calendar.strftime(course.tarikh_mula, "%d-%m-%Y") %> -
+                            <%= Calendar.strftime(course.tarikh_akhir, "%d-%m-%Y") %>
+                                &bull; Kuota: <%= course.kuota %>
                          </p>
                        </div>
                             <.link navigate={~p"/senaraikursususer"} class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200">
