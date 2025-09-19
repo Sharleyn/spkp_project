@@ -304,18 +304,25 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
               </div>
 
               <!-- Button Mohon -->
-              <div class="mt-2 flex justify-end">
-                <%= if kursus.id in @applied_ids do %>
-                   <button class="bg-gray-400 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
-                    Sudah Dimohon
-                 </button>
-                <% else %>
-                   <button phx-click="mohon" phx-value-kursus_id={kursus.id}
-                     class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
-                    Mohon
-                  </button>
-                <% end %>
-               </div>
+                 <div class="mt-2 flex justify-end">
+                    <%= cond do %>
+                      <% kursus.id in @applied_ids -> %>
+                        <button class="bg-gray-400 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+                          Sudah Dimohon
+                        </button>
+
+                    <% Date.compare(kursus.tarikh_tutup, Date.utc_today()) == :lt -> %>
+                      <button class="bg-red-500 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+                        Permohonan Ditutup
+                      </button>
+
+                    <% true -> %>
+                      <button phx-click="mohon" phx-value-kursus_id={kursus.id}
+                         class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                           Mohon
+                      </button>
+                   <% end %>
+                 </div>
               </div>
              </div>
             <% end %>
