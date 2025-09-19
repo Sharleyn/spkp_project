@@ -26,12 +26,6 @@ defmodule SpkpProjectWeb.Endpoint do
     gzip: false,
     only: ~w(assets fonts images favicon.ico robots.txt uploads)
 
-
-  plug Plug.Static,
-  at: "/uploads",
-  from: Path.expand("./uploads"),
-  gzip: false
-
   # Serve uploaded files
     plug Plug.Static,
     at: "/uploads",
