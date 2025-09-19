@@ -275,7 +275,7 @@ end
                        <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl shadow hover:shadow-md transition-shadow duration-200">
                        <div>
                          <p class="font-medium text-gray-800"><%= course.nama_kursus %></p>
-                         <p class="text-xs text-gray-500">
+                         <p class="text-xs text-gray-500">Tarikh:
                             <%= Calendar.strftime(course.tarikh_mula, "%d-%m-%Y") %> -
                             <%= Calendar.strftime(course.tarikh_akhir, "%d-%m-%Y") %>
                                 &bull; Kuota: <%= course.kuota %>
