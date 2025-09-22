@@ -5,16 +5,25 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
   @impl true
   def mount(socket) do
     {:ok,
-     socket
-     |> allow_upload(:gambar_anjuran,
-       accept: ~w(.jpg .jpeg .png),
-       max_entries: 1
-     )
-     |> allow_upload(:gambar_kursus,
-       accept: ~w(.jpg .jpeg .png),
-       max_entries: 1
-     )}
+    socket
+    |> allow_upload(:gambar_anjuran,
+      accept: ~w(.jpg .jpeg .png),
+      max_entries: 1
+    )
+    |> allow_upload(:gambar_kursus,
+      accept: ~w(.jpg .jpeg .png),
+      max_entries: 1
+    )
+    |> allow_upload(:nota_kursus,
+      accept: ~w(.pdf),
+      max_entries: 1
+    )
+    |> allow_upload(:jadual_kursus,
+      accept: ~w(.pdf),
+      max_entries: 1
+    )}
   end
+
 
   @impl true
   def render(assigns) do
@@ -42,8 +51,8 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
           label="Status Kursus"
           prompt="-- Pilih status --"
           options={[
-            {"Aktif", "Aktif"},
-            {"Akan Datang", "Akan Datang"},
+            {"Buka", "Buka"},
+            {"Tutup", "Tutup"},
             {"Tamat", "Tamat"}
           ]}
         />
@@ -125,6 +134,46 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
           ]}
         /> <.input field={@form[:kuota]} type="number" label="Kuota" />
         <.input field={@form[:tarikh_tutup]} type="date" label="Tarikh tutup" />
+        <!-- Upload Nota Kursus -->
+        <div class="mb-4">
+          <label class="block font-semibold mb-2">Nota Kursus (PDF)</label>
+
+          <%= for entry <- @uploads.nota_kursus.entries do %>
+            <div class="mb-2">
+              <p><%= entry.client_name %> (<%= entry.progress %>%)</p>
+              <progress value={entry.progress} max="100"></progress>
+            </div>
+          <% end %>
+
+          <%= if @kursuss.nota_kursus && @uploads.nota_kursus.entries == [] do %>
+            <a href={@kursuss.nota_kursus} target="_blank" class="text-blue-600 underline">
+              Lihat Nota Kursus
+            </a>
+          <% end %>
+
+          <.live_file_input upload={@uploads.nota_kursus} />
+        </div>
+
+        <!-- Upload Jadual Kursus -->
+        <div class="mb-4">
+          <label class="block font-semibold mb-2">Jadual Kursus (PDF)</label>
+
+          <%= for entry <- @uploads.jadual_kursus.entries do %>
+            <div class="mb-2">
+              <p><%= entry.client_name %> (<%= entry.progress %>%)</p>
+              <progress value={entry.progress} max="100"></progress>
+            </div>
+          <% end %>
+
+          <%= if @kursuss.jadual_kursus && @uploads.jadual_kursus.entries == [] do %>
+            <a href={@kursuss.jadual_kursus} target="_blank" class="text-blue-600 underline">
+              Lihat Jadual Kursus
+            </a>
+          <% end %>
+
+          <.live_file_input upload={@uploads.jadual_kursus} />
+        </div>
+
         <:actions>
         <.button phx-disable-with="Saving...">Simpan</.button>
           <.link
@@ -219,9 +268,39 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
       end)
       |> List.first()
 
+    nota_kursus =
+      consume_uploaded_entries(socket, :nota_kursus, fn %{path: path}, entry ->
+        uploads_dir = Path.expand("./uploads")
+        File.mkdir_p!(uploads_dir)
+
+        ext = Path.extname(entry.client_name)
+        unique_name = "#{System.unique_integer([:positive])}#{ext}"
+        dest = Path.join(uploads_dir, unique_name)
+
+        File.cp!(path, dest)
+        {:ok, "/uploads/#{unique_name}"}
+      end)
+      |> List.first()
+
+    jadual_kursus =
+      consume_uploaded_entries(socket, :jadual_kursus, fn %{path: path}, entry ->
+        uploads_dir = Path.expand("./uploads")
+        File.mkdir_p!(uploads_dir)
+
+        ext = Path.extname(entry.client_name)
+        unique_name = "#{System.unique_integer([:positive])}#{ext}"
+        dest = Path.join(uploads_dir, unique_name)
+
+        File.cp!(path, dest)
+        {:ok, "/uploads/#{unique_name}"}
+      end)
+      |> List.first()
+
     params
     |> maybe_put("gambar_anjuran", gambar_anjuran, socket.assigns.kursuss.gambar_anjuran)
     |> maybe_put("gambar_kursus", gambar_kursus, socket.assigns.kursuss.gambar_kursus)
+    |> maybe_put("nota_kursus", nota_kursus, socket.assigns.kursuss.nota_kursus)
+    |> maybe_put("jadual_kursus", jadual_kursus, socket.assigns.kursuss.jadual_kursus)
   end
 
   defp maybe_put(params, key, new_val, old_val) do

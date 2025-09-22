@@ -160,9 +160,11 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
                   <div class="flex-1 p-3 border-r border-gray-400"><span class="text-black text-xs">RM <%= item.jumlah %></span></div>
                   <div class="flex-1 p-3">
                     <%= if @elaun.status_permohonan == "draft" do %>
-                      <button phx-click="edit_item" phx-value-id={item.id} class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">
+                      <.link
+                        patch={~p"/pekerja/elaun/#{@elaun.id}?action=edit_item&id_item=#{item.id}"}
+                        class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">
                         Edit
-                      </button>
+                      </.link>
                     <% else %>
                       <span class="text-gray-400 italic text-xs">Locked</span>
                     <% end %>

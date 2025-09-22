@@ -231,7 +231,11 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
           <:col :let={item} label="Jumlah"><%= item.jumlah %></:col>
 
           <:action :let={item}>
-            <.link patch={~p"/pekerja/elaun/#{item.elaun_pekerja_id}/item_elaun_pekerja/#{item.id}/edit"}>Edit</.link>
+
+            <%= if @elaun do %>
+              <.link patch={~p"/pekerja/elaun/#{@elaun.id}?action=edit_item&id_item=#{item.id}"}>Edit</.link>
+            <% end %>
+
             <.link phx-click={JS.push("delete", value: %{id: item.id})} data-confirm="Are you sure?">Delete</.link>
           </:action>
         </.table>

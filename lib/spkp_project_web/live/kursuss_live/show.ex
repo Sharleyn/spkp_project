@@ -109,6 +109,45 @@ defmodule SpkpProjectWeb.KursussLive.Show do
             <dt class="text-gray-600">Tarikh Tutup</dt>
             <dd class="font-medium text-gray-900"><%= @kursuss.tarikh_tutup %></dd>
           </div>
+
+      <!-- Nota & Jadual Kursus -->
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Nota Kursus -->
+            <div>
+              <h3 class="text-gray-700 font-medium mb-2">Nota Kursus</h3>
+              <%= if @kursuss.nota_kursus do %>
+                <div class="border rounded-lg overflow-hidden">
+                  <iframe
+                    src={@kursuss.nota_kursus}
+                    type="application/pdf"
+                  >
+                    PDF tidak dapat dipaparkan.
+                    <a href={@kursuss.nota_kursus} target="_blank">Muat Turun di sini</a>.
+                  </iframe>
+                </div>
+              <% else %>
+                <span class="text-gray-400">Tiada nota kursus</span>
+              <% end %>
+            </div>
+
+            <!-- Jadual Kursus -->
+            <div>
+              <h3 class="text-gray-700 font-medium mb-2">Jadual Kursus</h3>
+              <%= if @kursuss.jadual_kursus do %>
+                <div class="border rounded-lg overflow-hidden">
+                  <iframe
+                    src={@kursuss.jadual_kursus}
+                    type="application/pdf"
+                  >
+                    PDF tidak dapat dipaparkan.
+                    <a href={@kursuss.jadual_kursus} target="_blank">Muat Turun di sini</a>.
+                  </iframe>
+                </div>
+              <% else %>
+                <span class="text-gray-400">Tiada jadual kursus</span>
+              <% end %>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -82,7 +82,7 @@ defmodule SpkpProjectWeb.KursussLive.Index do
 
     socket =
       socket
-      |> stream(:kursus, results.data)   # set semula stream mengikut page baru
+      |> stream(:kursus, results.data, reset: true)   # set semula stream mengikut page baru
       |> assign(:page, results.page)
       |> assign(:total_pages, results.total_pages)
       |> assign(:kursus_collection, results.data) # optional
@@ -101,7 +101,7 @@ defmodule SpkpProjectWeb.KursussLive.Index do
 
     socket =
       socket
-      |> stream(:kursus, results.data)   # set semula stream hasil carian
+      |> stream(:kursus, results.data, reset: true)   # set semula stream hasil carian
       |> assign(:query, query)
       |> assign(:page, results.page)
       |> assign(:total_pages, results.total_pages)

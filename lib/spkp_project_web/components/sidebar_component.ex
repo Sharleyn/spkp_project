@@ -117,6 +117,7 @@ defmodule SpkpProjectWeb.SidebarComponent do
           Permohonan
         </.link>
         <% end %>
+
         <!-- Peserta -->
         <div>
           <div
@@ -132,8 +133,8 @@ defmodule SpkpProjectWeb.SidebarComponent do
             <div class="ml-4">
              <%= if @role == "admin" do %>
                   <.link
-                    navigate={~p"/admin/senaraipeserta"}
-                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/senaraipeserta", do: "bg-gray-600 font-bold"}"}
+                    navigate={~p"/admin/peserta"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/admin/peserta", do: "bg-gray-600 font-bold"}"}
               >
                 Senarai Peserta
               </.link>
