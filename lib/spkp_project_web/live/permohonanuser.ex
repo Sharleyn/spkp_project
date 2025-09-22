@@ -213,8 +213,8 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
 
         <!-- Actions -->
            <div class="flex mt-4 gap-2">
-             <%= if permohonan.status == "Diterima" and permohonan.nota_kursus do %>
-               <a href={permohonan.nota_kursus}
+             <%= if permohonan.status == "Diterima" and permohonan.kursus.nota_kursus do %>
+               <a href={permohonan.kursus.nota_kursus}
                  class="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600">
                    📄 Muat Turun Nota
               </a>
@@ -224,8 +224,8 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               </button>
              <% end %>
 
-             <%= if permohonan.status == "Diterima" and permohonan.jadual_kursus do %>
-               <a href={permohonan.jadual_kursus}
+             <%= if permohonan.status == "Diterima" and permohonan.kursus.jadual_kursus do %>
+               <a href={permohonan.kursus.jadual_kursus}
                  class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
                    🗓️ Muat Turun Jadual
                </a>
