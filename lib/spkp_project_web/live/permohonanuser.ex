@@ -205,11 +205,11 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
 
         <!-- Butiran Kursus -->
            <div class="mt-4 text-sm text-gray-700 space-y-1">
-             <p><strong>Tarikh Mula:</strong> <%= permohonan.kursus.tarikh_mula %></p>
-             <p><strong>Tarikh Akhir:</strong> <%= permohonan.kursus.tarikh_akhir %></p>
+             <p><strong>Tarikh Mula:</strong> <%= Calendar.strftime(permohonan.kursus.tarikh_mula, "%d-%m-%Y") %></p>
+             <p><strong>Tarikh Akhir:</strong> <%= Calendar.strftime(permohonan.kursus.tarikh_akhir, "%d-%m-%Y") %></p>
              <p><strong>Tempat:</strong> <%= permohonan.kursus.tempat %></p>
              <p><strong>Anjuran:</strong> <%= permohonan.kursus.anjuran %></p>
-         </div>
+           </div>
 
         <!-- Actions -->
            <div class="flex mt-4 gap-2">
