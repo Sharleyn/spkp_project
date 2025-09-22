@@ -367,54 +367,72 @@ defmodule SpkpProjectWeb.UserProfileLive do
             />
           </div>
 
-          <!-- Upload IC Attachment -->
-            <div class="border-2 border-indigo-300 rounded-xl mt-4 mb-4 p-4">
-            <h3 class="flex items-center font-semibold mb-4 space-x-2">
-              <img src={~p"/images/paper.png"} alt="Lampiran Tambahan" class="w-5 h-5" />
-              <span>Lampiran Tambahan</span>
-            </h3>
-             <label class="block font-semibold mb-2">Salinan Kad Pengenalan</label>
+         <!-- Upload IC Attachment -->
+<div class="border-2 border-indigo-300 rounded-xl mt-4 mb-4 p-4">
+  <h3 class="flex items-center font-semibold mb-4 space-x-2">
+    <img src={~p"/images/paper.png"} alt="Lampiran Tambahan" class="w-5 h-5" />
+    <span>Lampiran Tambahan</span>
+  </h3>
 
-             <!-- Preview sebelum submit -->
-             <%= for entry <- @uploads.ic_attachment.entries do %>
-               <div class="mb-2">
-                 <.live_img_preview entry={entry} class="w-32 h-32 rounded-lg border" />
-                 <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
-               </div>
-             <% end %>
+  <label class="block font-semibold mb-2">Salinan Kad Pengenalan</label>
 
-             <!-- Gambar lama bila edit -->
-             <%= if @profile_changeset.data.ic_attachment do %>
-               <% mime = MIME.from_path(@profile_changeset.data.ic_attachment) %>
+  <!-- Preview sebelum submit -->
+  <%= for entry <- @uploads.ic_attachment.entries do %>
+    <div class="mb-2">
+      <.live_img_preview entry={entry} class="w-32 h-32 rounded-lg border object-cover" />
+      <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+    </div>
+  <% end %>
 
-               <%= cond do %>
-                 <% mime in ["image/jpeg", "image/png"] -> %>
-                   <img src={@profile_changeset.data.ic_attachment} class="w-32 h-32 rounded-lg border" />
+  <!-- Gambar lama bila edit -->
+  <%= if @profile_changeset.data.ic_attachment do %>
+    <% mime = MIME.from_path(@profile_changeset.data.ic_attachment) %>
 
-                 <% mime == "application/pdf" -> %>
-                    <a href={@profile_changeset.data.ic_attachment} target="_blank" class="text-blue-600 underline">
-                      📄 Lihat PDF
-                  </a>
+    <%= cond do %>
+      <% mime in ["image/jpeg", "image/png"] -> %>
+        <!-- Preview image -->
+        <img src={@profile_changeset.data.ic_attachment}
+             class="w-32 h-32 rounded-lg border object-cover" />
 
-                 <% true -> %>
-                   <a href={@profile_changeset.data.ic_attachment} target="_blank" class="text-blue-600 underline">
-                    📎 Muat Turun Fail
-                  </a>
-               <% end %>
-             <% end %>
+      <% mime == "application/pdf" -> %>
+        <!-- Preview PDF kecil -->
+        <iframe src={@profile_changeset.data.ic_attachment}
+                class="w-32 h-32 border rounded-lg"
+                frameborder="0"></iframe>
+        <!-- Link buka besar -->
+        <div>
+          <a href={@profile_changeset.data.ic_attachment}
+             target="_blank"
+             class="text-blue-600 underline">
+             📄 Buka PDF
+          </a>
+        </div>
 
-             <!-- Input upload -->
-               <div class="mt-2">
-               <.live_file_input upload={@uploads.ic_attachment} />
-               </div>
-              </div>
+      <% true -> %>
+        <!-- Fail lain -->
+        <a href={@profile_changeset.data.ic_attachment}
+           target="_blank"
+           class="text-blue-600 underline">
+          📎 Muat Turun Fail
+        </a>
+    <% end %>
+  <% end %>
 
-               <:actions>
-                 <.button
-                    type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition mt-4 w-fit mx-auto">
-                        💾 Simpan Profil
-                </.button>
-              </:actions>
+  <!-- Input upload -->
+  <div class="mt-2">
+    <.live_file_input upload={@uploads.ic_attachment} />
+  </div>
+</div>
+
+<:actions>
+  <.button
+     type="submit"
+     class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition mt-4 w-fit mx-auto">
+     💾 Simpan Profil
+  </.button>
+</:actions>
+
+
 
             </.simple_form>
           </div>
