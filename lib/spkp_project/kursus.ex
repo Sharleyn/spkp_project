@@ -254,4 +254,11 @@ end
   def change_kursuss(%Kursuss{} = kursuss, attrs \\ %{}) do
     Kursuss.changeset(kursuss, attrs)
   end
+
+  def get_available_courses_count do
+    from(k in Kursuss,
+      where: k.status_kursus in ["Aktif", "Akan Datang"]
+    )
+    |> Repo.aggregate(:count, :id)
   end
+end
