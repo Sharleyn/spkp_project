@@ -100,15 +100,8 @@ defmodule SpkpProjectWeb.UserProfileLive do
   def handle_event("save_profile", %{"user_profile" => profile_params}, socket) do
     current_user = socket.assigns.current_user
 
-    # Debug logging for upload state
-    IO.inspect(socket.assigns.uploads.ic_attachment.entries, label: "UPLOAD ENTRIES")
-    IO.inspect(profile_params, label: "ORIGINAL PARAMS")
-
     # Process uploads using the working pattern from KursussLive.FormComponent
     profile_params = save_uploads(socket, profile_params, current_user.id)
-
-    # Debug logging
-    IO.inspect(profile_params, label: "FINAL PARAMS WITH UPLOADS")
 
     # Update user + user_profile
     case Accounts.update_user_profile(current_user, profile_params) do
@@ -129,8 +122,6 @@ defmodule SpkpProjectWeb.UserProfileLive do
             education: profile.education,
             ic_attachment: profile.ic_attachment
           })
-
-        IO.inspect(profile_changeset, label: "profile_changeset")
 
         {:noreply,
          socket

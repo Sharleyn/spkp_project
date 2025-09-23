@@ -436,15 +436,13 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
       case Userpermohonan.create_application(user_id, kursus_id) do
         {:ok, _application} ->
-          IO.puts("✅ Permohonan berjaya disimpan!")
           {:noreply,
            socket
            |> put_flash(:info, "Permohonan berjaya dihantar.")
            |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
            |> redirect(to: ~p"/permohonanuser")}
 
-        {:error, changeset} ->
-          IO.inspect(changeset.errors, label: "❌ Gagal simpan")
+        {:error, _changeset} ->
           {:noreply,
            socket
            |> put_flash(:error, "Gagal menghantar permohonan.")}
