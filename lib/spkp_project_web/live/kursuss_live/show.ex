@@ -73,14 +73,19 @@ defmodule SpkpProjectWeb.KursussLive.Show do
 
         <!-- Images -->
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <%= if @kursuss.gambar_anjuran do %>
           <div>
-            <h3 class="text-gray-700 font-medium mb-2">Gambar Anjuran</h3>
-            <%= if @kursuss.gambar_anjuran do %>
-              <img src={@kursuss.gambar_anjuran} alt="Gambar anjuran" class="w-48 h-48 rounded-lg border" />
-            <% else %>
-              <span class="text-gray-400">Tiada gambar</span>
-            <% end %>
+            <img src={@kursuss.gambar_anjuran} class="w-48 h-48 rounded-lg border" />
+            <div class="mt-2">
+              <.link href={@kursuss.gambar_anjuran} target="_blank" class="text-blue-600 underline">
+                Lihat Penuh
+              </.link>
+            </div>
           </div>
+        <% else %>
+          <span class="text-gray-400">Tiada gambar</span>
+        <% end %>
+
           <div>
             <h3 class="text-gray-700 font-medium mb-2">Gambar Kursus</h3>
             <%= if @kursuss.gambar_kursus do %>

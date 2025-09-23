@@ -32,6 +32,8 @@ defmodule SpkpProjectWeb.Endpoint do
     from: Path.expand("./uploads"),
     gzip: false
 
+
+
   # Pastikan uploads directory wujud
   # Ini akan dijalankan setiap kali endpoint start
 

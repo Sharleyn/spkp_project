@@ -50,11 +50,17 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
             <p><strong>Pendidikan:</strong> <%= profile.education %></p>
 
             <%= if profile.ic_attachment do %>
-              <p><strong>Lampiran IC:</strong>
-                <a href={profile.ic_attachment} target="_blank" class="text-blue-600 underline">
-                  Lihat Dokumen
-                </a>
-              </p>
+              <p><strong>Lampiran IC:</strong></p>
+              <div class="border rounded-lg overflow-hidden h-96">
+                <iframe
+                  src={profile.ic_attachment}
+                  type="application/pdf"
+                  class="w-full h-full"
+                >
+                  Dokumen tidak dapat dipaparkan.
+                  <a href={profile.ic_attachment} target="_blank">Muat Turun</a>
+                </iframe>
+              </div>
             <% end %>
           <% end %>
 
@@ -74,11 +80,17 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
 
 
           <%= if @permohonan.kursus && @permohonan.kursus.jadual_kursus do %>
-            <p><strong>Jadual Kursus:</strong>
-              <a href={@permohonan.kursus.jadual_kursus} target="_blank" class="text-blue-600 underline">
-                Lihat PDF
-              </a>
-            </p>
+            <p><strong>Jadual Kursus:</strong></p>
+            <div class="border rounded-lg overflow-hidden h-96">
+              <iframe
+                src={@permohonan.kursus.jadual_kursus}
+                type="application/pdf"
+                class="w-full h-full"
+              >
+                PDF tidak dapat dipaparkan.
+                <a href={@permohonan.kursus.jadual_kursus} target="_blank">Muat Turun</a>
+              </iframe>
+            </div>
           <% end %>
         </div>
 

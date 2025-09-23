@@ -67,15 +67,18 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
             <th class="px-4 py-2">Kursus Dipohon</th>
             <th class="px-4 py-2">Tarikh Permohonan</th>
             <th class="px-4 py-2">Status</th>
-            <th class="px-4 py-2">Nota Kursus</th>
-            <th class="px-4 py-2">Jadual Kursus</th>
             <th class="px-4 py-2">Tindakan</th>
           </tr>
         </thead>
+
         <tbody>
           <%= for p <- @permohonan do %>
             <tr class="border-t cursor-pointer hover:bg-gray-100"
                 phx-click={JS.navigate(~p"/admin/permohonan/#{p.id}")}>
+
+                      <!-- ✅ Column debug -->
+              <td class="px-4 py-2"><%= inspect(p.id) %></td>
+
               <td class="px-4 py-2"><%= p.user && p.user.full_name %></td>
               <td class="px-4 py-2"><%= p.user && p.user.email %></td>
               <td class="px-4 py-2"><%= p.kursus && p.kursus.nama_kursus %></td>
@@ -91,21 +94,7 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
                   <%= p.status %>
                 </span>
               </td>
-              <td class="px-4 py-2">
-            <%= if p.kursus && p.kursus.nota_kursus do %>
-              <a href={p.kursus.nota_kursus} target="_blank" class="text-blue-600 underline">Lihat Nota</a>
-            <% else %>
-              <span class="text-gray-400 text-xs">Tiada</span>
-            <% end %>
-          </td>
 
-          <td class="px-4 py-2">
-            <%= if p.kursus && p.kursus.jadual_kursus do %>
-              <a href={p.kursus.jadual_kursus} target="_blank" class="text-blue-600 underline">Lihat Jadual</a>
-            <% else %>
-              <span class="text-gray-400 text-xs">Tiada</span>
-            <% end %>
-          </td>
               <td class="px-4 py-2 space-x-2">
                 <.link navigate={~p"/admin/permohonan/#{p.id}"} class="bg-gray-600 text-white px-2 py-1 rounded">
                   Lihat
