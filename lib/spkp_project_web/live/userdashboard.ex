@@ -11,14 +11,14 @@ defmodule SpkpProjectWeb.UserDashboardLive do
     # ✅ Kira jumlah Kursus Tersedia (hanya Aktif & Akan Datang) - (CARD KURSUS TERSEDIA)
   available_courses_count =
     from(k in SpkpProject.Kursus.Kursuss,
-      where: k.status_kursus in ["Aktif", "Akan Datang"]
+      where: k.status_kursus in ["Buka", "Tutup"]
     )
     |> SpkpProject.Repo.aggregate(:count, :id)
 
     # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini" (CARD KURSUS TERKINI)
   available_courses =
     from(k in SpkpProject.Kursus.Kursuss,
-      where: k.status_kursus in ["Aktif", "Akan Datang"],
+      where: k.status_kursus in ["Buka", "Tutup"],
       order_by: [desc: k.inserted_at],
       limit: 3
     )
