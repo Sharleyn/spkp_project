@@ -227,7 +227,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
 
                    <% true -> %>
                       <a href={permohonan.kursus.nota_kursus}
-                        class="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600">
+                        class="px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600">
                          📄 Muat Turun Nota
                       </a>
                   <% end %>
@@ -246,7 +246,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
 
                     <% true -> %>
                        <a href={permohonan.kursus.jadual_kursus}
-                         class="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600">
+                         class="px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600">
                           🗓️ Muat Turun Jadual
                        </a>
                     <% end %>
