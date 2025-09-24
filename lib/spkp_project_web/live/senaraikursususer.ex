@@ -9,10 +9,17 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    current_user = socket.assigns.current_user
+    # Pastikan preload dulu
+    current_user = Repo.preload(socket.assigns.current_user, :user_profile)
+    umur_pemohon = current_user.user_profile.age
 
     # Ambil semua kursus + preload kategori
-    kursus = Repo.all(Kursuss) |> Repo.preload(:kursus_kategori)
+    kursus =
+      from(k in Kursuss,
+        where: ^umur_pemohon <= k.had_umur,   # ✅ umur pemohon mesti <= had umur kursus
+        preload: [:kursus_kategori]
+      )
+      |> Repo.all()
 
     # Senarai kategori unik
     categories =
@@ -50,6 +57,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:selected_category, "")
      |> assign(:selected_type, "")
      |> assign(:current_user_name, current_user.full_name)
+     |> assign(:current_user, current_user)   # ⬅ simpan user yang sudah preload
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
      |> assign(:applied_ids, applied_ids)
@@ -431,21 +439,39 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     end
 
     def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
-      user_id = socket.assigns.current_user.id
-      kursus_id = String.to_integer(kursus_id)   # 🔥 convert ke integer
+      user = Repo.preload(socket.assigns.current_user, :user_profile)
+      user_id = user.id
+      umur_pemohon = user.user_profile.age
+      kursus_id = String.to_integer(kursus_id)
 
-      case Userpermohonan.create_application(user_id, kursus_id) do
-        {:ok, _application} ->
+      # Ambil kursus untuk check had umur
+      kursus = Repo.get!(Kursuss, kursus_id)
+
+      cond do
+        is_nil(umur_pemohon) ->
           {:noreply,
            socket
-           |> put_flash(:info, "Permohonan berjaya dihantar.")
-           |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
-           |> redirect(to: ~p"/permohonanuser")}
+           |> put_flash(:error, "Profil anda tidak lengkap. Sila kemas kini umur sebelum memohon.")}
 
-        {:error, _changeset} ->
+        umur_pemohon > kursus.had_umur ->
           {:noreply,
            socket
-           |> put_flash(:error, "Gagal menghantar permohonan.")}
+           |> put_flash(:error, "Umur anda melebihi had umur untuk kursus ini.")}
+
+        true ->
+          case Userpermohonan.create_application(user_id, kursus_id) do
+            {:ok, _application} ->
+              {:noreply,
+               socket
+               |> put_flash(:info, "Permohonan berjaya dihantar.")
+               |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
+               |> redirect(to: ~p"/permohonanuser")}
+
+            {:error, _changeset} ->
+              {:noreply,
+               socket
+               |> put_flash(:error, "Gagal menghantar permohonan.")}
+          end
       end
     end
 
