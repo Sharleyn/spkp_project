@@ -429,7 +429,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
               class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition mt-4 w-fit mx-auto">
                💾 Simpan Profil
            </.button>
-          </:actions>s
+          </:actions>
             </.simple_form>
           </div>
          </div>
