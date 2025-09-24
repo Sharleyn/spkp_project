@@ -229,12 +229,12 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                  <%= cond do %>
                    <% permohonan.status != "Diterima" -> %>
                      <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
-                       🚫 Nota belum boleh dimuat turun
+                       🚫 Nota Belum Boleh Dimuat Turun
                     </button>
 
                    <% is_nil(permohonan.kursus.nota_kursus) -> %>
                       <button disabled class="px-4 py-2 rounded-lg bg-yellow-200 text-yellow-800 cursor-not-allowed">
-                        ⏳ Nota belum dimuat naik oleh admin
+                        ⏳ Nota Belum Dimuat Naik
                       </button>
 
                    <% true -> %>
@@ -248,12 +248,12 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                  <%= cond do %>
                     <% permohonan.status != "Diterima" -> %>
                        <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
-                         🚫 Jadual belum boleh dimuat turun
+                         🚫 Jadual Belum Boleh Dimuat Turun
                       </button>
 
                     <% is_nil(permohonan.kursus.jadual_kursus) -> %>
                        <button disabled class="px-4 py-2 rounded-lg bg-yellow-200 text-yellow-800 cursor-not-allowed">
-                          ⏳ Jadual belum dimuat naik oleh admin
+                          ⏳ Jadual Belum Dimuat Naik
                       </button>
 
                     <% true -> %>
