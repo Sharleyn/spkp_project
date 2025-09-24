@@ -5,6 +5,8 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    role = socket.assigns.current_user.role
+
     participants_stats = %{
       total_participants: 50,
       active_participants: 50,
@@ -26,10 +28,15 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
 
     {:ok,
      socket
+     |> assign(:role, role)
      |> assign(:participants_stats, participants_stats)
      |> assign(:course_categories, course_categories)
      |> assign(:current_path, socket.assigns[:uri] && URI.parse(socket.assigns.uri).path || "/")}
   end
+
+  # helper untuk bina route ikut role
+  defp kategori_path("admin", id), do: ~p"/admin/kategori/#{id}"
+  defp kategori_path("pekerja", id), do: ~p"/pekerja/kategori/#{id}"
 
   @impl true
   def render(assigns) do
@@ -54,7 +61,7 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-              <h1 class="text-xl font-semibold text-gray-800">Kursus Hub Admin Dashboard</h1>
+              <h1 class="text-xl font-semibold text-gray-800">Kursus Hub Dashboard</h1>
             </div>
 
             <div class="flex items-center space-x-4">
@@ -63,7 +70,9 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
                 Logout
               </.link>
               <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <span class="text-sm font-medium text-gray-700">A</span>
+                <span class="text-sm font-medium text-gray-700">
+                  <%= String.first(@current_user.full_name || "U") %>
+                </span>
               </div>
             </div>
           </div>
@@ -84,9 +93,6 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
               + Tambah peserta
             </button>
           </div>
-
-          <!-- Statistics Cards -->
-          <!-- ... (kekalkan yang lama) ... -->
 
           <!-- Course Categories Table -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -111,7 +117,7 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200"><%= category.name %></td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200"><%= category.course_count %></td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200">
-                        <.link navigate={~p"/admin/kategori/#{category.id}"} class="text-blue-600 hover:text-blue-800 font-medium">
+                        <.link navigate={kategori_path(@role, category.id)} class="text-blue-600 hover:text-blue-800 font-medium">
                           Lihat
                         </.link>
                       </td>

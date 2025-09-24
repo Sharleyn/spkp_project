@@ -8,18 +8,18 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
   def mount(_params, _session, socket) do
     role = socket.assigns.current_user.role
 
-  {:ok,
-   socket
-   |> assign(:role, role)
-   |> stream(:kursus_kategori_collection, Kursus.list_kursus_kategori())}
+    {:ok,
+     socket
+     |> assign(:role, role)
+     |> stream(:kursus_kategori_collection, Kursus.list_kursus_kategori())}
   end
 
   @impl true
   def handle_params(params, uri, socket) do
     {:noreply,
-    socket
-    |> assign(:current_path, URI.parse(uri).path)
-    |> apply_action(socket.assigns.live_action, params)}
+     socket
+     |> assign(:current_path, URI.parse(uri).path)
+     |> apply_action(socket.assigns.live_action, params)}
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -61,7 +61,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
       <!-- Sidebar -->
-       <.live_component
+      <.live_component
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
         current_view={@socket.view}
@@ -78,51 +78,66 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-
-              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
+              <h1 class="text-xl font-semibold text-gray-800">SPKP Dashboard</h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
-
-                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-              Logout
+              <span class="text-gray-600"><%= @current_user.email %></span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
               </.link>
-
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
+
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Kategori Kursus</h1>
-
             <p class="text-gray-600">Urus kursus mengikut kategori</p>
           </div>
 
-          <.link patch={~p"/admin/kursus_kategori/new"}>
+          <.link patch={
+            if @role == "admin",
+              do: ~p"/admin/kursus_kategori/new",
+              else: ~p"/pekerja/kursus_kategori/new"
+          }>
             <.button>Kategori Kursus Baru</.button>
           </.link>
         </div>
 
-
-      <.table
+        <.table
           id="kursus_kategori"
           rows={@streams.kursus_kategori_collection}
           row_click={
             fn {_id, kursus_kategori} ->
-              JS.navigate(~p"/admin/kursus_kategori/#{kursus_kategori}")
+              if @role == "admin" do
+                JS.navigate(~p"/admin/kursus_kategori/#{kursus_kategori}")
+              else
+                JS.navigate(~p"/pekerja/kursus_kategori/#{kursus_kategori}")
+              end
             end
           }
         >
-          <:col :let={{_id, kursus_kategori}} label="Kategori">{kursus_kategori.kategori}</:col>
+          <:col :let={{_id, kursus_kategori}} label="Kategori">
+            <%= kursus_kategori.kategori %>
+          </:col>
 
           <:action :let={{_id, kursus_kategori}}>
             <div class="sr-only">
-              <.link navigate={~p"/admin/kursus_kategori/#{kursus_kategori}"}>Show</.link>
+              <.link navigate={
+                if @role == "admin",
+                  do: ~p"/admin/kursus_kategori/#{kursus_kategori}",
+                  else: ~p"/pekerja/kursus_kategori/#{kursus_kategori}"
+              }>Show</.link>
             </div>
-             <.link patch={~p"/admin/kursus_kategori/#{kursus_kategori}/edit"}>Edit</.link>
+
+            <.link patch={
+              if @role == "admin",
+                do: ~p"/admin/kursus_kategori/#{kursus_kategori}/edit",
+                else: ~p"/pekerja/kursus_kategori/#{kursus_kategori}/edit"
+            }>Edit</.link>
           </:action>
 
           <:action :let={{id, kursus_kategori}}>
@@ -139,7 +154,11 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
           :if={@live_action in [:new, :edit]}
           id="kursus_kategori-modal"
           show
-          on_cancel={JS.patch(~p"/admin/kursus_kategori")}
+          on_cancel={
+            if @role == "admin",
+              do: JS.patch(~p"/admin/kursus_kategori"),
+              else: JS.patch(~p"/pekerja/kursus_kategori")
+          }
         >
           <.live_component
             module={SpkpProjectWeb.KursusKategoriLive.FormComponent}
@@ -147,7 +166,11 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
             title={@page_title}
             action={@live_action}
             kursus_kategori={@kursus_kategori}
-            patch={~p"/admin/kursus_kategori"}
+            patch={
+              if @role == "admin",
+                do: ~p"/admin/kursus_kategori",
+                else: ~p"/pekerja/kursus_kategori"
+            }
             role={@role}
           />
         </.modal>

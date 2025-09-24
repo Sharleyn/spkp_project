@@ -4,7 +4,8 @@ defmodule SpkpProjectWeb.KursussLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    role = socket.assigns.current_user.role
+    {:ok, assign(socket, :role, role)}
   end
 
   @impl true
@@ -17,6 +18,16 @@ defmodule SpkpProjectWeb.KursussLive.Show do
 
   defp page_title(:show), do: "Maklumat Kursus"
   defp page_title(:edit), do: "Kemaskini Kursus"
+
+  # Helper untuk generate path ikut role
+  defp kursus_path("admin", :index), do: ~p"/admin/kursus"
+  defp kursus_path("pekerja", :index), do: ~p"/pekerja/kursus"
+
+  defp kursus_path("admin", :show, kursus), do: ~p"/admin/kursus/#{kursus}"
+  defp kursus_path("pekerja", :show, kursus), do: ~p"/pekerja/kursus/#{kursus}"
+
+  defp kursus_path("admin", :edit, kursus), do: ~p"/admin/kursus/#{kursus}/show/edit"
+  defp kursus_path("pekerja", :edit, kursus), do: ~p"/pekerja/kursus/#{kursus}/show/edit"
 
   @impl true
   def render(assigns) do
@@ -31,7 +42,7 @@ defmodule SpkpProjectWeb.KursussLive.Show do
           <p class="text-gray-600 text-sm">Maklumat penuh kursus ini</p>
         </div>
         <div>
-          <.link patch={~p"/admin/kursus/#{@kursuss}/show/edit"} phx-click={JS.push_focus()}>
+          <.link patch={kursus_path(@role, :edit, @kursuss)} phx-click={JS.push_focus()}>
             <.button class="bg-blue-600 hover:bg-blue-700">✏️ Kemaskini</.button>
           </.link>
         </div>
@@ -73,18 +84,18 @@ defmodule SpkpProjectWeb.KursussLive.Show do
 
         <!-- Images -->
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <%= if @kursuss.gambar_anjuran do %>
-          <div>
-            <img src={@kursuss.gambar_anjuran} class="w-48 h-48 rounded-lg border" />
-            <div class="mt-2">
-              <.link href={@kursuss.gambar_anjuran} target="_blank" class="text-blue-600 underline">
-                Lihat Penuh
-              </.link>
+          <%= if @kursuss.gambar_anjuran do %>
+            <div>
+              <img src={@kursuss.gambar_anjuran} class="w-48 h-48 rounded-lg border" />
+              <div class="mt-2">
+                <.link href={@kursuss.gambar_anjuran} target="_blank" class="text-blue-600 underline">
+                  Lihat Penuh
+                </.link>
+              </div>
             </div>
-          </div>
-        <% else %>
-          <span class="text-gray-400">Tiada gambar</span>
-        <% end %>
+          <% else %>
+            <span class="text-gray-400">Tiada gambar</span>
+          <% end %>
 
           <div>
             <h3 class="text-gray-700 font-medium mb-2">Gambar Kursus</h3>
@@ -115,17 +126,14 @@ defmodule SpkpProjectWeb.KursussLive.Show do
             <dd class="font-medium text-gray-900"><%= @kursuss.tarikh_tutup %></dd>
           </div>
 
-      <!-- Nota & Jadual Kursus -->
+          <!-- Nota & Jadual Kursus -->
           <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Nota Kursus -->
             <div>
               <h3 class="text-gray-700 font-medium mb-2">Nota Kursus</h3>
               <%= if @kursuss.nota_kursus do %>
                 <div class="border rounded-lg overflow-hidden">
-                  <iframe
-                    src={@kursuss.nota_kursus}
-                    type="application/pdf"
-                  >
+                  <iframe src={@kursuss.nota_kursus} type="application/pdf">
                     PDF tidak dapat dipaparkan.
                     <a href={@kursuss.nota_kursus} target="_blank">Muat Turun di sini</a>.
                   </iframe>
@@ -140,10 +148,7 @@ defmodule SpkpProjectWeb.KursussLive.Show do
               <h3 class="text-gray-700 font-medium mb-2">Jadual Kursus</h3>
               <%= if @kursuss.jadual_kursus do %>
                 <div class="border rounded-lg overflow-hidden">
-                  <iframe
-                    src={@kursuss.jadual_kursus}
-                    type="application/pdf"
-                  >
+                  <iframe src={@kursuss.jadual_kursus} type="application/pdf">
                     PDF tidak dapat dipaparkan.
                     <a href={@kursuss.jadual_kursus} target="_blank">Muat Turun di sini</a>.
                   </iframe>
@@ -158,7 +163,7 @@ defmodule SpkpProjectWeb.KursussLive.Show do
 
       <!-- Back Button -->
       <div>
-        <.link navigate={~p"/admin/kursus"}>
+        <.link navigate={kursus_path(@role, :index)}>
           <.button class="bg-gray-500 hover:bg-gray-600">← Kembali ke Senarai Kursus</.button>
         </.link>
       </div>
@@ -169,14 +174,14 @@ defmodule SpkpProjectWeb.KursussLive.Show do
       :if={@live_action == :edit}
       id="kursuss-modal"
       show
-      on_cancel={JS.patch(~p"/admin/kursus/#{@kursuss}")}>
+      on_cancel={JS.patch(kursus_path(@role, :show, @kursuss))}>
       <.live_component
         module={SpkpProjectWeb.KursussLive.FormComponent}
         id={@kursuss.id}
         title={@page_title}
         action={@live_action}
         kursuss={@kursuss}
-        patch={~p"/admin/kursus/#{@kursuss}"}
+        patch={kursus_path(@role, :show, @kursuss)}
       />
     </.modal>
     """

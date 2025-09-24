@@ -120,7 +120,7 @@ defmodule SpkpProjectWeb.DashboardLive do
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Box 1 -->
         <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer">
-          <.link patch={~p"/admin/kursus/new?return_to=/admin/dashboard"} class="block">
+          <.link patch={if @role == "admin", do: ~p"/admin/kursus/new?return_to=/admin/dashboard", else: ~p"/pekerja/kursus/new?return_to=/pekerja/dashboard"} class="block">
             <h4 class="font-semibold text-gray-800 mb-2">Tambah kursus baru</h4>
             <p class="text-gray-600 text-sm">Cipta kursus baru untuk peserta</p>
           </.link>
@@ -137,7 +137,7 @@ defmodule SpkpProjectWeb.DashboardLive do
         <% end %>
 
         <!-- Box 3 -->
-        <.link navigate={~p"/admin/peserta"} class="block">
+        <.link navigate={if @role == "admin", do: ~p"/admin/peserta", else: ~p"/pekerja/peserta"} class="block">
           <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer">
             <h4 class="font-semibold text-gray-800 mb-2">Senarai peserta</h4>
             <p class="text-gray-600 text-sm">Senarai peserta yang mengikuti kursus</p>

@@ -61,7 +61,7 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Show do
 
       <!-- Back Button -->
       <div>
-        <.link navigate={~p"/admin/kursus_kategori"}>
+        <.link navigate={if @role == "admin", do: ~p"/admin/kursus_kategori", else: ~p"/pekerja/kursus_kategori"} class="block">
           <.button class="bg-gray-500 hover:bg-gray-600">← Kembali ke Senarai</.button>
         </.link>
       </div>
