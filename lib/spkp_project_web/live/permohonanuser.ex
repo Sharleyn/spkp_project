@@ -183,6 +183,18 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
              <div class="flex justify-between items-start">
                 <div class="flex items-center space-x-2">
 
+          <!-- Icon status -->
+              <%= case permohonan.status do %>
+                  <% "Diterima" -> %>
+                    <.icon name="hero-check-circle" class="w-6 h-6 text-green-500" />
+                  <% "Dalam Proses" -> %>
+                    <.icon name="hero-clock" class="w-6 h-6 text-yellow-500" />
+                  <% "Ditolak" -> %>
+                    <.icon name="hero-x-circle" class="w-6 h-6 text-red-500" />
+                  <% _ -> %>
+                    <.icon name="hero-information-circle" class="w-6 h-6 text-gray-400" />
+               <% end %>
+
           <!-- Nama kursus -->
             <h3 class="text-lg font-bold"><%= permohonan.kursus.nama_kursus %></h3>
           </div>
