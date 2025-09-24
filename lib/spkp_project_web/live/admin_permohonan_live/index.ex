@@ -52,14 +52,14 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Senarai Tuntutan</h1>
-            <p class="text-gray-600">Semak dan urus tuntutan elaun pekerja</p>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Senarai Permohonan</h1>
+            <p class="text-gray-600">Semak dan urus permohonan</p>
           </div>
         </div>
 
       <!-- Wrapper table -->
       <div class="px-10 w-full">
-        <table class="w-full bg-white border rounded-lg">
+        <table class="w-full bg-white border rounded-lg text-center">
         <thead>
           <tr class="bg-gray-100">
             <th class="px-4 py-2">Nama Pemohon</th>
@@ -75,9 +75,6 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
           <%= for p <- @permohonan do %>
             <tr class="border-t cursor-pointer hover:bg-gray-100"
                 phx-click={JS.navigate(~p"/admin/permohonan/#{p.id}")}>
-
-                      <!-- ✅ Column debug -->
-              <td class="px-4 py-2"><%= inspect(p.id) %></td>
 
               <td class="px-4 py-2"><%= p.user && p.user.full_name %></td>
               <td class="px-4 py-2"><%= p.user && p.user.email %></td>
@@ -99,8 +96,7 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
                 <.link navigate={~p"/admin/permohonan/#{p.id}"} class="bg-gray-600 text-white px-2 py-1 rounded">
                   Lihat
                 </.link>
-                <button phx-click="edit" phx-value-id={p.id} class="bg-blue-600 text-white px-2 py-1 rounded">Edit</button>
-                <button phx-click="delete" phx-value-id={p.id} class="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
+
               </td>
             </tr>
           <% end %>

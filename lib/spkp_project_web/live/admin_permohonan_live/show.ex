@@ -9,15 +9,22 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _uri, socket) do
+  def handle_params(%{"id" => id}, uri, socket) do
     permohonan =
       Userpermohonan
       |> Repo.get!(id)
       |> Repo.preload([:kursus, user: :user_profile])
 
+      # dapatkan current_path dari full URL
+    current_path =
+    uri
+    |> URI.parse()
+    |> Map.get(:path)
+
     {:noreply,
      socket
      |> assign(:permohonan, permohonan)
+     |> assign(:current_path, current_path)
      |> assign(:page_title, page_title(socket.assigns.live_action))}
   end
 
@@ -28,8 +35,44 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="p-6">
-      <h1 class="text-2xl font-bold mb-6">Maklumat Permohonan</h1>
+        <div class="w-full min-h-screen bg-gray-100 flex">
+      <!-- Sidebar -->
+      <.live_component
+        module={SpkpProjectWeb.SidebarComponent}
+        id="sidebar"
+        role={@current_user.role}
+        current_user={@current_user}
+        current_path={@current_path}
+      />
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
+          <div class="flex justify-between items-center px-6 py-4">
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center gap-4">
+                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              </div>
+              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-600">admin@gmail.com</span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
+              </.link>
+              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+            </div>
+          </div>
+        </.header>
+
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-8 px-10 py-6">
+          <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Maklumat Permohonan</h1>
+            <p class="text-gray-600">Maklumat pemohon kursus</p>
+          </div>
+        </div>
 
       <div class="bg-white shadow rounded-lg p-6 space-y-4">
           <p><strong>Nama Pemohon:</strong> <%= @permohonan.user.full_name %></p>
@@ -102,6 +145,14 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
         <.link patch={~p"/admin/permohonan/#{@permohonan.id}/show/edit"} class="bg-blue-600 text-white px-4 py-2 rounded">
           Edit
         </.link>
+      <button
+          phx-click="delete"
+          phx-value-id={@permohonan.id}
+          class="bg-red-600 text-white px-4 py-2 rounded"
+          data-confirm="Adakah anda pasti mahu padam permohonan ini?"
+        >
+          Delete
+        </button>
       </div>
 
       <!-- Modal untuk edit -->
@@ -121,6 +172,7 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
           </.modal>
         <% end %>
 
+    </div>
     </div>
     """
   end

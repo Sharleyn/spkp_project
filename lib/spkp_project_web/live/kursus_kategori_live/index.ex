@@ -106,7 +106,8 @@ defmodule SpkpProjectWeb.KursusKategoriLive.Index do
           </.link>
         </div>
 
-        <.table
+
+      <.table
           id="kursus_kategori"
           rows={@streams.kursus_kategori_collection}
           row_click={

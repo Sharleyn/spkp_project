@@ -8,6 +8,7 @@ defmodule SpkpProject.Kursus do
 
   alias SpkpProject.Kursus.Kursuss
   alias SpkpProject.Kursus.KursusKategori
+  alias SpkpProject.{Repo, Kursus.Kursuss, Userpermohonan.Userpermohonan}
 
   @doc """
   Returns the list of kursus_kategori.
@@ -260,5 +261,18 @@ end
       where: k.status_kursus in ["Aktif", "Akan Datang"]
     )
     |> Repo.aggregate(:count, :id)
+  end
+
+  # Statistik jumlah peserta per kursus
+  def statistics do
+    from(k in Kursuss,
+      left_join: p in Userpermohonan, on: p.kursus_id == k.id,
+      group_by: k.id,
+      select: %{
+        nama_kursus: k.nama_kursus,
+        jumlah_peserta: count(p.id)
+      }
+    )
+    |> Repo.all()
   end
 end
