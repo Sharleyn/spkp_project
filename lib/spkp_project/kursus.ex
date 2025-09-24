@@ -258,7 +258,7 @@ end
 
   def get_available_courses_count do
     from(k in Kursuss,
-      where: k.status_kursus in ["Aktif", "Akan Datang"]
+      where: k.status_kursus in ["Buka", "Tutup"]
     )
     |> Repo.aggregate(:count, :id)
   end
