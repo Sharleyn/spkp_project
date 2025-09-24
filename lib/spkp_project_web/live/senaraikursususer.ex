@@ -11,7 +11,13 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
   def mount(_params, _session, socket) do
     # Pastikan preload dulu
     current_user = Repo.preload(socket.assigns.current_user, :user_profile)
-    umur_pemohon = current_user.user_profile.age
+
+    # ✅ kira umur dari tarikh_lahir
+    umur_pemohon =
+    case current_user.user_profile.tarikh_lahir do
+      nil -> nil
+      tarikh -> Date.diff(Date.utc_today(), tarikh) |> div(365)
+    end
 
       # ✅ Ambil kursus ikut umur
     kursus = filter_courses("", "", "", umur_pemohon)
@@ -320,6 +326,9 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                         Permohonan Ditutup
                       </button>
 
+                    <% not is_nil(@umur_pemohon) and @umur_pemohon > kursus.had_umur -> %>
+                       <button class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>Umur Tidak Layak</button>
+
                     <% true -> %>
                       <button phx-click="mohon" phx-value-kursus_id={kursus.id}
                          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
@@ -435,44 +444,51 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     end
 
     # ✅ Mohon kursus, check umur sekali lagi
-  def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
-    user = Repo.preload(socket.assigns.current_user, :user_profile)
-    user_id = user.id
-    umur_pemohon = user.user_profile.age
-    kursus_id = String.to_integer(kursus_id)
-    kursus = Repo.get!(Kursuss, kursus_id)
+    def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
+      user = Repo.preload(socket.assigns.current_user, :user_profile)
+      user_id = user.id
 
-    cond do
-      is_nil(umur_pemohon) ->
-        {:noreply, put_flash(socket, :error, "Profil anda tidak lengkap. Sila kemas kini umur sebelum memohon.")}
-
-      umur_pemohon > kursus.had_umur ->
-        {:noreply, put_flash(socket, :error, "Umur anda melebihi had umur untuk kursus ini.")}
-
-      true ->
-        case Userpermohonan.create_application(user_id, kursus_id) do
-          {:ok, _application} ->
-            {:noreply,
-             socket
-             |> put_flash(:info, "Permohonan berjaya dihantar.")
-             |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
-             |> redirect(to: ~p"/permohonanuser")}
-
-          {:error, _changeset} ->
-            {:noreply, put_flash(socket, :error, "Gagal menghantar permohonan.")}
+      umur_pemohon =
+        case user.user_profile.tarikh_lahir do
+          nil -> nil
+          tarikh -> Date.diff(Date.utc_today(), tarikh) |> div(365)
         end
+
+      kursus_id = String.to_integer(kursus_id)
+      kursus = Repo.get!(Kursuss, kursus_id)
+
+      cond do
+        is_nil(umur_pemohon) ->
+          {:noreply,
+           put_flash(socket, :error, "Profil anda tidak lengkap. Sila kemas kini tarikh lahir sebelum memohon.")}
+
+        umur_pemohon > kursus.had_umur ->
+          {:noreply, put_flash(socket, :error, "Umur anda melebihi had umur untuk kursus ini.")}
+
+        true ->
+          case Userpermohonan.create_application(user_id, kursus_id) do
+            {:ok, _application} ->
+              {:noreply,
+               socket
+               |> put_flash(:info, "Permohonan berjaya dihantar.")
+               |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
+               |> redirect(to: ~p"/permohonanuser")}
+
+            {:error, _changeset} ->
+              {:noreply, put_flash(socket, :error, "Gagal menghantar permohonan.")}
+          end
+      end
     end
-  end
 
   # Fungsi filter dengan umur
-  defp filter_courses(search, category, type, umur_pemohon) do
+  defp filter_courses(search, category, type, _umur_pemohon) do
     query =
       from k in Kursuss,
         join: c in assoc(k, :kursus_kategori),
         preload: [kursus_kategori: c],
-        where: ilike(k.nama_kursus, ^"%#{search}%"),
-        where: ^umur_pemohon <= k.had_umur
+        where: ilike(k.nama_kursus, ^"%#{search}%")
 
+    # ✅ tapis ikut kategori (kalau user pilih kategori)
     query =
       if category != "" do
         from [k, c] in query, where: c.kategori == ^category
@@ -480,6 +496,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
         query
       end
 
+    # ✅ tapis ikut jenis kursus
     query =
       case type do
         "Kursus Jangka Panjang" ->

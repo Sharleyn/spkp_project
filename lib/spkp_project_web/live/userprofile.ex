@@ -68,7 +68,8 @@ defmodule SpkpProjectWeb.UserProfileLive do
         address: profile.address,
         district: profile.district,
         education: profile.education,
-        ic_attachment: profile.ic_attachment
+        ic_attachment: profile.ic_attachment,
+        tarikh_lahir: profile.tarikh_lahir
       })
 
     socket =
@@ -120,7 +121,8 @@ defmodule SpkpProjectWeb.UserProfileLive do
             address: profile.address,
             district: profile.district,
             education: profile.education,
-            ic_attachment: profile.ic_attachment
+            ic_attachment: profile.ic_attachment,
+            tarikh_lahir: profile.tarikh_lahir
           })
 
         {:noreply,
@@ -327,7 +329,12 @@ defmodule SpkpProjectWeb.UserProfileLive do
               <.input field={f[:full_name]} type="text" label="Nama Penuh" />
               <.input field={f[:email]} type="email" label="Email" />
               <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
-              <.input field={f[:age]} type="number" label="Umur" />
+              <.input field={f[:tarikh_lahir]} type="date" label="Tarikh Lahir" />
+
+                <!-- ✅ Umur paparkan dalam kotak tapi readonly -->
+                  <.input name="calculated_age" value={UserProfile.kira_umur(@profile_form.data.tarikh_lahir) || ""}
+                     type="number" label="Umur" readonly/>
+
               <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
             </div>
           </div>
