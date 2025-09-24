@@ -142,6 +142,20 @@ defmodule SpkpProjectWeb.UserProfileLive do
     end
   end
 
+  def handle_event("update_age", %{"user_profile" => %{"tarikh_lahir" => tarikh_lahir}}, socket) do
+    umur =
+      case Date.from_iso8601(tarikh_lahir) do
+        {:ok, date} -> SpkpProject.Accounts.UserProfile.kira_umur(date)
+        _ -> nil
+      end
+
+    changeset =
+      socket.assigns.profile_changeset
+      |> Ecto.Changeset.change(%{tarikh_lahir: tarikh_lahir, age: umur})
+
+    {:noreply, assign(socket, profile_form: to_form(changeset))}
+  end
+
   # Events UI lain
   @impl true
   def handle_event("toggle_sidebar", _params, socket) do
@@ -326,16 +340,20 @@ defmodule SpkpProjectWeb.UserProfileLive do
             </h3>
 
             <div class="grid grid-cols-2 gap-4">
-              <.input field={f[:full_name]} type="text" label="Nama Penuh" />
-              <.input field={f[:email]} type="email" label="Email" />
-              <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
-              <.input field={f[:tarikh_lahir]} type="date" label="Tarikh Lahir" />
+               <.input field={f[:full_name]} type="text" label="Nama Penuh" />
+               <.input field={f[:email]} type="email" label="Email" />
+               <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
 
-                <!-- ✅ Umur paparkan dalam kotak tapi readonly -->
-                  <.input name="calculated_age" value={UserProfile.kira_umur(@profile_form.data.tarikh_lahir) || ""}
-                     type="number" label="Umur" readonly/>
+               <!-- User pilih tarikh lahir -->
+                  <.input field={f[:tarikh_lahir]} type="date" label="Tarikh Lahir"
+                     phx-change="update_age" />
 
-              <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
+               <!-- Auto kira umur -->
+                <div class="opacity-80">
+                  <.input field={f[:age]} type="number" label="Umur" readonly class="bg-gray-100 text-gray-500 cursor-not-allowed" />
+                </div>
+
+                  <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
             </div>
           </div>
 
