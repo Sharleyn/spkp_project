@@ -16,33 +16,79 @@ defmodule SpkpProjectWeb.ItemElaunPekerjaLive.Show do
      |> assign(:item_elaun_pekerja, Elaun.get_item_elaun_pekerja!(id))}
   end
 
-  defp page_title(:show), do: "Show Item elaun pekerja"
-  defp page_title(:edit), do: "Edit Item elaun pekerja"
+  defp page_title(:show), do: "Maklumat Item Elaun Pekerja"
+  defp page_title(:edit), do: "Kemaskini Item Elaun Pekerja"
 
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>
-      Item elaun pekerja {@item_elaun_pekerja.id}
-      <:subtitle>This is a item_elaun_pekerja record from your database.</:subtitle>
-      <:actions>
-        <.link patch={~p"/admin/item_elaun_pekerja/#{@item_elaun_pekerja}/show/edit"} phx-click={JS.push_focus()}>
-          <.button>Edit item_elaun_pekerja</.button>
-        </.link>
-      </:actions>
-    </.header>
+    <div class="p-6 space-y-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">
+            {@page_title}
+          </h1>
+          <p class="text-gray-600 text-sm">ID Rekod: {@item_elaun_pekerja.id}</p>
+        </div>
 
-    <.list>
-      <:item title="Kenyataan tuntutan"><%= @item_elaun_pekerja.kenyataan_tuntutan %></:item>
-      <:item title="Tarikh tuntutan"><%= @item_elaun_pekerja.tarikh_tuntutan %></:item>
-      <:item title="Masa mula"><%= @item_elaun_pekerja.masa_mula %></:item>
-      <:item title="Masa tamat"><%= @item_elaun_pekerja.masa_tamat %></:item>
-      <:item title="Keterangan"><%= @item_elaun_pekerja.keterangan %></:item>
-      <:item title="Jumlah"><%= @item_elaun_pekerja.jumlah %></:item>
-    </.list>
+        <div class="flex gap-2">
+          <.link
+            patch={~p"/admin/item_elaun_pekerja/#{@item_elaun_pekerja}/show/edit"}
+            phx-click={JS.push_focus()}
+          >
+            <.button class="bg-blue-600 hover:bg-blue-700 text-white">
+              ✏️ Edit
+            </.button>
+          </.link>
 
-    <.back navigate={~p"/admin/item_elaun_pekerja"}>Back to item_elaun_pekerja</.back>
+          <.link
+            navigate={~p"/admin/item_elaun_pekerja"}
+          >
+            <.button class="bg-gray-200 text-gray-700 hover:bg-gray-300">
+              ← Kembali
+            </.button>
+          </.link>
+        </div>
+      </div>
 
+      <!-- Detail Card -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-600">Kenyataan Tuntutan</dt>
+            <dd class="mt-1 text-gray-900">{@item_elaun_pekerja.kenyataan_tuntutan}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-gray-600">Tarikh Tuntutan</dt>
+            <dd class="mt-1 text-gray-900">{@item_elaun_pekerja.tarikh_tuntutan}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-gray-600">Masa Mula</dt>
+            <dd class="mt-1 text-gray-900">{@item_elaun_pekerja.masa_mula}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-gray-600">Masa Tamat</dt>
+            <dd class="mt-1 text-gray-900">{@item_elaun_pekerja.masa_tamat}</dd>
+          </div>
+
+          <div class="md:col-span-2">
+            <dt class="text-sm font-medium text-gray-600">Keterangan</dt>
+            <dd class="mt-1 text-gray-900">{@item_elaun_pekerja.keterangan}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-gray-600">Jumlah</dt>
+            <dd class="mt-1 font-semibold text-green-600">RM {@item_elaun_pekerja.jumlah}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
     <.modal
       :if={@live_action == :edit}
       id="item_elaun_pekerja-modal"

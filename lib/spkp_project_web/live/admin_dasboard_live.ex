@@ -20,31 +20,35 @@ defmodule SpkpProjectWeb.DashboardLive do
       <.live_component
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
-        role={@role}
+        current_view={@socket.view}
+        role={@current_user.role}
+        current_user={@current_user}
         current_path={@current_path}
       />
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
-            <div class="flex items-center gap-4 min-w-0">
-              <img src={~p"/images/a3.png"} alt="Logo" class="h-12 w-auto" />
-              <h1 class="text-xl font-semibold text-gray-800 truncate">
-                SPKP <%= String.capitalize(@role) %> Dashboard
-              </h1>
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center gap-4">
+                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              </div>
+
+              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.email %></span>
-              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-                Logout
+              <span class="text-gray-600">admin@gmail.com</span>
+
+                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
               </.link>
+
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
-        </header>
+        </.header>
 
         <!-- Quick Actions -->
         <.quick_actions role={@role} />
@@ -63,62 +67,70 @@ defmodule SpkpProjectWeb.DashboardLive do
 
   ## COMPONENTS
 
-defp quick_actions(assigns) do
-  ~H"""
-  <div class="mb-8 p-6">
-    <div class="flex items-center space-x-2 mb-4">
-      <svg class="w-6 h-6 text-gray-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" clip-rule="evenodd"
-          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0
-          00-1.414-1.414L9 10.586 7.707 9.293a1 1 0
-          00-1.414 1.414l2 2a1 1 0
-          001.414 0l4-4z" />
-      </svg>
-      <h3 class="text-xl font-semibold text-gray-800">Tindakan pantas</h3>
-    </div>
+  defp quick_actions(assigns) do
+    ~H"""
+    <div class="mb-8 p-6">
+      <div class="flex items-center space-x-2 mb-4">
+        <svg class="w-6 h-6 text-gray-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0
+            00-1.414-1.414L9 10.586 7.707 9.293a1 1 0
+            00-1.414 1.414l2 2a1 1 0
+            001.414 0l4-4z" />
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-800">Tindakan pantas</h3>
+      </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Box 1 -->
-      <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer overflow-hidden">
-        <.link navigate={~p"/admin/kursus/new"} class="block">
-          <div class="flex flex-wrap items-center justify-between min-w-0">
-            <div class="min-w-0 break-words">
-              <h4 class="font-semibold text-gray-800 mb-2">Tambah kursus baru</h4>
-              <p class="text-gray-600 text-sm">Cipta kursus baru untuk peserta</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Box 1 -->
+        <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer overflow-hidden">
+          <.link patch={~p"/admin/kursus/new?return_to=/admin/dashboard"} class="block">
+            <div class="flex flex-wrap items-center justify-between min-w-0">
+              <div class="min-w-0 break-words">
+                <h4 class="font-semibold text-gray-800 mb-2">Tambah kursus baru</h4>
+                <p class="text-gray-600 text-sm">Cipta kursus baru untuk peserta</p>
+              </div>
+              <img src={~p"/images/users.png"} alt="Peserta"
+                class="w-8 h-8 object-contain flex-shrink-0 max-w-full" />
             </div>
-            <img src={~p"/images/users.png"} alt="Peserta"
-              class="w-8 h-8 object-contain flex-shrink-0 max-w-full" />
-          </div>
-        </.link>
-      </div>
-
-      <!-- Box 2 -->
-      <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer overflow-hidden">
-        <div class="flex flex-wrap items-center justify-between min-w-0">
-          <div class="min-w-0 break-words">
-            <h4 class="font-semibold text-gray-800 mb-2">Pengesahan permohonan</h4>
-            <p class="text-gray-600 text-sm">Semak dan sahkan permohonan baru</p>
-          </div>
-          <img src={~p"/images/sah.png"} alt="Pengesahan"
-            class="w-8 h-8 object-contain flex-shrink-0 max-w-full" />
+          </.link>
         </div>
-      </div>
 
-      <!-- Box 3 -->
-      <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer overflow-hidden">
-        <div class="flex flex-wrap items-center justify-between min-w-0">
-          <div class="min-w-0 break-words">
-            <h4 class="font-semibold text-gray-800 mb-2">Senarai peserta</h4>
-            <p class="text-gray-600 text-sm">Senarai peserta yang mengikuti kursus</p>
-          </div>
-          <img src={~p"/images/usershijauu.png"} alt="SenaraiPeserta"
-            class="w-8 h-8 object-contain flex-shrink-0 max-w-full" />
-        </div>
+        <!-- Box 2 (hanya untuk admin) -->
+        <%= if @role == "admin" do %>
+          <.link navigate={~p"/admin/permohonan"} class="block">
+            <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer overflow-hidden">
+              <div class="flex flex-wrap items-center justify-between min-w-0">
+                <div class="min-w-0 break-words">
+                  <h4 class="font-semibold text-gray-800 mb-2">Pengesahan permohonan</h4>
+                  <p class="text-gray-600 text-sm">Semak dan sahkan permohonan baru</p>
+                </div>
+                <img src={~p"/images/sah.png"} alt="Pengesahan"
+                  class="w-8 h-8 object-contain flex-shrink-0 max-w-full" />
+              </div>
+            </div>
+          </.link>
+        <% end %>
+
+          <!-- Box 3 -->
+          <.link navigate={~p"/admin/peserta"} class="block">
+            <div class="bg-white border rounded-lg p-6 hover:shadow-md cursor-pointer overflow-hidden">
+              <div class="flex flex-wrap items-center justify-between min-w-0">
+                <div class="min-w-0 break-words">
+                  <h4 class="font-semibold text-gray-800 mb-2">Senarai peserta</h4>
+                  <p class="text-gray-600 text-sm">Senarai peserta yang mengikuti kursus</p>
+                </div>
+                <img src={~p"/images/usershijauu.png"} alt="SenaraiPeserta"
+                  class="w-8 h-8 object-contain flex-shrink-0 max-w-full" />
+              </div>
+            </div>
+          </.link>
+
       </div>
     </div>
-  </div>
-  """
-end
+    """
+  end
+
 
 defp statistics(assigns) do
   ~H"""

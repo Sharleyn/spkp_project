@@ -124,6 +124,55 @@ def list_all_courses do
   |> Repo.all()
 end
 
+def list_kursus_paginated(page \\ 1, per_page \\ 5) do
+  offset = (page - 1) * per_page
+
+  query =
+    from k in Kursuss,
+      order_by: [desc: k.inserted_at],
+      offset: ^offset,
+      limit: ^per_page
+
+  data = Repo.all(query)
+
+  total_count = Repo.aggregate(Kursuss, :count, :id)
+
+  %{
+    data: data,
+    page: page,
+    per_page: per_page,
+    total_count: total_count,
+    total_pages: div(total_count + per_page - 1, per_page)
+  }
+end
+
+def search_kursus(query, page \\ 1, per_page \\ 5) do
+  offset = (page - 1) * per_page
+
+  base_query =
+    from k in Kursuss,
+      where: ilike(k.nama_kursus, ^"%#{query}%"),
+      order_by: [desc: k.inserted_at],
+      offset: ^offset,
+      limit: ^per_page
+
+  data = Repo.all(base_query)
+
+  total_count =
+    from(k in Kursuss, where: ilike(k.nama_kursus, ^"%#{query}%"))
+    |> Repo.aggregate(:count, :id)
+
+  %{
+    data: data,
+    page: page,
+    per_page: per_page,
+    total_count: total_count,
+    total_pages: div(total_count + per_page - 1, per_page)
+  }
+end
+
+
+
 
   @doc """
   Gets a single kursuss.

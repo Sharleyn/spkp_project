@@ -5,7 +5,7 @@ defmodule SpkpProject.Elaun.ElaunPekerja do
   schema "elaun_pekerja" do
     field :tarikh_mula, :date
     field :tarikh_akhir, :date
-    field :status_permohonan, :string
+    field :status_permohonan, :string, default: "draft"
     field :jumlah_keseluruhan, :decimal
 
     belongs_to :maklumat_pekerja, SpkpProject.Accounts.MaklumatPekerja
