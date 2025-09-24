@@ -138,9 +138,13 @@ defmodule SpkpProjectWeb.Router do
       live "/kursus_kategori/:id", KursusKategoriLive.Show, :show
       live "/kursus_kategori/:id/show/edit", KursusKategoriLive.Show, :edit
 
-      live "/senaraipeserta", SenaraiPesertaLive
+      live "/peserta", AdminPesertaLive.Index, :index
+      live "/kategori/:id", AdminKategoriLive.Show, :show
+      live "/kursus/:id/peserta", PesertaKursusLive.Show, :show
 
-      live "/permohonan", PermohonanLive
+      live "/permohonan", PermohonanLive.Index, :index
+      live "/permohonan/:id", PermohonanLive.Show, :show
+      live "/permohonan/:id/show/edit", PermohonanLive.Show, :edit
 
       live "/senaraipekerja", SenaraiPesertaLive
 

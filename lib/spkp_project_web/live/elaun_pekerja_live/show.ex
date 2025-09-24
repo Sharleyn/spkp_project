@@ -4,15 +4,17 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    role = socket.assigns.current_user.role
+    {:ok, assign(socket, :role, role)}
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
+  def handle_params(%{"id" => id}, uri, socket) do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:elaun_pekerja, Elaun.get_elaun_pekerja!(id, [:item_elaun_pekerja, maklumat_pekerja: :user]))}
+     |> assign(:elaun_pekerja, Elaun.get_elaun_pekerja!(id, [:item_elaun_pekerja, maklumat_pekerja: :user]))
+     |> assign(:current_path, URI.parse(uri).path)}
   end
 
   defp page_title(:show), do: "Maklumat Elaun Pekerja"
@@ -22,16 +24,28 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Show do
   def render(assigns) do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
+      <!-- Sidebar -->
+      <.live_component
+        module={SpkpProjectWeb.SidebarComponent}
+        id="sidebar"
+        current_view={@socket.view}
+        role={@current_user.role}
+        current_user={@current_user}
+        current_path={@current_path}
+      />
+
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <!-- Header -->
         <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
-            <h1 class="text-2xl font-bold text-gray-800">Maklumat Tuntutan Elaun</h1>
-            <div>
-              <.link patch={~p"/admin/elaun_pekerja/#{@elaun_pekerja}/show/edit"} phx-click={JS.push_focus()}>
-                <.button>Edit</.button>
-              </.link>
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">Logout</.link>
+              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
@@ -86,14 +100,10 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Show do
           </div>
         </div>
 
-          <!-- Back Button -->
-          <div class="px-6 mb-6">
-            <.link
-              navigate={~p"/admin/elaun_pekerja"}
-              class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-            >
-              Kembali ke Senarai
-            </.link>
+          <!-- Back & Edit Buttons -->
+          <div class="px-6 mb-6 flex items-center gap-3">
+            <.link navigate={~p"/admin/elaun_pekerja"} class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Kembali ke Senarai</.link>
+            <.link patch={~p"/admin/elaun_pekerja/#{@elaun_pekerja}/show/edit"} phx-click={JS.push_focus()} class="inline-flex"><.button>Edit</.button></.link>
           </div>
 
         <!-- Modal Edit -->

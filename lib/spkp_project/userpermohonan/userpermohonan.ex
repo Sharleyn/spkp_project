@@ -46,4 +46,11 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
     end
   end
 
+
+    # -------- JUMLAH SEMUA PERMOHONAN --------
+    def total_applications do
+      from(p in __MODULE__, select: count(p.id))
+      |> Repo.one()
+    end
+
 end

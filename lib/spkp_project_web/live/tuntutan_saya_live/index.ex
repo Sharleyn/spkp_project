@@ -19,7 +19,8 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
      |> assign(:elaun, nil)
      |> assign(:item_elaun_pekerja, nil)
      |> assign(:query, "")
-     |> assign(:search_date, "")}
+     |> assign(:search_date, "")
+     |> assign(:role, socket.assigns.current_user.role)}
   end
 
   @impl true
@@ -166,20 +167,32 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
         current_user={@current_user}
         current_path={@current_path}
       />
-
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <.header class="bg-white shadow-sm border-b border-gray-200">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
-            <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.email %></span>
-              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-                Logout
+              <div class="flex items-center gap-4">
+                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              </div>
+
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
+
+                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
               </.link>
+
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-black rounded-full"></div>
+              </div>
             </div>
           </div>
-        </.header>
+        </header>
 
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">

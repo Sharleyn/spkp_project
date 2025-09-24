@@ -13,7 +13,8 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
      |> assign(:maklumat_pekerja_collection, result.data)
      |> assign(:page, result.page)
      |> assign(:total_pages, result.total_pages)
-     |> assign(:per_page, result.per_page)}
+     |> assign(:per_page, result.per_page)
+     |> assign(:role, socket.assigns.current_user.role)}
   end
 
   @impl true
@@ -87,11 +88,11 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center gap-4">
               <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
-              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
