@@ -13,13 +13,8 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     current_user = Repo.preload(socket.assigns.current_user, :user_profile)
     umur_pemohon = current_user.user_profile.age
 
-    # Ambil semua kursus + preload kategori
-    kursus =
-      from(k in Kursuss,
-        where: ^umur_pemohon <= k.had_umur,   # ✅ umur pemohon mesti <= had umur kursus
-        preload: [:kursus_kategori]
-      )
-      |> Repo.all()
+      # ✅ Ambil kursus ikut umur
+    kursus = filter_courses("", "", "", umur_pemohon)
 
     # Senarai kategori unik
     categories =
@@ -57,7 +52,8 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:selected_category, "")
      |> assign(:selected_type, "")
      |> assign(:current_user_name, current_user.full_name)
-     |> assign(:current_user, current_user)   # ⬅ simpan user yang sudah preload
+     |> assign(:current_user, current_user)
+     |> assign(:umur_pemohon, umur_pemohon) # ✅ simpan umur untuk search/filter|> assign(:sidebar_open, true)
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
      |> assign(:applied_ids, applied_ids)
@@ -389,38 +385,38 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> redirect(to: ~p"/lamanutama")}
   end
 
-    # Bila user tekan "Cari"
+    # ✅ Search ikut umur
   @impl true
   def handle_event("search", %{"search_query" => search, "category" => category, "type" => type}, socket) do
-    kursus = filter_courses(search, category, type)
+    kursus = filter_courses(search, category, type, socket.assigns.umur_pemohon)
     total = length(kursus)
-    per_page = socket.assigns.per_page
+
     {:noreply,
      socket
      |> assign(:kursus, kursus)
      |> assign(:search_query, search)
      |> assign(:selected_category, category)
      |> assign(:selected_type, type)
-     |> assign(:total_pages, total_pages(total, per_page))
-     |> assign(:total, total)    # ✅ update total
-     |> assign(:page, 1)}        # ✅ reset ke page 1 bila search baru
+     |> assign(:total_pages, total_pages(total, socket.assigns.per_page))
+     |> assign(:total, total)
+     |> assign(:page, 1)}
   end
 
-  # Bila user ubah search / filter
+  # ✅ Filter ikut umur
   @impl true
   def handle_event("filter", %{"search_query" => search, "category" => category, "type" => type}, socket) do
-    kursus = filter_courses(search, category, type)
+    kursus = filter_courses(search, category, type, socket.assigns.umur_pemohon)
     total = length(kursus)
-    per_page = socket.assigns.per_page
+
     {:noreply,
      socket
      |> assign(:kursus, kursus)
      |> assign(:search_query, search)
      |> assign(:selected_category, category)
      |> assign(:selected_type, type)
-     |> assign(:total_pages, total_pages(total, per_page))
-     |> assign(:total, total)    # ✅ update total
-     |> assign(:page, 1)}        # ✅ reset ke page 1 bila filter berubah
+     |> assign(:total_pages, total_pages(total, socket.assigns.per_page))
+     |> assign(:total, total)
+     |> assign(:page, 1)}
   end
 
   def handle_event("next_page", _params, socket) do
@@ -438,52 +434,45 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     {:noreply, assign(socket, :kursus, value)}
     end
 
-    def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
-      user = Repo.preload(socket.assigns.current_user, :user_profile)
-      user_id = user.id
-      umur_pemohon = user.user_profile.age
-      kursus_id = String.to_integer(kursus_id)
+    # ✅ Mohon kursus, check umur sekali lagi
+  def handle_event("mohon", %{"kursus_id" => kursus_id}, socket) do
+    user = Repo.preload(socket.assigns.current_user, :user_profile)
+    user_id = user.id
+    umur_pemohon = user.user_profile.age
+    kursus_id = String.to_integer(kursus_id)
+    kursus = Repo.get!(Kursuss, kursus_id)
 
-      # Ambil kursus untuk check had umur
-      kursus = Repo.get!(Kursuss, kursus_id)
+    cond do
+      is_nil(umur_pemohon) ->
+        {:noreply, put_flash(socket, :error, "Profil anda tidak lengkap. Sila kemas kini umur sebelum memohon.")}
 
-      cond do
-        is_nil(umur_pemohon) ->
-          {:noreply,
-           socket
-           |> put_flash(:error, "Profil anda tidak lengkap. Sila kemas kini umur sebelum memohon.")}
+      umur_pemohon > kursus.had_umur ->
+        {:noreply, put_flash(socket, :error, "Umur anda melebihi had umur untuk kursus ini.")}
 
-        umur_pemohon > kursus.had_umur ->
-          {:noreply,
-           socket
-           |> put_flash(:error, "Umur anda melebihi had umur untuk kursus ini.")}
+      true ->
+        case Userpermohonan.create_application(user_id, kursus_id) do
+          {:ok, _application} ->
+            {:noreply,
+             socket
+             |> put_flash(:info, "Permohonan berjaya dihantar.")
+             |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
+             |> redirect(to: ~p"/permohonanuser")}
 
-        true ->
-          case Userpermohonan.create_application(user_id, kursus_id) do
-            {:ok, _application} ->
-              {:noreply,
-               socket
-               |> put_flash(:info, "Permohonan berjaya dihantar.")
-               |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
-               |> redirect(to: ~p"/permohonanuser")}
-
-            {:error, _changeset} ->
-              {:noreply,
-               socket
-               |> put_flash(:error, "Gagal menghantar permohonan.")}
-          end
-      end
+          {:error, _changeset} ->
+            {:noreply, put_flash(socket, :error, "Gagal menghantar permohonan.")}
+        end
     end
+  end
 
-  # Fungsi filter kursus
-  defp filter_courses(search, category, type) do
+  # Fungsi filter dengan umur
+  defp filter_courses(search, category, type, umur_pemohon) do
     query =
       from k in Kursuss,
         join: c in assoc(k, :kursus_kategori),
         preload: [kursus_kategori: c],
-        where: ilike(k.nama_kursus, ^"%#{search}%")
+        where: ilike(k.nama_kursus, ^"%#{search}%"),
+        where: ^umur_pemohon <= k.had_umur
 
-    # tapis ikut kategori (kalau user pilih kategori tertentu)
     query =
       if category != "" do
         from [k, c] in query, where: c.kategori == ^category
@@ -491,30 +480,24 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
         query
       end
 
-    # tapis ikut jenis kursus (computed ikut beza tarikh)
     query =
       case type do
         "Kursus Jangka Panjang" ->
-          from [k, _c] in query,
-            where: fragment("? - ? > 30", k.tarikh_akhir, k.tarikh_mula)
+          from [k, _c] in query, where: fragment("? - ? > 30", k.tarikh_akhir, k.tarikh_mula)
 
         "Kursus Jangka Pendek" ->
-          from [k, _c] in query,
-            where: fragment("? - ? <= 30", k.tarikh_akhir, k.tarikh_mula)
+          from [k, _c] in query, where: fragment("? - ? <= 30", k.tarikh_akhir, k.tarikh_mula)
 
-        _ -> query
+        _ ->
+          query
       end
 
     Repo.all(query)
   end
 
   defp paginated_courses(kursus, page, per_page) do
-    kursus
-    |> Enum.chunk_every(per_page)
-    |> Enum.at(page - 1, [])
+    kursus |> Enum.chunk_every(per_page) |> Enum.at(page - 1, [])
   end
 
-  defp total_pages(total, per_page) do
-    div(total + per_page - 1, per_page)
-  end
+  defp total_pages(total, per_page), do: div(total + per_page - 1, per_page)
 end
