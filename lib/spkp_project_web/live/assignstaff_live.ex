@@ -5,7 +5,17 @@ defmodule SpkpProjectWeb.AssignStaffLive do
   @impl true
   def mount(_params, _session, socket) do
     users = Accounts.list_users()
-    {:ok, assign(socket, users: users, user: nil, changeset: nil, live_action: :index)}
+    role = socket.assigns.current_user.role
+
+    {:ok,
+     assign(socket,
+       users: users,
+       user: nil,
+       changeset: nil,
+       live_action: :index,
+       role: role,
+       current_path: socket.host_uri.path
+     )}
   end
 
   @impl true
@@ -26,77 +36,101 @@ defmodule SpkpProjectWeb.AssignStaffLive do
   end
 
   @impl true
-  def render(%{live_action: :edit} = assigns) do
-    ~H"""
-    <div class="p-6">
-      <h1 class="text-2xl font-bold mb-4">Tukar Role Pengguna</h1>
+def render(assigns) do
+  ~H"""
+   <div class="w-full min-h-screen bg-gray-100 flex">
+      <!-- Sidebar -->
+      <.live_component
+        module={SpkpProjectWeb.SidebarComponent}
+        id="sidebar"
+        current_view={@socket.view}
+        role={@current_user.role}
+        current_user={@current_user}
+        current_path={@current_path}
+      />
 
-      <.simple_form
-        for={@changeset}
-        as={:user}
-        phx-submit="save"
-        :let={f}>
-      >
-        <.input
-          field={f[:role]}
-          type="select"
-          label="Role"
-          options={[{"User", "user"}, {"Pekerja", "pekerja"}, {"Admin", "admin"}]}
-        />
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
+          <div class="flex justify-between items-center px-6 py-4">
+            <div class="flex items-center space-x-4">
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
+            </div>
 
-        <:actions>
-          <.button>Simpan</.button>
-          <.link patch={~p"/admin/assignstaff"} class="ml-2 text-gray-600 hover:underline">
-            Kembali
-          </.link>
-        </:actions>
-      </.simple_form>
-    </div>
-    """
-  end
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-600">admin@gmail.com</span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
+              </.link>
+              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+            </div>
+          </div>
+        </.header>
 
-  def render(assigns) do
-    ~H"""
-    <div class="p-6">
-      <h1 class="text-2xl font-bold mb-4">Senarai Pengguna</h1>
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <%= if @live_action == :edit do %>
+        <h1 class="text-2xl font-bold mb-4">Tukar Role Pengguna</h1>
 
-      <table class="min-w-full border border-gray-300">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="px-4 py-2">Nama</th>
-            <th class="px-4 py-2">Email</th>
-            <th class="px-4 py-2">Role</th>
-            <th class="px-4 py-2">Tindakan</th>
-          </tr>
-        </thead>
-        <tbody>
-          <%= for user <- @users do %>
+        <.simple_form for={@changeset} as={:user} phx-submit="save" :let={f}>
+          <.input
+            field={f[:role]}
+            type="select"
+            label="Role"
+            options={[{"User", "user"}, {"Pekerja", "pekerja"}, {"Admin", "admin"}]}
+          />
+          <:actions>
+            <.button>Simpan</.button>
+            <.link patch={~p"/admin/assignstaff"} class="ml-2 text-gray-600 hover:underline">
+              Kembali
+            </.link>
+          </:actions>
+        </.simple_form>
+      <% else %>
+        <h1 class="text-2xl font-bold mb-4">Senarai Pengguna</h1>
+
+        <table class="min-w-full border border-gray-300">
+          <thead class="bg-gray-100">
             <tr>
-              <td class="border px-4 py-2"><%= user.full_name %></td>
-              <td class="border px-4 py-2"><%= user.email %></td>
-              <td class="border px-4 py-2">
-                <span class={
-                  case user.role do
-                    "admin" -> "text-red-600 font-bold"
-                    "pekerja" -> "text-green-600"
-                    _ -> "text-gray-700"
-                  end
-                }>
-                  <%= user.role %>
-                </span>
-              </td>
-              <td class="border px-4 py-2">
-                <.link patch={~p"/admin/assignstaff/#{user.id}/edit"} class="text-blue-600 hover:underline">
-                  Tukar Role
-                </.link>
-              </td>
+              <th class="px-4 py-2">Nama</th>
+              <th class="px-4 py-2">Email</th>
+              <th class="px-4 py-2">Role</th>
+              <th class="px-4 py-2">Tindakan</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-    """
-  end
+          </thead>
+          <tbody>
+            <%= for user <- @users do %>
+              <tr>
+                <td class="border px-4 py-2"><%= user.full_name %></td>
+                <td class="border px-4 py-2"><%= user.email %></td>
+                <td class="border px-4 py-2">
+                  <span class={
+                    case user.role do
+                      "admin" -> "text-red-600 font-bold"
+                      "pekerja" -> "text-green-600"
+                      _ -> "text-gray-700"
+                    end
+                  }>
+                    <%= user.role %>
+                  </span>
+                </td>
+                <td class="border px-4 py-2">
+                  <.link patch={~p"/admin/assignstaff/#{user.id}/edit"} class="text-blue-600 hover:underline">
+                    Tukar Role
+                  </.link>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    </main>
+  </div>
+  </div>
+  """
+end
+
 
   @impl true
   def handle_event("save", %{"user" => %{"role" => role}}, socket) do

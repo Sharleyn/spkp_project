@@ -9,21 +9,66 @@ defmodule SpkpProjectWeb.AdminKategoriLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _uri, socket) do
-    kategori =
-      KursusKategori
-      |> Repo.get!(id)
-      |> Repo.preload(:kursus)
+def handle_params(%{"id" => id}, uri, socket) do
+  kategori =
+    KursusKategori
+    |> Repo.get!(id)
+    |> Repo.preload(:kursus)
 
-    {:noreply,
-     socket
-     |> assign(:kategori, kategori)
-     |> assign(:page_title, "Kategori: #{kategori.kategori}")}
-  end
+  current_path =
+    uri
+    |> URI.parse()
+    |> Map.get(:path)
+
+  {:noreply,
+   socket
+   |> assign(:kategori, kategori)
+   |> assign(:page_title, "Kategori: #{kategori.kategori}")
+   |> assign(:current_path, current_path)}
+end
+
 
   @impl true
   def render(assigns) do
     ~H"""
+
+    <div class="w-full min-h-screen bg-gray-100 flex">
+    <!-- Sidebar -->
+    <.live_component
+      module={SpkpProjectWeb.SidebarComponent}
+      id="sidebar"
+      role={@current_user.role}
+      current_user={@current_user}
+      current_path={@current_path}
+    />
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <.header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="flex justify-between items-center px-6 py-4">
+          <div class="flex items-center space-x-4">
+            <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+            <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-600">admin@gmail.com</span>
+            <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
+            </.link>
+            <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+          </div>
+        </div>
+      </.header>
+
+      <!-- Page Content -->
+      <div class="flex-1 p-6">
+        <!-- Page Title and Description -->
+        <div class="mb-6">
+          <h1 class="text-4xl font-bold text-gray-900 mb-2">Maklumat Permohonan</h1>
+          <p class="text-sm text-gray-600 mb-2">Lihat maklumat permohonan kursus</p>
+
+        </div>
     <div class="p-6">
       <h1 class="text-2xl font-bold mb-6">Kategori: <%= @kategori.kategori %></h1>
 
@@ -79,6 +124,9 @@ defmodule SpkpProjectWeb.AdminKategoriLive.Show do
           ← Kembali
         </.link>
       </div>
+    </div>
+    </div>
+    </div>
     </div>
     """
   end

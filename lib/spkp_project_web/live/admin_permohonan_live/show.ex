@@ -33,48 +33,47 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
 
 
   @impl true
-  def render(assigns) do
-    ~H"""
-        <div class="w-full min-h-screen bg-gray-100 flex">
-      <!-- Sidebar -->
-      <.live_component
-        module={SpkpProjectWeb.SidebarComponent}
-        id="sidebar"
-        role={@current_user.role}
-        current_user={@current_user}
-        current_path={@current_path}
-      />
+def render(assigns) do
+  ~H"""
+  <div class="w-full min-h-screen bg-gray-100 flex">
+    <!-- Sidebar -->
+    <.live_component
+      module={SpkpProjectWeb.SidebarComponent}
+      id="sidebar"
+      role={@current_user.role}
+      current_user={@current_user}
+      current_path={@current_path}
+    />
 
-      <!-- Main Content -->
-      <div class="flex-1 flex flex-col">
-        <.header class="bg-white shadow-sm border-b border-gray-200">
-          <div class="flex justify-between items-center px-6 py-4">
-            <div class="flex items-center space-x-4">
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
-              </div>
-              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
-            </div>
-
-            <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
-              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-                Logout
-              </.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
-            </div>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <.header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="flex justify-between items-center px-6 py-4">
+          <div class="flex items-center space-x-4">
+            <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+            <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
           </div>
-        </.header>
 
-        <!-- Page Header -->
-        <div class="flex items-center justify-between mb-8 px-10 py-6">
-          <div>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Maklumat Permohonan</h1>
-            <p class="text-gray-600">Maklumat pemohon kursus</p>
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-600">admin@gmail.com</span>
+            <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+              Logout
+            </.link>
+            <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
           </div>
         </div>
+      </.header>
 
-      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+      <!-- Page Content -->
+      <div class="flex-1 p-6">
+        <!-- Page Title and Description -->
+        <div class="mb-6">
+          <h1 class="text-4xl font-bold text-gray-900 mb-2">Maklumat Permohonan</h1>
+          <p class="text-sm text-gray-600 mb-2">Lihat maklumat permohonan kursus</p>
+
+        </div>
+
+        <div class="bg-white shadow rounded-lg p-6 space-y-4">
           <p><strong>Nama Pemohon:</strong> <%= @permohonan.user.full_name %></p>
           <p><strong>Email:</strong> <%= @permohonan.user.email %></p>
           <p><strong>Kursus Dipohon:</strong> <%= @permohonan.kursus.nama_kursus %></p>
@@ -121,7 +120,6 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
             </div>
           <% end %>
 
-
           <%= if @permohonan.kursus && @permohonan.kursus.jadual_kursus do %>
             <p><strong>Jadual Kursus:</strong></p>
             <div class="border rounded-lg overflow-hidden h-96">
@@ -135,45 +133,46 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
               </iframe>
             </div>
           <% end %>
+
+          <!-- Buttons -->
+          <div class="mt-6 space-x-2">
+            <.link patch={~p"/admin/permohonan"} class="bg-gray-600 text-white px-4 py-2 rounded">
+              ← Kembali
+            </.link>
+            <.link patch={~p"/admin/permohonan/#{@permohonan.id}/show/edit"} class="bg-blue-600 text-white px-4 py-2 rounded">
+              Edit
+            </.link>
+            <button
+              phx-click="delete"
+              phx-value-id={@permohonan.id}
+              class="bg-red-600 text-white px-4 py-2 rounded"
+              data-confirm="Adakah anda pasti mahu padam permohonan ini?"
+            >
+              Delete
+            </button>
+          </div>
         </div>
-
-
-      <div class="mt-6 space-x-2">
-        <.link patch={~p"/admin/permohonan"} class="bg-gray-600 text-white px-4 py-2 rounded">
-          ← Kembali
-        </.link>
-        <.link patch={~p"/admin/permohonan/#{@permohonan.id}/show/edit"} class="bg-blue-600 text-white px-4 py-2 rounded">
-          Edit
-        </.link>
-      <button
-          phx-click="delete"
-          phx-value-id={@permohonan.id}
-          class="bg-red-600 text-white px-4 py-2 rounded"
-          data-confirm="Adakah anda pasti mahu padam permohonan ini?"
-        >
-          Delete
-        </button>
       </div>
 
       <!-- Modal untuk edit -->
-        <%= if @live_action == :edit do %>
-          <.modal
-            id="permohonan-modal"
-            show
-            on_cancel={JS.patch(~p"/admin/permohonan/#{@permohonan.id}")}>
-            <.live_component
-              module={SpkpProjectWeb.PermohonanLive.FormComponent}
-              id="permohonan-form"
-              permohonan={@permohonan}
-              action={@live_action}
-              title="Edit Permohonan"
-              patch={~p"/admin/permohonan/#{@permohonan.id}"}
-            />
-          </.modal>
-        <% end %>
+      <%= if @live_action == :edit do %>
+        <.modal
+          id="permohonan-modal"
+          show
+          on_cancel={JS.patch(~p"/admin/permohonan/#{@permohonan.id}")}>
+          <.live_component
+            module={SpkpProjectWeb.PermohonanLive.FormComponent}
+            id="permohonan-form"
+            permohonan={@permohonan}
+            action={@live_action}
+            title="Edit Permohonan"
+            patch={~p"/admin/permohonan/#{@permohonan.id}"}
+          />
+        </.modal>
+      <% end %>
 
     </div>
-    </div>
-    """
-  end
+  </div>
+  """
+end
 end
