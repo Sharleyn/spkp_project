@@ -3,7 +3,8 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, socket
+    |> assign(:role, socket.assigns.current_user.role)}
   end
 
   @impl true
@@ -36,23 +37,23 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
 
-              <h1 class="text-xl font-semibold text-gray-800">Kursus Hub</h1>
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
 
                   <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
               Logout
               </.link>
 
               <div class="flex items-center space-x-2">
-                <span class="text-gray-600">Admin</span>
                 <div class="w-8 h-8 bg-black rounded-full"></div>
               </div>
             </div>
           </div>
         </header>
+
         <!-- Main Content Area -->
         <div class="flex-1 bg-gray-100 p-6">
           <!-- Breadcrumb and Title -->
@@ -66,6 +67,7 @@ defmodule SpkpProjectWeb.EditProfileLive.Show do
 
             <div class="text-sm text-gray-500">Tetapan admin</div>
           </div>
+
           <!-- Edit Profile Section -->
           <div class="bg-white rounded-lg shadow-sm border p-8 max-w-2xl mx-auto">
             <h3 class="text-3xl font-semibold text-gray-800 text-center mb-8">Edit Profile</h3>
