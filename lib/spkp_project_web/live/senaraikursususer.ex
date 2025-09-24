@@ -327,7 +327,9 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                       </button>
 
                     <% not is_nil(@umur_pemohon) and @umur_pemohon > kursus.had_umur -> %>
-                       <button class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>Umur Tidak Layak</button>
+                       <button class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+                         Umur Tidak Layak
+                       </button>
 
                     <% true -> %>
                       <button phx-click="mohon" phx-value-kursus_id={kursus.id}
