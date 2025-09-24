@@ -68,7 +68,8 @@ defmodule SpkpProjectWeb.UserProfileLive do
         address: profile.address,
         district: profile.district,
         education: profile.education,
-        ic_attachment: profile.ic_attachment
+        ic_attachment: profile.ic_attachment,
+        tarikh_lahir: profile.tarikh_lahir
       })
 
     socket =
@@ -120,7 +121,8 @@ defmodule SpkpProjectWeb.UserProfileLive do
             address: profile.address,
             district: profile.district,
             education: profile.education,
-            ic_attachment: profile.ic_attachment
+            ic_attachment: profile.ic_attachment,
+            tarikh_lahir: profile.tarikh_lahir
           })
 
         {:noreply,
@@ -138,6 +140,20 @@ defmodule SpkpProjectWeb.UserProfileLive do
          |> assign(:profile_changeset, changeset)
          |> assign(:profile_form, to_form(changeset))}
     end
+  end
+
+  def handle_event("update_age", %{"user_profile" => %{"tarikh_lahir" => tarikh_lahir}}, socket) do
+    umur =
+      case Date.from_iso8601(tarikh_lahir) do
+        {:ok, date} -> SpkpProject.Accounts.UserProfile.kira_umur(date)
+        _ -> nil
+      end
+
+    changeset =
+      socket.assigns.profile_changeset
+      |> Ecto.Changeset.change(%{tarikh_lahir: tarikh_lahir, age: umur})
+
+    {:noreply, assign(socket, profile_form: to_form(changeset))}
   end
 
   # Events UI lain
@@ -324,11 +340,20 @@ defmodule SpkpProjectWeb.UserProfileLive do
             </h3>
 
             <div class="grid grid-cols-2 gap-4">
-              <.input field={f[:full_name]} type="text" label="Nama Penuh" />
-              <.input field={f[:email]} type="email" label="Email" />
-              <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
-              <.input field={f[:age]} type="number" label="Umur" />
-              <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
+               <.input field={f[:full_name]} type="text" label="Nama Penuh" />
+               <.input field={f[:email]} type="email" label="Email" />
+               <.input field={f[:ic]} type="text" label="No. Kad Pengenalan" />
+
+               <!-- User pilih tarikh lahir -->
+                  <.input field={f[:tarikh_lahir]} type="date" label="Tarikh Lahir"
+                     phx-change="update_age" />
+
+               <!-- Auto kira umur -->
+                <div class="opacity-80">
+                  <.input field={f[:age]} type="number" label="Umur" readonly class="bg-gray-100 text-gray-500 cursor-not-allowed" />
+                </div>
+
+                  <.input field={f[:gender]} type="select" label="Jantina" options={@gender_options} />
             </div>
           </div>
 
@@ -422,7 +447,7 @@ defmodule SpkpProjectWeb.UserProfileLive do
               class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition mt-4 w-fit mx-auto">
                💾 Simpan Profil
            </.button>
-          </:actions>s
+          </:actions>
             </.simple_form>
           </div>
          </div>
