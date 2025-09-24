@@ -32,6 +32,14 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
     total = length(kursus)
     _total_pages = total_pages(total, per_page)
 
+     # ✅ Ambil semua kursus_id yang sudah dimohon user ini
+  applied_ids =
+    from(p in Userpermohonan.Userpermohonan,
+      where: p.user_id == ^current_user.id,
+      select: p.kursus_id
+    )
+    |> Repo.all()
+
     {:ok,
      socket
      |> assign(:kursus, kursus)
@@ -44,7 +52,7 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
      |> assign(:current_user_name, current_user.full_name)
      |> assign(:sidebar_open, true)
      |> assign(:user_menu_open, false)
-
+     |> assign(:applied_ids, applied_ids)
      # Pagination
      |> assign(:page, 1)
      |> assign(:per_page, per_page)
@@ -295,12 +303,26 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
                  </p>
               </div>
 
-              <div class="mt-2 flex justify-end">
-                <button phx-click="mohon" phx-value-kursus_id={kursus.id}
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
-                  Mohon
-                </button>
-               </div>
+              <!-- Button Mohon -->
+                 <div class="mt-2 flex justify-end">
+                    <%= cond do %>
+                      <% kursus.id in @applied_ids -> %>
+                        <button class="bg-gray-400 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+                          Sudah Dimohon
+                        </button>
+
+                    <% Date.compare(kursus.tarikh_tutup, Date.utc_today()) == :lt -> %>
+                      <button class="bg-red-500 text-white font-bold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+                        Permohonan Ditutup
+                      </button>
+
+                    <% true -> %>
+                      <button phx-click="mohon" phx-value-kursus_id={kursus.id}
+                         class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                           Mohon
+                      </button>
+                   <% end %>
+                 </div>
               </div>
              </div>
             <% end %>
@@ -414,14 +436,13 @@ defmodule SpkpProjectWeb.SenaraiKursusLive do
 
       case Userpermohonan.create_application(user_id, kursus_id) do
         {:ok, _application} ->
-          IO.puts("✅ Permohonan berjaya disimpan!")
           {:noreply,
            socket
            |> put_flash(:info, "Permohonan berjaya dihantar.")
+           |> assign(:applied_ids, [kursus_id | socket.assigns.applied_ids])
            |> redirect(to: ~p"/permohonanuser")}
 
-        {:error, changeset} ->
-          IO.inspect(changeset.errors, label: "❌ Gagal simpan")
+        {:error, _changeset} ->
           {:noreply,
            socket
            |> put_flash(:error, "Gagal menghantar permohonan.")}

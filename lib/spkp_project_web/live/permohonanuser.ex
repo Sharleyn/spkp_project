@@ -183,6 +183,18 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
              <div class="flex justify-between items-start">
                 <div class="flex items-center space-x-2">
 
+          <!-- Icon status -->
+              <%= case permohonan.status do %>
+                  <% "Diterima" -> %>
+                    <.icon name="hero-check-circle" class="w-6 h-6 text-green-500" />
+                  <% "Dalam Proses" -> %>
+                    <.icon name="hero-clock" class="w-6 h-6 text-yellow-500" />
+                  <% "Ditolak" -> %>
+                    <.icon name="hero-x-circle" class="w-6 h-6 text-red-500" />
+                  <% _ -> %>
+                    <.icon name="hero-information-circle" class="w-6 h-6 text-gray-400" />
+               <% end %>
+
           <!-- Nama kursus -->
             <h3 class="text-lg font-bold"><%= permohonan.kursus.nama_kursus %></h3>
           </div>
@@ -213,30 +225,46 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
 
         <!-- Actions -->
            <div class="flex mt-4 gap-2">
-             <%= if permohonan.status == "Diterima" and permohonan.kursus.nota_kursus do %>
-               <a href={permohonan.kursus.nota_kursus}
-                 class="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600">
-                   📄 Muat Turun Nota
-              </a>
-             <% else %>
-               <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
-                   🚫 Nota Tidak Boleh Dimuat Turun
-              </button>
-             <% end %>
+              <!-- Nota -->
+                 <%= cond do %>
+                   <% permohonan.status != "Diterima" -> %>
+                     <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
+                       🚫 Nota Belum Boleh Dimuat Turun
+                    </button>
 
-             <%= if permohonan.status == "Diterima" and permohonan.kursus.jadual_kursus do %>
-               <a href={permohonan.kursus.jadual_kursus}
-                 class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
-                   🗓️ Muat Turun Jadual
-               </a>
-             <% else %>
-                 <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
-                   🚫 Jadual Tidak Boleh Dimuat Turun
-                 </button>
-             <% end %>
-            </div>
-           </div>
-          <% end %>
+                   <% is_nil(permohonan.kursus.nota_kursus) -> %>
+                      <button disabled class="px-4 py-2 rounded-lg bg-yellow-200 text-yellow-800 cursor-not-allowed">
+                        ⏳ Nota Belum Dimuat Naik
+                      </button>
+
+                   <% true -> %>
+                      <a href={permohonan.kursus.nota_kursus}
+                        class="px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600">
+                         📄 Muat Turun Nota
+                      </a>
+                  <% end %>
+
+              <!-- Jadual -->
+                 <%= cond do %>
+                    <% permohonan.status != "Diterima" -> %>
+                       <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
+                         🚫 Jadual Belum Boleh Dimuat Turun
+                      </button>
+
+                    <% is_nil(permohonan.kursus.jadual_kursus) -> %>
+                       <button disabled class="px-4 py-2 rounded-lg bg-yellow-200 text-yellow-800 cursor-not-allowed">
+                          ⏳ Jadual Belum Dimuat Naik
+                      </button>
+
+                    <% true -> %>
+                       <a href={permohonan.kursus.jadual_kursus}
+                         class="px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600">
+                          🗓️ Muat Turun Jadual
+                       </a>
+                    <% end %>
+                 </div>
+                </div>
+               <% end %>
 
         <!-- Pagination -->
           <div class="flex justify-center mt-6 space-x-1">

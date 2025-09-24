@@ -8,16 +8,27 @@ defmodule SpkpProject.AccountsFixtures do
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do
+    password = valid_user_password()
+
     Enum.into(attrs, %{
       email: unique_user_email(),
-      password: valid_user_password()
+      password: password,
+      password_confirmation: password,  # ✅ confirm password ikut schema
+      full_name: "Test User",           # ✅ required field
+      role: "user"                      # ✅ default role
     })
   end
 
   def user_fixture(attrs \\ %{}) do
     {:ok, user} =
       attrs
-      |> valid_user_attributes()
+      |> Enum.into(%{
+        email: unique_user_email(),
+        password: valid_user_password(),
+        password_confirmation: valid_user_password(),  # ✅ confirm password
+        full_name: "Test User",                 # ✅ required field
+        role: "user"
+      })
       |> SpkpProject.Accounts.register_user()
 
     user

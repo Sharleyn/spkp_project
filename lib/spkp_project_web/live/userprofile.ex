@@ -100,15 +100,8 @@ defmodule SpkpProjectWeb.UserProfileLive do
   def handle_event("save_profile", %{"user_profile" => profile_params}, socket) do
     current_user = socket.assigns.current_user
 
-    # Debug logging for upload state
-    IO.inspect(socket.assigns.uploads.ic_attachment.entries, label: "UPLOAD ENTRIES")
-    IO.inspect(profile_params, label: "ORIGINAL PARAMS")
-
     # Process uploads using the working pattern from KursussLive.FormComponent
     profile_params = save_uploads(socket, profile_params, current_user.id)
-
-    # Debug logging
-    IO.inspect(profile_params, label: "FINAL PARAMS WITH UPLOADS")
 
     # Update user + user_profile
     case Accounts.update_user_profile(current_user, profile_params) do
@@ -129,8 +122,6 @@ defmodule SpkpProjectWeb.UserProfileLive do
             education: profile.education,
             ic_attachment: profile.ic_attachment
           })
-
-        IO.inspect(profile_changeset, label: "profile_changeset")
 
         {:noreply,
          socket
@@ -367,55 +358,71 @@ defmodule SpkpProjectWeb.UserProfileLive do
             />
           </div>
 
-          <!-- Upload IC Attachment -->
-            <div class="border-2 border-indigo-300 rounded-xl mt-4 mb-4 p-4">
-            <h3 class="flex items-center font-semibold mb-4 space-x-2">
-              <img src={~p"/images/paper.png"} alt="Lampiran Tambahan" class="w-5 h-5" />
-              <span>Lampiran Tambahan</span>
-            </h3>
-             <label class="block font-semibold mb-2">Salinan Kad Pengenalan</label>
+         <!-- Upload IC Attachment -->
+             <div class="border-2 border-indigo-300 rounded-xl mt-4 mb-4 p-4">
+             <h3 class="flex items-center font-semibold mb-4 space-x-2">
+               <img src={~p"/images/paper.png"} alt="Lampiran Tambahan" class="w-5 h-5" />
+                <span>Lampiran Tambahan</span>
+             </h3>
 
-             <!-- Preview sebelum submit -->
-             <%= for entry <- @uploads.ic_attachment.entries do %>
-               <div class="mb-2">
-                 <.live_img_preview entry={entry} class="w-32 h-32 rounded-lg border" />
-                 <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
-               </div>
-             <% end %>
+              <label class="block font-semibold mb-2">Salinan Kad Pengenalan</label>
 
-             <!-- Gambar lama bila edit -->
-             <%= if @profile_changeset.data.ic_attachment do %>
-               <% mime = MIME.from_path(@profile_changeset.data.ic_attachment) %>
+              <!-- Preview sebelum submit -->
+                <%= for entry <- @uploads.ic_attachment.entries do %>
+                  <div class="mb-2">
+                    <.live_img_preview entry={entry} class="w-32 h-32 rounded-lg border object-cover" />
+                      <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+                 </div>
+               <% end %>
 
-               <%= cond do %>
-                 <% mime in ["image/jpeg", "image/png"] -> %>
-                   <img src={@profile_changeset.data.ic_attachment} class="w-32 h-32 rounded-lg border" />
+              <!-- Gambar lama bila edit -->
+                 <%= if @profile_changeset.data.ic_attachment do %>
+                   <% mime = MIME.from_path(@profile_changeset.data.ic_attachment) %>
+
+                 <%= cond do %>
+                   <% mime in ["image/jpeg", "image/png"] -> %>
+
+              <!-- Preview image -->
+                 <img src={@profile_changeset.data.ic_attachment}
+                   class="w-32 h-32 rounded-lg border object-cover" />
 
                  <% mime == "application/pdf" -> %>
-                    <a href={@profile_changeset.data.ic_attachment} target="_blank" class="text-blue-600 underline">
-                      📄 Lihat PDF
-                  </a>
 
-                 <% true -> %>
-                   <a href={@profile_changeset.data.ic_attachment} target="_blank" class="text-blue-600 underline">
-                    📎 Muat Turun Fail
-                  </a>
-               <% end %>
-             <% end %>
+              <!-- Preview PDF kecil -->
+                <iframe src={@profile_changeset.data.ic_attachment}
+                  class="w-32 h-32 border rounded-lg"frameborder="0"></iframe>
 
-             <!-- Input upload -->
-               <div class="mt-2">
-               <.live_file_input upload={@uploads.ic_attachment} />
-               </div>
+              <!-- Link buka besar -->
+              <div>
+               <a href={@profile_changeset.data.ic_attachment}
+                 target="_blank"class="text-blue-600 underline">
+                  📄 Buka PDF
+               </a>
               </div>
 
-               <:actions>
-                 <.button
-                    type="submit" class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition mt-4 w-fit mx-auto">
-                        💾 Simpan Profil
-                </.button>
-              </:actions>
+               <% true -> %>
 
+              <!-- Fail lain -->
+                <a href={@profile_changeset.data.ic_attachment}
+                 target="_blank"class="text-blue-600 underline">
+                  📎 Muat Turun Fail
+                </a>
+             <% end %>
+            <% end %>
+
+              <!-- Input upload -->
+                <div class="mt-2">
+                 <.live_file_input upload={@uploads.ic_attachment} />
+               </div>
+            </div>
+
+          <:actions>
+           <.button
+             type="submit"
+              class="bg-green-500 text-white px-6 py-2 rounded-xl hover:bg-green-600 transition mt-4 w-fit mx-auto">
+               💾 Simpan Profil
+           </.button>
+          </:actions>s
             </.simple_form>
           </div>
          </div>
