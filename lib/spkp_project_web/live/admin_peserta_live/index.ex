@@ -13,8 +13,49 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
       completed_courses: 50
     }
 
-    # Ambil data sebenar dari DB
-    course_categories =
+    {:ok,
+     socket
+     |> assign(:role, role)
+     |> assign(:participants_stats, participants_stats)
+     |> assign(:page, 1)
+     |> assign(:per_page, 5) # 5 per page
+     |> assign(:current_path, socket.assigns[:uri] && URI.parse(socket.assigns.uri).path || "/")
+     |> load_course_categories()}
+  end
+
+  # Semua handle_event/3 diletakkan bersama supaya compiler tidak komplen
+  @impl true
+  def handle_event("noop", _params, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("goto_page", %{"page" => page}, socket) do
+    # ensure page param is integer (comes as string from phx-value)
+    page_int =
+      case page do
+        p when is_integer(p) -> p
+        p when is_binary(p) ->
+          case Integer.parse(p) do
+            {n, ""} -> n
+            _ -> socket.assigns.page
+          end
+        _ -> socket.assigns.page
+      end
+
+    {:noreply,
+     socket
+     |> assign(:page, page_int)
+     |> load_course_categories()}
+  end
+
+  # helper untuk bina route ikut role
+  defp kategori_path("admin", id), do: ~p"/admin/kategori/#{id}"
+  defp kategori_path("pekerja", id), do: ~p"/pekerja/kategori/#{id}"
+
+  # Load data dengan pagination (per_page set di assigns)
+  defp load_course_categories(socket) do
+    all_categories =
       KursusKategori
       |> Repo.all()
       |> Repo.preload(:kursus)
@@ -26,17 +67,26 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
         }
       end)
 
-    {:ok,
-     socket
-     |> assign(:role, role)
-     |> assign(:participants_stats, participants_stats)
-     |> assign(:course_categories, course_categories)
-     |> assign(:current_path, socket.assigns[:uri] && URI.parse(socket.assigns.uri).path || "/")}
-  end
+    total_count = length(all_categories)
+    per_page = socket.assigns.per_page
+    # ceil division: (total_count + per_page - 1) // per_page
+    total_pages = max(div(total_count + per_page - 1, per_page), 1)
 
-  # helper untuk bina route ikut role
-  defp kategori_path("admin", id), do: ~p"/admin/kategori/#{id}"
-  defp kategori_path("pekerja", id), do: ~p"/pekerja/kategori/#{id}"
+    page =
+      socket.assigns.page
+      |> min(total_pages)
+      |> max(1)
+
+    start_index = (page - 1) * per_page
+    # Enum.slice(list, start_index, count) returns [] if out of range
+    page_entries = Enum.slice(all_categories, start_index, per_page)
+
+    socket
+    |> assign(:course_categories_collection, page_entries)
+    |> assign(:total_pages, total_pages)
+    |> assign(:total_count, total_count)
+    |> assign(:page, page)
+  end
 
   @impl true
   def render(assigns) do
@@ -54,44 +104,29 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <!-- Header -->
-        <div class="bg-white shadow-sm border-b border-gray-200">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
-              </div>
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <span class="text-gray-600"><%= @current_user.full_name%></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <span class="text-sm font-medium text-gray-700">
-                  <%= String.first(@current_user.full_name || "U") %>
-                </span>
-              </div>
             </div>
           </div>
-        </div>
+        </.header>
 
         <!-- Page Content -->
         <div class="flex-1 p-6">
           <!-- Page Title and Description -->
           <div class="mb-6">
+          <h1 class="text-4xl font-bold text-gray-900 mb-2">Peserta</h1>
             <p class="text-sm text-gray-600 mb-2">Pantau dan urus semua peserta kursus</p>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Peserta</h1>
             <div class="w-full h-px bg-gray-300"></div>
-          </div>
-
-          <!-- Add Participant Button -->
-          <div class="flex justify-end mb-6">
-            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg border border-gray-300 transition-colors">
-              + Tambah peserta
-            </button>
           </div>
 
           <!-- Course Categories Table -->
@@ -101,22 +136,25 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
             </div>
 
             <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Bil.</th>
-                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Kategori Kursus</th>
-                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Jumlah Kursus</th>
-                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Tindakan</th>
+              <table class="w-full border border-gray-300 rounded-lg shadow-lg text-center">
+                <thead>
+                  <tr class="bg-blue-900 text-white">
+                    <th class="px-4 py-3">Bil.</th>
+                    <th class="px-4 py-3">Kategori Kursus</th>
+                    <th class="px-4 py-3">Jumlah Kursus</th>
+                    <th class="px-4 py-3">Tindakan</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <%= for {category, index} <- Enum.with_index(@course_categories, 1) do %>
-                    <tr class="hover:bg-gray-50">
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200"><%= index %></td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200"><%= category.name %></td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200"><%= category.course_count %></td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200">
+                <tbody>
+                  <%= for {category, index} <- Enum.with_index(@course_categories_collection, 1 + (@page - 1) * @per_page) do %>
+                    <tr
+                      class="border-b cursor-pointer transition duration-200 ease-in-out hover:scale-[1.01] hover:shadow-md hover:bg-gray-100"
+                      phx-click={JS.navigate(kategori_path(@role, category.id))}
+                    >
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= index %></td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= category.name %></td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= category.course_count %></td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900" phx-click="noop">
                         <.link navigate={kategori_path(@role, category.id)} class="text-blue-600 hover:text-blue-800 font-medium">
                           Lihat
                         </.link>
@@ -126,6 +164,37 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
                 </tbody>
               </table>
             </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex justify-center mt-6 space-x-2">
+            <button
+              phx-click="goto_page"
+              phx-value-page={@page - 1}
+              class="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50"
+              disabled={@page <= 1}
+            >
+              Prev
+            </button>
+
+            <%= for p <- 1..@total_pages do %>
+              <button
+                phx-click="goto_page"
+                phx-value-page={p}
+                class={ "px-3 py-1 rounded border " <> if(p == @page, do: "bg-blue-600 text-white", else: "bg-white text-gray-700") }
+              >
+                <%= p %>
+              </button>
+            <% end %>
+
+            <button
+              phx-click="goto_page"
+              phx-value-page={@page + 1}
+              class="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50"
+              disabled={@page >= @total_pages}
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>

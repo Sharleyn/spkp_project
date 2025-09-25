@@ -44,7 +44,6 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Show do
             <div class="flex items-center space-x-4">
               <span class="text-gray-600"><%= @current_user.full_name %></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">Logout</.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
@@ -87,7 +86,7 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Show do
         </div>
 
         <div class="mt-6 flex gap-4">
-          <.link patch={~p"/pekerja/item_elaun_pekerja/#{@item_elaun_pekerja.id}/edit"}
+         <.link patch={~p"/pekerja/item_elaun_pekerja/#{@item_elaun_pekerja.id}/edit"}
                 class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
             Edit Item
           </.link>
