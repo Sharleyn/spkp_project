@@ -86,17 +86,16 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
       <div class="flex-1 flex flex-col">
         <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
-            <div class="flex items-center gap-4">
+            <div class="flex items-center space-x-4">
               <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <span class="text-gray-600"><%= @current_user.full_name%></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
@@ -109,19 +108,37 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
           </div>
         </div>
 
-        <!-- Table -->
-        <.table
-          id="maklumat_pekerja"
-          rows={@maklumat_pekerja_collection}
-          row_click={fn maklumat -> JS.navigate(~p"/admin/maklumat_pekerja/#{maklumat.id}") end}
-        >
-          <:col :let={m} label="Nama Penuh"><%= m.user.full_name %></:col>
-          <:col :let={m} label="Emel"><%= m.user.email %></:col>
-          <:col :let={m} label="No ic"><%= m.no_ic %></:col>
-          <:col :let={m} label="No tel"><%= m.no_tel %></:col>
-          <:col :let={m} label="Nama bank"><%= m.nama_bank %></:col>
-          <:col :let={m} label="No akaun"><%= m.no_akaun %></:col>
-        </.table>
+        <!-- Table (styled like kursus kategori) -->
+        <div class="px-10 w-full">
+          <table class="w-full border border-gray-300 rounded-lg shadow-lg text-center">
+            <thead>
+              <tr class="bg-blue-900 text-white">
+                <th class="px-4 py-3">Nama Penuh</th>
+                <th class="px-4 py-3">Emel</th>
+                <th class="px-4 py-3">No ic</th>
+                <th class="px-4 py-3">No tel</th>
+                <th class="px-4 py-3">Nama bank</th>
+                <th class="px-4 py-3">No akaun</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <%= for m <- @maklumat_pekerja_collection do %>
+                <tr
+                  class="border-b cursor-pointer transition duration-200 ease-in-out hover:scale-[1.01] hover:shadow-md hover:bg-gray-100"
+                  phx-click={JS.navigate(~p"/admin/maklumat_pekerja/#{m.id}")}
+                >
+                  <td class="px-4 py-3"><%= m.user.full_name %></td>
+                  <td class="px-4 py-3"><%= m.user.email %></td>
+                  <td class="px-4 py-3"><%= m.no_ic %></td>
+                  <td class="px-4 py-3"><%= m.no_tel %></td>
+                  <td class="px-4 py-3"><%= m.nama_bank %></td>
+                  <td class="px-4 py-3"><%= m.no_akaun %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
 
         <!-- Pagination -->
         <div class="flex justify-center mt-4 space-x-2">

@@ -23,4 +23,13 @@ defmodule SpkpProject.Elaun.ElaunPekerja do
     |> cast(attrs, [:tarikh_mula, :tarikh_akhir, :status_permohonan, :jumlah_keseluruhan, :maklumat_pekerja_id])
     |> validate_required([:tarikh_mula, :tarikh_akhir, :status_permohonan, :jumlah_keseluruhan, :maklumat_pekerja_id])
   end
+
+  def human_status_permohonan(status_permohonan) do
+    case status_permohonan do
+      "draft" -> "Draft"
+      "submitted" -> "Menunggu Kelulusan"
+      "diterima" -> "Diterima"
+      "ditolak" -> "Ditolak"
+    end
+  end
 end

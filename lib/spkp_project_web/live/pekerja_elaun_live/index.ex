@@ -3,6 +3,7 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Index do
 
   alias SpkpProject.Elaun
   alias SpkpProject.Accounts
+  alias SpkpProject.Elaun.ElaunPekerja
 
   @impl true
   def mount(_params, _session, socket) do
@@ -66,12 +67,12 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Index do
               <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
+
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <span class="text-gray-600"><%= @current_user.full_name%></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
@@ -84,16 +85,33 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Index do
           </div>
         </div>
 
-        <.table
-          id="elaun_saya"
-          rows={@elaun_saya}
-          row_click={fn elaun -> JS.navigate(~p"/pekerja/elaun/#{elaun.id}") end}
-        >
-          <:col :let={elaun} label="Tarikh Mula"><%= elaun.tarikh_mula %></:col>
-          <:col :let={elaun} label="Tarikh Akhir"><%= elaun.tarikh_akhir %></:col>
-          <:col :let={elaun} label="Status"><%= elaun.status_permohonan %></:col>
-          <:col :let={elaun} label="Jumlah (RM)"><%= elaun.jumlah_keseluruhan %></:col>
-        </.table>
+        <!-- Table (styled like kursus kategori) -->
+        <div class="px-10 w-full">
+          <table class="w-full border border-gray-300 rounded-lg shadow-lg text-center">
+            <thead>
+              <tr class="bg-blue-900 text-white">
+                <th class="px-4 py-3">Tarikh Mula</th>
+                <th class="px-4 py-3">Tarikh Akhir</th>
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3">Jumlah (RM)</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <%= for elaun <- @elaun_saya do %>
+                <tr
+                  class="border-b cursor-pointer transition duration-200 ease-in-out hover:scale-[1.01] hover:shadow-md hover:bg-gray-100"
+                  phx-click={JS.navigate(~p"/pekerja/elaun/#{elaun.id}")}
+                >
+                  <td class="px-4 py-3"><%= elaun.tarikh_mula %></td>
+                  <td class="px-4 py-3"><%= elaun.tarikh_akhir %></td>
+                  <td class="px-4 py-3"><%= elaun.status_permohonan |> ElaunPekerja.human_status_permohonan() %></td>
+                  <td class="px-4 py-3"><%= elaun.jumlah_keseluruhan %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
 
         <!-- Pagination -->
         <div class="flex justify-center items-center space-x-2 mt-4">
