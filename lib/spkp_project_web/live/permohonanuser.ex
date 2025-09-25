@@ -265,31 +265,34 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                  </div>
 
                  <!-- ✅ Sijil (mesti masih dalam loop) -->
-                    <div class="mt-4">
-                      <%= cond do %>
-                        <% permohonan.status != "Diterima" -> %>
-                      <!-- Selain Diterima (Ditolak / Dalam Proses), jangan tunjuk apa-apa -->
-                      <%= "" %>
+                     <div class="mt-4">
+                       <%= cond do %>
+                         <% permohonan.status != "Diterima" -> %>
+                         <!-- Selain Diterima (Ditolak / Dalam Proses), jangan tunjuk apa-apa -->
+                         <%= "" %>
 
-                      <% Date.compare(permohonan.kursus.tarikh_akhir, Date.utc_today()) == :gt -> %>
-                        <p class="italic text-gray-500 text-sm font-medium">
-                          ** Sijil hanya tersedia selepas kursus tamat **
-                        </p>
+                       <% Date.compare(permohonan.kursus.tarikh_akhir, Date.utc_today()) == :gt -> %>
+                         <p class="italic text-gray-500 text-sm font-medium">
+                           <i class="fa fa-hourglass-half text-yellow-500" aria-hidden="true"></i>
+                              Sijil hanya tersedia selepas kursus tamat
+                           </p>
 
-                      <% is_nil(permohonan.certificate) or is_nil(permohonan.certificate.sijil_url) -> %>
-                        <p class="italic text-gray-500 text-sm">
-                           Sijil Belum Dimuat Naik
-                        </p>
+                       <% is_nil(permohonan.certificate) or is_nil(permohonan.certificate.sijil_url) -> %>
+                         <p class="italic text-gray-500 text-sm font-medium">
+                           <i class="fa fa-exclamation-triangle text-red-500" aria-hidden="true"></i>
+                              Sijil Belum Dimuat Naik
+                         </p>
 
-                      <% true -> %>
-                        <a href={permohonan.certificate.sijil_url}
-                           class="px-4 py-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700">
-                            🎓 Muat Turun Sijil
-                        </a>
+                       <% true -> %>
+                          <a href={permohonan.certificate.sijil_url}
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white font-bold hover:bg-green-700">
+                             <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                               Muat Turun Sijil
+                          </a>
                       <% end %>
                     </div>
 
-                </div>
+                 </div>
                <% end %>
 
 
