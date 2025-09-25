@@ -129,13 +129,6 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
             <div class="w-full h-px bg-gray-300"></div>
           </div>
 
-          <!-- Add Participant Button -->
-          <div class="flex justify-end mb-6">
-            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg border border-gray-300 transition-colors">
-              + Tambah peserta
-            </button>
-          </div>
-
           <!-- Course Categories Table -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="bg-gray-100 px-6 py-4 border-b border-gray-200">

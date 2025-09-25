@@ -118,16 +118,16 @@ defmodule SpkpProjectWeb.DashboardLive do
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Box 1 - Tambah Kursus -->
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
+        <div class="bg-white border border-gray-200 border-l-4 border-l-blue-300 rounded-xl p-6 hover:shadow-md transition-all duration-200 cursor-pointer group">
           <.link patch={if @role == "admin", do: ~p"/admin/kursus/new?return_to=/admin/dashboard", else: ~p"/pekerja/kursus/new?return_to=/pekerja/dashboard"} class="block">
             <div class="flex items-center mb-3">
-              <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
+              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
               </div>
             </div>
-            <h4 class="font-semibold text-gray-800 mb-2 group-hover:text-blue-700 transition-colors duration-300">Tambah kursus baru</h4>
+            <h4 class="font-semibold text-gray-800 mb-2 group-hover:text-blue-700 transition-colors duration-200">Tambah kursus baru</h4>
             <p class="text-gray-600 text-sm">Cipta kursus baru untuk peserta</p>
           </.link>
         </div>
@@ -135,15 +135,15 @@ defmodule SpkpProjectWeb.DashboardLive do
         <!-- Box 2 - Pengesahan Permohonan (Admin only) -->
         <%= if @role == "admin" do %>
           <.link navigate={~p"/admin/permohonan"} class="block">
-            <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
+            <div class="bg-white border border-gray-200 border-l-4 border-l-green-300 rounded-xl p-6 hover:shadow-md transition-all duration-200 cursor-pointer group">
               <div class="flex items-center mb-3">
-                <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center group-hover:bg-green-600 transition-colors duration-300">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors duration-200">
                   <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                 </div>
               </div>
-              <h4 class="font-semibold text-gray-800 mb-2 group-hover:text-green-700 transition-colors duration-300">Pengesahan permohonan</h4>
+              <h4 class="font-semibold text-gray-800 mb-2 group-hover:text-green-700 transition-colors duration-200">Pengesahan permohonan</h4>
               <p class="text-gray-600 text-sm">Semak dan sahkan permohonan baru</p>
             </div>
           </.link>
@@ -151,15 +151,15 @@ defmodule SpkpProjectWeb.DashboardLive do
 
         <!-- Box 3 - Senarai Peserta -->
         <.link navigate={if @role == "admin", do: ~p"/admin/peserta", else: ~p"/pekerja/peserta"} class="block">
-          <div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
+          <div class="bg-white border border-gray-200 border-l-4 border-l-purple-300 rounded-xl p-6 hover:shadow-md transition-all duration-200 cursor-pointer group">
             <div class="flex items-center mb-3">
-              <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center group-hover:bg-purple-600 transition-colors duration-300">
+              <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors duration-200">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
               </div>
             </div>
-            <h4 class="font-semibold text-gray-800 mb-2 group-hover:text-purple-700 transition-colors duration-300">Senarai peserta</h4>
+            <h4 class="font-semibold text-gray-800 mb-2 group-hover:text-purple-700 transition-colors duration-200">Senarai peserta</h4>
             <p class="text-gray-600 text-sm">Senarai peserta yang mengikuti kursus</p>
           </div>
         </.link>
@@ -172,13 +172,13 @@ defmodule SpkpProjectWeb.DashboardLive do
     ~H"""
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 px-6 mb-8">
       <!-- Stat Box 1 - Jumlah Peserta -->
-      <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500 opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+      <div class="bg-white border border-gray-200 border-l-4 border-l-blue-300 rounded-xl p-6 shadow-sm overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-full -translate-y-8 translate-x-8"></div>
         <div class="relative">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-sm font-medium text-blue-700">Jumlah Peserta</h4>
-            <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
               </svg>
             </div>
@@ -188,13 +188,13 @@ defmodule SpkpProjectWeb.DashboardLive do
       </div>
 
       <!-- Stat Box 2 - Kursus Tersedia -->
-      <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6 shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-20 h-20 bg-green-500 opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+      <div class="bg-white border border-gray-200 border-l-4 border-l-green-300 rounded-xl p-6 shadow-sm overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-green-50 rounded-full -translate-y-8 translate-x-8"></div>
         <div class="relative">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-sm font-medium text-green-700">Kursus Tersedia</h4>
-            <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
               </svg>
             </div>
@@ -204,13 +204,13 @@ defmodule SpkpProjectWeb.DashboardLive do
       </div>
 
       <!-- Stat Box 3 - Pendaftaran Baharu -->
-      <div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-20 h-20 bg-orange-500 opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+      <div class="bg-white border border-gray-200 border-l-4 border-l-orange-300 rounded-xl p-6 shadow-sm overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-orange-50 rounded-full -translate-y-8 translate-x-8"></div>
         <div class="relative">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-sm font-medium text-orange-700">Pendaftaran Baharu</h4>
-            <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
             </div>
@@ -220,13 +220,13 @@ defmodule SpkpProjectWeb.DashboardLive do
       </div>
 
       <!-- Stat Box 4 - Kadar Tamat -->
-      <div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-20 h-20 bg-purple-500 opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+      <div class="bg-white border border-gray-200 border-l-4 border-l-purple-300 rounded-xl p-6 shadow-sm overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-purple-50 rounded-full -translate-y-8 translate-x-8"></div>
         <div class="relative">
           <div class="flex items-center justify-between mb-2">
             <h4 class="text-sm font-medium text-purple-700">Kadar Tamat</h4>
-            <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
             </div>
