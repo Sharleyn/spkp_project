@@ -41,8 +41,8 @@ defmodule SpkpProject.Accounts.UserProfile do
     @doc false
   def changeset(user_profile, attrs) do
     user_profile
-    |> cast(attrs, [:user_id, :ic, :gender, :phone_number, :address, :district, :education, :ic_attachment, :tarikh_lahir])
-    |> validate_required([:user_id, :ic, :gender, :phone_number, :address, :district, :education, :tarikh_lahir])
+    |> cast(attrs, [:user_id, :ic, :age, :gender, :phone_number, :address, :district, :education, :ic_attachment, :tarikh_lahir])
+    |> validate_required([:user_id, :age, :ic, :gender, :phone_number, :address, :district, :education, :tarikh_lahir])
     |> validate_inclusion(:gender, @gender_options)
     |> validate_inclusion(:district, @district_options)
     |> validate_inclusion(:education, @education_options)

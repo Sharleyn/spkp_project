@@ -11,6 +11,9 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
     belongs_to :user, SpkpProject.Accounts.User
     belongs_to :kursus, SpkpProject.Kursus.Kursuss
 
+    # ✅ Tambah association untuk sijil
+    has_one :certificate, SpkpProject.Certificate, foreign_key: :user_permohonan_id
+
     timestamps(type: :utc_datetime)
   end
 
