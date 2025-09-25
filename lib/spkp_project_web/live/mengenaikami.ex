@@ -142,7 +142,7 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
         <div id="carta" class="tab-content hidden">
           <h2 class="text-2xl flex justify-center font-bold mb-4">Carta Organisasi</h2>
 
-          <img src={~p"/images/carta1.png"} alt="Carta Organisasi" class="flex justify-center w-full">
+          <img src={~p"/images/organisasi.png"} alt="Carta Organisasi" class="flex justify-center w-full">
 
         </div>
 
