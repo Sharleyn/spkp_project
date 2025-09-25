@@ -9,6 +9,7 @@ defmodule SpkpProject.Certificate do
 
     belongs_to :user, SpkpProject.Accounts.User
     belongs_to :kursus, SpkpProject.Kursus.Kursuss
+    belongs_to :user_permohonan, SpkpProject.Userpermohonan.Userpermohonan
 
     timestamps(type: :utc_datetime)
   end

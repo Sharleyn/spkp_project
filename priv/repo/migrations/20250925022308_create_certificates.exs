@@ -9,6 +9,9 @@ defmodule SpkpProject.Repo.Migrations.CreateCertificates do
       add :user_id, references(:users, on_delete: :nothing)
       add :kursus_id, references(:kursus, on_delete: :nothing)
 
+      # ✅ Tambah foreign key untuk hubungan dengan user_permohonan
+      add :user_permohonan_id, references(:userpermohonan, on_delete: :delete_all)
+
       timestamps(type: :utc_datetime)
     end
 
