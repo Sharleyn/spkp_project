@@ -3,8 +3,9 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket
-    |> assign(:role, socket.assigns.current_user.role)}
+    {:ok,
+     socket
+     |> assign(:role, socket.assigns.current_user.role)}
   end
 
   @impl true
@@ -25,28 +26,28 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
         current_user={@current_user}
         current_path={@current_path}
       />
+
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
-              </div>
-
-              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              <h1 class="text-xl font-semibold text-gray-800">
+                <%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %>
+              </h1>
             </div>
 
             <div class="flex items-center space-x-4">
               <span class="text-gray-600"><%= @current_user.full_name %></span>
-              <button class="text-gray-600 hover:text-gray-800">Logout</button>
-              <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-black rounded-full"></div>
-              </div>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
+              </.link>
+              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
-        </header>
+        </.header>
+
         <!-- Main Content Area -->
         <div class="flex-1 bg-gray-100 p-6">
           <!-- Breadcrumb and Title -->
@@ -57,9 +58,9 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
               </svg>
               <h2 class="text-3xl font-semibold text-gray-800">Dashboard Admin Kursus</h2>
             </div>
-
             <div class="text-sm text-gray-500">Tetapan admin</div>
           </div>
+
           <!-- Tukar Kata Laluan Section -->
           <div class="bg-white rounded-lg shadow-sm border p-8 max-w-2xl mx-auto">
             <h3 class="text-3xl font-semibold text-gray-800 text-center mb-8">Tukar Kata Laluan</h3>
@@ -84,15 +85,14 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
               </div>
 
               <div>
-                <label class="block text-xl font-semibold text-gray-800 mb-2">
-                  Sahkan Kata Laluan Baru
-                </label>
+                <label class="block text-xl font-semibold text-gray-800 mb-2">Sahkan Kata Laluan Baru</label>
                 <input
                   type="text"
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Masukkan kata laluan baru"
                 />
               </div>
+
               <!-- Save Button -->
               <div class="flex justify-center pt-4">
                 <button

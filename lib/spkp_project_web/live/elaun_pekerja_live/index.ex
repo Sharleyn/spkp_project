@@ -127,13 +127,13 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Index do
       <div class="flex-1 flex flex-col">
         <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
-            <div class="flex items-center gap-4">
+            <div class="flex items-center space-x-4">
               <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <span class="text-gray-600"><%= @current_user.full_name%></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
@@ -164,31 +164,48 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Index do
           </div>
 
 
-        <!-- Table -->
-        <.table
-          id="elaun_pekerja"
-          rows={@elaun_pekerja_collection}
-          row_click={fn elaun_pekerja -> JS.navigate(~p"/admin/elaun_pekerja/#{elaun_pekerja}") end}
-        >
-          <:col :let={elaun_pekerja} label="Nama Penuh">{elaun_pekerja.maklumat_pekerja.user.full_name}</:col>
-          <:col :let={elaun_pekerja} label="Tarikh mula">{elaun_pekerja.tarikh_mula}</:col>
-          <:col :let={elaun_pekerja} label="Tarikh akhir">{elaun_pekerja.tarikh_akhir}</:col>
-          <:col :let={elaun_pekerja} label="Status permohonan">{elaun_pekerja.status_permohonan}</:col>
-          <:col :let={elaun_pekerja} label="Jumlah keseluruhan">{elaun_pekerja.jumlah_keseluruhan}</:col>
+        <!-- Table (styled like kursus kategori) -->
+        <div class="px-10 pt-4 w-full">
+          <table class="w-full border border-gray-300 rounded-lg shadow-lg text-center">
+            <thead>
+              <tr class="bg-blue-900 text-white">
+                <th class="px-4 py-3">Nama Penuh</th>
+                <th class="px-4 py-3">Tarikh mula</th>
+                <th class="px-4 py-3">Tarikh akhir</th>
+                <th class="px-4 py-3">Status permohonan</th>
+                <th class="px-4 py-3">Jumlah keseluruhan</th>
+                <th class="px-4 py-3">Tindakan</th>
+              </tr>
+            </thead>
 
-          <:action :let={elaun_pekerja}>
-            <.link patch={~p"/admin/elaun_pekerja/#{elaun_pekerja}/edit"}>Edit</.link>
-          </:action>
-
-          <:action :let={elaun_pekerja}>
-            <.link
-              phx-click={JS.push("delete", value: %{id: elaun_pekerja.id})}
-              data-confirm="Are you sure?"
-            >
-              Delete
-            </.link>
-          </:action>
-        </.table>
+            <tbody>
+              <%= for elaun_pekerja <- @elaun_pekerja_collection do %>
+                <tr
+                  class="border-b cursor-pointer transition duration-200 ease-in-out hover:scale-[1.01] hover:shadow-md hover:bg-gray-100"
+                  phx-click={JS.navigate(~p"/admin/elaun_pekerja/#{elaun_pekerja}")}
+                >
+                  <td class="px-4 py-3"><%= elaun_pekerja.maklumat_pekerja.user.full_name %></td>
+                  <td class="px-4 py-3"><%= elaun_pekerja.tarikh_mula %></td>
+                  <td class="px-4 py-3"><%= elaun_pekerja.tarikh_akhir %></td>
+                  <td class="px-4 py-3"><%= elaun_pekerja.status_permohonan |> ElaunPekerja.human_status_permohonan() %></td>
+                  <td class="px-4 py-3"><%= elaun_pekerja.jumlah_keseluruhan %></td>
+                  <td class="px-4 py-3 space-x-3" phx-click="noop">
+                    <.link patch={~p"/admin/elaun_pekerja/#{elaun_pekerja}/edit"} class="text-blue-600 font-medium hover:underline">
+                      Edit
+                    </.link>
+                    <.link
+                      phx-click={JS.push("delete", value: %{id: elaun_pekerja.id})}
+                      data-confirm="Are you sure?"
+                      class="text-red-600 font-medium hover:underline"
+                    >
+                      Delete
+                    </.link>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
 
         <!-- Pagination -->
         <div class="flex justify-center mt-6 space-x-2">

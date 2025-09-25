@@ -58,19 +58,11 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
             </div>
 
             <div class="flex items-center space-x-4">
-              <!-- Email ikut siapa yang login -->
-              <span class="text-gray-600"><%= @current_user.full_name %></span>
-
+              <span class="text-gray-600"><%= @current_user.full_name%></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
-
-              <!-- Avatar -->
-              <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <span class="text-sm font-medium text-gray-700">
-                  <%= String.first(@current_user.full_name || @current_user.email) |> String.upcase() %>
-                </span>
-              </div>
+              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>

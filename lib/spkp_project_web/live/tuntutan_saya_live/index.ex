@@ -169,30 +169,22 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
       />
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-200">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
-              </div>
-
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.full_name %></span>
-
-                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-              Logout
+              <span class="text-gray-600"><%= @current_user.full_name%></span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
               </.link>
-
-              <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-black rounded-full"></div>
-              </div>
+              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
-        </header>
+        </.header>
 
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">
@@ -231,27 +223,44 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Index do
         </div>
 
 
-        <.table
-          id="item_elaun_pekerja"
-          rows={@item_elaun_pekerja_collection}
-          row_click={fn item -> JS.navigate(~p"/pekerja/item_elaun_pekerja/#{item.id}") end}
-        >
-          <:col :let={item} label="Kenyataan tuntutan"><%= item.kenyataan_tuntutan %></:col>
-          <:col :let={item} label="Tarikh tuntutan"><%= item.tarikh_tuntutan %></:col>
-          <:col :let={item} label="Masa mula"><%= item.masa_mula %></:col>
-          <:col :let={item} label="Masa tamat"><%= item.masa_tamat %></:col>
-          <:col :let={item} label="Keterangan"><%= item.keterangan %></:col>
-          <:col :let={item} label="Jumlah"><%= item.jumlah %></:col>
+        <!-- Table (styled like kursus kategori) -->
+        <div class="px-10 pt-4 w-full">
+          <table class="w-full border border-gray-300 rounded-lg shadow-lg text-center">
+            <thead>
+              <tr class="bg-blue-900 text-white">
+                <th class="px-4 py-3">Kenyataan tuntutan</th>
+                <th class="px-4 py-3">Tarikh tuntutan</th>
+                <th class="px-4 py-3">Masa mula</th>
+                <th class="px-4 py-3">Masa tamat</th>
+                <th class="px-4 py-3">Keterangan</th>
+                <th class="px-4 py-3">Jumlah</th>
+                <th class="px-4 py-3">Tindakan</th>
+              </tr>
+            </thead>
 
-          <:action :let={item}>
-
-            <%= if @elaun do %>
-              <.link patch={~p"/pekerja/elaun/#{@elaun.id}?action=edit_item&id_item=#{item.id}"}>Edit</.link>
-            <% end %>
-
-            <.link phx-click={JS.push("delete", value: %{id: item.id})} data-confirm="Are you sure?">Delete</.link>
-          </:action>
-        </.table>
+            <tbody>
+              <%= for item <- @item_elaun_pekerja_collection do %>
+                <tr
+                  class="border-b cursor-pointer transition duration-200 ease-in-out hover:scale-[1.01] hover:shadow-md hover:bg-gray-100"
+                  phx-click={JS.navigate(~p"/pekerja/item_elaun_pekerja/#{item.id}")}
+                >
+                  <td class="px-4 py-3"><%= item.kenyataan_tuntutan %></td>
+                  <td class="px-4 py-3"><%= item.tarikh_tuntutan %></td>
+                  <td class="px-4 py-3"><%= item.masa_mula %></td>
+                  <td class="px-4 py-3"><%= item.masa_tamat %></td>
+                  <td class="px-4 py-3"><%= item.keterangan %></td>
+                  <td class="px-4 py-3"><%= item.jumlah %></td>
+                  <td class="px-4 py-3 space-x-3" phx-click="noop">
+                    <%= if @elaun do %>
+                      <.link patch={~p"/pekerja/elaun/#{@elaun.id}?action=edit_item&id_item=#{item.id}"} class="text-blue-600 font-medium hover:underline">Edit</.link>
+                    <% end %>
+                    <.link phx-click={JS.push("delete", value: %{id: item.id})} data-confirm="Are you sure?" class="text-red-600 font-medium hover:underline">Delete</.link>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
 
         <!-- Pagination -->
         <div class="flex justify-center mt-4 space-x-2">

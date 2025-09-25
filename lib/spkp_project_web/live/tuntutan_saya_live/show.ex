@@ -87,7 +87,7 @@ defmodule SpkpProjectWeb.TuntutanSayaLive.Show do
         </div>
 
         <div class="mt-6 flex gap-4">
-          <.link patch={~p"/pekerja/item_elaun_pekerja/#{@item_elaun_pekerja.id}/edit"}
+         <.link patch={~p"/pekerja/item_elaun_pekerja/#{@item_elaun_pekerja.id}/edit"}
                 class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
             Edit Item
           </.link>

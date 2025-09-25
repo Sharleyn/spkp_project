@@ -58,8 +58,10 @@ defmodule SpkpProjectWeb.AdminKategoriLive.Show do
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.full_name %></span>
-              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">Logout</.link>
+              <span class="text-gray-600"><%= @current_user.full_name%></span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
+              </.link>
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>

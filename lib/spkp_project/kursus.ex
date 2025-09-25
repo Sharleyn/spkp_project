@@ -23,6 +23,30 @@ defmodule SpkpProject.Kursus do
     Repo.all(KursusKategori)
   end
 
+  #Tambah pagination di Kursus kategori
+  def list_kursus_kategori_paginated(page \\ 1, per_page \\ 5) do
+    query = from k in KursusKategori, order_by: [asc: k.kategori]
+
+    total_entries = Repo.aggregate(query, :count, :id)
+
+    entries =
+      query
+      |> limit(^per_page)
+      |> offset(^((page - 1) * per_page))
+      |> Repo.all()
+
+      total_pages = div(total_entries + per_page - 1, per_page)
+
+    %{
+      entries: entries,
+      page: page,
+      per_page: per_page,
+      total_entries: total_entries,
+      total_pages: total_pages
+    }
+  end
+
+
   @doc """
   Gets a single kursus_kategori.
 

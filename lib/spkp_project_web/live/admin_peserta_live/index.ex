@@ -54,29 +54,22 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <!-- Header -->
-        <div class="bg-white shadow-sm border-b border-gray-200">
+        <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
-              </div>
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <span class="text-gray-600"><%= @current_user.full_name%></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <span class="text-sm font-medium text-gray-700">
-                  <%= String.first(@current_user.full_name || "U") %>
-                </span>
-              </div>
+              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
-        </div>
+        </.header>
 
         <!-- Page Content -->
         <div class="flex-1 p-6">
@@ -101,22 +94,22 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
             </div>
 
             <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Bil.</th>
-                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Kategori Kursus</th>
-                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Jumlah Kursus</th>
-                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider border-b border-gray-200">Tindakan</th>
+              <table class="w-full border border-gray-300 rounded-lg shadow-lg text-center">
+                <thead>
+                  <tr class="bg-blue-900 text-white">
+                    <th class="px-4 py-3">Bil.</th>
+                    <th class="px-4 py-3">Kategori Kursus</th>
+                    <th class="px-4 py-3">Jumlah Kursus</th>
+                    <th class="px-4 py-3">Tindakan</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody>
                   <%= for {category, index} <- Enum.with_index(@course_categories, 1) do %>
-                    <tr class="hover:bg-gray-50">
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200"><%= index %></td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200"><%= category.name %></td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200"><%= category.course_count %></td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200">
+                    <tr class="border-b hover:bg-gray-100">
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= index %></td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= category.name %></td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= category.course_count %></td>
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                         <.link navigate={kategori_path(@role, category.id)} class="text-blue-600 hover:text-blue-800 font-medium">
                           Lihat
                         </.link>

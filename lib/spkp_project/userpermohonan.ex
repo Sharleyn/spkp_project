@@ -127,4 +127,28 @@ defmodule SpkpProject.Userpermohonan do
 
       Repo.all(query)
     end
-  end
+
+      # ✅ Tambahkan fungsi pagination admin di bawah sekali
+      def list_permohonan_paginated(page \\ 1, per_page \\ 5) do
+        query =
+          from p in Userpermohonan,
+            order_by: [desc: p.inserted_at],
+            preload: [:user, :kursus]
+
+        total_entries = Repo.aggregate(query, :count, :id)
+
+        entries =
+          query
+          |> limit(^per_page)
+          |> offset(^((page - 1) * per_page))
+          |> Repo.all()
+
+        %{
+          entries: entries,
+          page: page,
+          per_page: per_page,
+          total_entries: total_entries,
+          total_pages: div(total_entries + per_page - 1, per_page)
+        }
+      end
+    end
