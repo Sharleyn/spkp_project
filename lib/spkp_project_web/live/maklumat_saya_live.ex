@@ -15,7 +15,8 @@ defmodule SpkpProjectWeb.MaklumatSayaLive do
      socket
      |> assign(:maklumat_pekerja, maklumat)
      |> assign(:changeset, Accounts.change_maklumat_pekerja(maklumat))
-     |> assign(:current_path, "")}
+     |> assign(:current_path, "")
+     |> assign(:role, socket.assigns.current_user.role)}
   end
 
   @impl true
@@ -86,10 +87,11 @@ defmodule SpkpProjectWeb.MaklumatSayaLive do
           <div class="flex justify-between items-center px-6 py-4">
             <div class="flex items-center space-x-4">
               <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600"><%= @current_user.email %></span>
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>

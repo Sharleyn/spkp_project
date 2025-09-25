@@ -140,8 +140,8 @@ defmodule SpkpProjectWeb.SidebarComponent do
               </.link>
               <% else %>
                   <.link
-                    navigate={~p"/pekerja/senaraipeserta"}
-                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/senaraipeserta", do: "bg-gray-600 font-bold"}"}
+                    navigate={~p"/pekerja/peserta"}
+                    class={"block p-2 mb-1 rounded-lg hover:bg-gray-600 text-sm #{if @active_link == "/pekerja/peserta", do: "bg-gray-600 font-bold"}"}
               >
               Senarai Peserta
               </.link>
