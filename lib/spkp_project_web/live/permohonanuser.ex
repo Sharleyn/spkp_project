@@ -325,28 +325,44 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
   @impl true
  # ========== EVENTS ==========
   def handle_event("filter", %{"filter" => filter}, socket) do
+    # Reset balik ke page 1 setiap kali tukar filter
+    page = 1
+
     {apps, has_more} =
       Userpermohonan.list_user_applications(
         socket.assigns.current_user.id,
         filter,
-        socket.assigns.page,
+        page,
         socket.assigns.per_page
       )
 
-    {:noreply, assign(socket, applications: apps, filter: filter, has_more: has_more)}
+    {:noreply,
+     assign(socket,
+       applications: apps,
+       filter: filter,
+       page: page,        # reset page
+       has_more: has_more
+     )}
   end
 
   def handle_event("search", %{"value" => term}, socket) do
+    page = 1
+
     {apps, has_more} =
       Userpermohonan.search_user_applications(
         socket.assigns.current_user.id,
         term,
         socket.assigns.filter,
-        socket.assigns.page,
+        page,
         socket.assigns.per_page
       )
 
-    {:noreply, assign(socket, applications: apps, has_more: has_more)}
+    {:noreply,
+     assign(socket,
+       applications: apps,
+       page: page,
+       has_more: has_more
+     )}
   end
 
   def handle_event("next_page", _params, socket) do
