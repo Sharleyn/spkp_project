@@ -11,7 +11,8 @@ defmodule SpkpProject.Userpermohonan do
       from(p in SpkpProject.Userpermohonan.Userpermohonan,
         where: p.user_id == ^user_id,
         join: k in assoc(p, :kursus),
-        preload: [kursus: k],
+        left_join: cert in assoc(p, :certificate), # join sijil
+        preload: [kursus: k, certificate: cert],   # 👈 wajib preload!
         order_by: [desc: p.inserted_at]
       )
 
@@ -39,7 +40,8 @@ defmodule SpkpProject.Userpermohonan do
       from(p in SpkpProject.Userpermohonan.Userpermohonan,
         where: p.user_id == ^user_id,
         join: k in assoc(p, :kursus),
-        preload: [kursus: k],
+        left_join: cert in assoc(p, :certificate),
+        preload: [kursus: k, certificate: cert],   # ✅
         where: ilike(k.nama_kursus, ^"%#{term}%"),
         order_by: [desc: p.inserted_at]
       )
