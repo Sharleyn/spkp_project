@@ -48,7 +48,6 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Show do
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>

@@ -3,6 +3,7 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Index do
 
   alias SpkpProject.Elaun
   alias SpkpProject.Accounts
+  alias SpkpProject.Elaun.ElaunPekerja
 
   @impl true
   def mount(_params, _session, socket) do
@@ -72,7 +73,6 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Index do
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
@@ -105,7 +105,7 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Index do
                 >
                   <td class="px-4 py-3"><%= elaun.tarikh_mula %></td>
                   <td class="px-4 py-3"><%= elaun.tarikh_akhir %></td>
-                  <td class="px-4 py-3"><%= elaun.status_permohonan %></td>
+                  <td class="px-4 py-3"><%= elaun.status_permohonan |> ElaunPekerja.human_status_permohonan() %></td>
                   <td class="px-4 py-3"><%= elaun.jumlah_keseluruhan %></td>
                 </tr>
               <% end %>

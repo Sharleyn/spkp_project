@@ -13,8 +13,49 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
       completed_courses: 50
     }
 
-    # Ambil data sebenar dari DB
-    course_categories =
+    {:ok,
+     socket
+     |> assign(:role, role)
+     |> assign(:participants_stats, participants_stats)
+     |> assign(:page, 1)
+     |> assign(:per_page, 5) # 5 per page
+     |> assign(:current_path, socket.assigns[:uri] && URI.parse(socket.assigns.uri).path || "/")
+     |> load_course_categories()}
+  end
+
+  # Semua handle_event/3 diletakkan bersama supaya compiler tidak komplen
+  @impl true
+  def handle_event("noop", _params, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("goto_page", %{"page" => page}, socket) do
+    # ensure page param is integer (comes as string from phx-value)
+    page_int =
+      case page do
+        p when is_integer(p) -> p
+        p when is_binary(p) ->
+          case Integer.parse(p) do
+            {n, ""} -> n
+            _ -> socket.assigns.page
+          end
+        _ -> socket.assigns.page
+      end
+
+    {:noreply,
+     socket
+     |> assign(:page, page_int)
+     |> load_course_categories()}
+  end
+
+  # helper untuk bina route ikut role
+  defp kategori_path("admin", id), do: ~p"/admin/kategori/#{id}"
+  defp kategori_path("pekerja", id), do: ~p"/pekerja/kategori/#{id}"
+
+  # Load data dengan pagination (per_page set di assigns)
+  defp load_course_categories(socket) do
+    all_categories =
       KursusKategori
       |> Repo.all()
       |> Repo.preload(:kursus)
@@ -26,17 +67,26 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
         }
       end)
 
-    {:ok,
-     socket
-     |> assign(:role, role)
-     |> assign(:participants_stats, participants_stats)
-     |> assign(:course_categories, course_categories)
-     |> assign(:current_path, socket.assigns[:uri] && URI.parse(socket.assigns.uri).path || "/")}
-  end
+    total_count = length(all_categories)
+    per_page = socket.assigns.per_page
+    # ceil division: (total_count + per_page - 1) // per_page
+    total_pages = max(div(total_count + per_page - 1, per_page), 1)
 
-  # helper untuk bina route ikut role
-  defp kategori_path("admin", id), do: ~p"/admin/kategori/#{id}"
-  defp kategori_path("pekerja", id), do: ~p"/pekerja/kategori/#{id}"
+    page =
+      socket.assigns.page
+      |> min(total_pages)
+      |> max(1)
+
+    start_index = (page - 1) * per_page
+    # Enum.slice(list, start_index, count) returns [] if out of range
+    page_entries = Enum.slice(all_categories, start_index, per_page)
+
+    socket
+    |> assign(:course_categories_collection, page_entries)
+    |> assign(:total_pages, total_pages)
+    |> assign(:total_count, total_count)
+    |> assign(:page, page)
+  end
 
   @impl true
   def render(assigns) do
@@ -66,7 +116,6 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
                 Logout
               </.link>
-              <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
@@ -75,8 +124,8 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
         <div class="flex-1 p-6">
           <!-- Page Title and Description -->
           <div class="mb-6">
+          <h1 class="text-4xl font-bold text-gray-900 mb-2">Peserta</h1>
             <p class="text-sm text-gray-600 mb-2">Pantau dan urus semua peserta kursus</p>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Peserta</h1>
             <div class="w-full h-px bg-gray-300"></div>
           </div>
 
@@ -104,12 +153,15 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
                   </tr>
                 </thead>
                 <tbody>
-                  <%= for {category, index} <- Enum.with_index(@course_categories, 1) do %>
-                    <tr class="border-b hover:bg-gray-100">
+                  <%= for {category, index} <- Enum.with_index(@course_categories_collection, 1 + (@page - 1) * @per_page) do %>
+                    <tr
+                      class="border-b cursor-pointer transition duration-200 ease-in-out hover:scale-[1.01] hover:shadow-md hover:bg-gray-100"
+                      phx-click={JS.navigate(kategori_path(@role, category.id))}
+                    >
                       <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= index %></td>
                       <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= category.name %></td>
                       <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"><%= category.course_count %></td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900" phx-click="noop">
                         <.link navigate={kategori_path(@role, category.id)} class="text-blue-600 hover:text-blue-800 font-medium">
                           Lihat
                         </.link>
@@ -119,6 +171,37 @@ defmodule SpkpProjectWeb.AdminPesertaLive.Index do
                 </tbody>
               </table>
             </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex justify-center mt-6 space-x-2">
+            <button
+              phx-click="goto_page"
+              phx-value-page={@page - 1}
+              class="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50"
+              disabled={@page <= 1}
+            >
+              Prev
+            </button>
+
+            <%= for p <- 1..@total_pages do %>
+              <button
+                phx-click="goto_page"
+                phx-value-page={p}
+                class={ "px-3 py-1 rounded border " <> if(p == @page, do: "bg-blue-600 text-white", else: "bg-white text-gray-700") }
+              >
+                <%= p %>
+              </button>
+            <% end %>
+
+            <button
+              phx-click="goto_page"
+              phx-value-page={@page + 1}
+              class="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50"
+              disabled={@page >= @total_pages}
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>

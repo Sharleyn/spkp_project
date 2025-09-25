@@ -252,6 +252,7 @@ defmodule SpkpProjectWeb.KursussLive.FormComponent do
       consume_uploaded_entries(socket, :gambar_anjuran, fn %{path: path}, _entry ->
         uploads_dir = Path.expand("./uploads")
         File.mkdir_p!(uploads_dir)
+
         dest = Path.join(uploads_dir, Path.basename(path))
         File.cp!(path, dest)
         {:ok, "/uploads/#{Path.basename(dest)}"}
