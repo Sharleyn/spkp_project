@@ -6,7 +6,16 @@ defmodule SpkpProjectWeb.ItemElaunPekerjaLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :item_elaun_pekerja_collection, Elaun.list_item_elaun_pekerja())}
+    result = Elaun.list_item_elaun_pekerja_paginated(1, 5)
+
+    {:ok,
+     socket
+     |> assign(:item_elaun_pekerja_collection, result.data)
+     |> assign(:page, result.page)
+     |> assign(:total_pages, result.total_pages)
+     |> assign(:per_page, result.per_page)
+     |> assign(:query, "") # <<< untuk simpan nilai search
+     |> assign(:role, socket.assigns.current_user.role)}
   end
 
   @impl true
@@ -16,7 +25,6 @@ defmodule SpkpProjectWeb.ItemElaunPekerjaLive.Index do
      |> assign(:current_path, URI.parse(uri).path)
      |> apply_action(socket.assigns.live_action, params)}
   end
-
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
@@ -38,7 +46,10 @@ defmodule SpkpProjectWeb.ItemElaunPekerjaLive.Index do
 
   @impl true
   def handle_info({SpkpProjectWeb.ItemElaunPekerjaLive.FormComponent, {:saved, item_elaun_pekerja}}, socket) do
-    {:noreply, stream_insert(socket, :item_elaun_pekerja_collection, item_elaun_pekerja)}
+    {:noreply,
+     assign(socket, :item_elaun_pekerja_collection,
+       [item_elaun_pekerja | socket.assigns.item_elaun_pekerja_collection]
+     )}
   end
 
   @impl true
@@ -46,8 +57,48 @@ defmodule SpkpProjectWeb.ItemElaunPekerjaLive.Index do
     item_elaun_pekerja = Elaun.get_item_elaun_pekerja!(id)
     {:ok, _} = Elaun.delete_item_elaun_pekerja(item_elaun_pekerja)
 
-    {:noreply, stream_delete(socket, :item_elaun_pekerja_collection, item_elaun_pekerja)}
+    {:noreply,
+     assign(socket, :item_elaun_pekerja_collection,
+       Enum.reject(socket.assigns.item_elaun_pekerja_collection, fn i -> i.id == item_elaun_pekerja.id end)
+     )}
   end
+
+  @impl true
+  def handle_event("goto_page", %{"page" => page}, socket) do
+    page = String.to_integer(page)
+
+    results =
+      if socket.assigns.query == "" do
+        Elaun.list_item_elaun_pekerja_paginated(page, socket.assigns.per_page)
+      else
+        Elaun.search_item_elaun_pekerja(socket.assigns.query, page, socket.assigns.per_page)
+      end
+
+    {:noreply,
+     socket
+     |> assign(:item_elaun_pekerja_collection, results.data)
+     |> assign(:page, results.page)
+     |> assign(:total_pages, results.total_pages)}
+  end
+
+
+  @impl true
+  def handle_event("search", %{"q" => query}, socket) do
+    results =
+      if query == "" do
+        Elaun.list_item_elaun_pekerja_paginated(1, socket.assigns.per_page)
+      else
+        Elaun.search_item_elaun_pekerja(query, 1, socket.assigns.per_page) # <<< buat function ni dalam context Elaun
+      end
+
+    {:noreply,
+    socket
+    |> assign(:query, query)
+    |> assign(:item_elaun_pekerja_collection, results.data)
+    |> assign(:page, results.page)
+    |> assign(:total_pages, results.total_pages)}
+  end
+
 
   @impl true
   def render(assigns) do
@@ -71,90 +122,94 @@ defmodule SpkpProjectWeb.ItemElaunPekerjaLive.Index do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-
-              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
-
-                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-              Logout
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
               </.link>
-
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
+
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Item Tuntutan</h1>
-
             <p class="text-gray-600">Tambah item tuntutan baru</p>
           </div>
-           <.link patch={~p"/admin/elaun_pekerja/new"}><.button>Item tuntutan</.button></.link>
         </div>
 
-    <.table
-      id="item_elaun_pekerja"
-      rows={@streams.item_elaun_pekerja_collection}
-      row_click={fn {_id, item_elaun_pekerja} ->
-        JS.navigate(~p"/admin/item_elaun_pekerja/#{item_elaun_pekerja}")
-      end}
-    >
-      <:col :let={{_id, item_elaun_pekerja}} label="Kenyataan tuntutan">
-        <%= item_elaun_pekerja.kenyataan_tuntutan %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Tarikh tuntutan">
-        <%= item_elaun_pekerja.tarikh_tuntutan %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Masa mula">
-        <%= item_elaun_pekerja.masa_mula %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Masa tamat">
-        <%= item_elaun_pekerja.masa_tamat %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Keterangan">
-        <%= item_elaun_pekerja.keterangan %>
-      </:col>
-      <:col :let={{_id, item_elaun_pekerja}} label="Jumlah">
-        <%= item_elaun_pekerja.jumlah %>
-      </:col>
-
-      <:action :let={{_id, item_elaun_pekerja}}>
-        <div class="sr-only">
-          <.link navigate={~p"/admin/item_elaun_pekerja/#{item_elaun_pekerja}"}>Show</.link>
+        <!-- Search bar -->
+        <div class="flex justify-start px-20">
+          <form phx-change="search" class="w-full">
+            <input
+              type="text"
+              name="q"
+              value={@query}
+              placeholder="Cari item elaun pekerja..."
+              class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+            />
+          </form>
         </div>
-        <.link patch={~p"/admin/item_elaun_pekerja/#{item_elaun_pekerja}/edit"}>Edit</.link>
-      </:action>
 
-      <:action :let={{id, item_elaun_pekerja}}>
-        <.link
-          phx-click={JS.push("delete", value: %{id: item_elaun_pekerja.id}) |> hide("##{id}")}
-          data-confirm="Are you sure?"
+
+        <!-- Table -->
+        <.table
+          id="item_elaun_pekerja"
+          rows={@item_elaun_pekerja_collection}
+          row_click={fn item -> JS.navigate(~p"/admin/item_elaun_pekerja/#{item.id}") end}
         >
-          Delete
-        </.link>
-      </:action>
-    </.table>
+          <:col :let={item} label="Kenyataan tuntutan"><%= item.kenyataan_tuntutan %></:col>
+          <:col :let={item} label="Tarikh tuntutan"><%= item.tarikh_tuntutan %></:col>
+          <:col :let={item} label="Masa mula"><%= item.masa_mula %></:col>
+          <:col :let={item} label="Masa tamat"><%= item.masa_tamat %></:col>
+          <:col :let={item} label="Keterangan"><%= item.keterangan %></:col>
+          <:col :let={item} label="Jumlah"><%= item.jumlah %></:col>
+        </.table>
 
-    <.modal
-      :if={@live_action in [:new, :edit]}
-      id="item_elaun_pekerja-modal"
-      show
-      on_cancel={JS.patch(~p"/admin/item_elaun_pekerja")}
-    >
-      <.live_component
-        module={SpkpProjectWeb.ItemElaunPekerjaLive.FormComponent}
-        id={@item_elaun_pekerja.id || :new}
-        title={@page_title}
-        action={@live_action}
-        item_elaun_pekerja={@item_elaun_pekerja}
-        patch={~p"/admin/item_elaun_pekerja"}
-      />
-    </.modal>
-    </div>
+        <!-- Pagination -->
+        <div class="flex justify-center mt-4 space-x-2">
+          <!-- Prev -->
+          <%= if @page > 1 do %>
+            <button
+              phx-click="goto_page"
+              phx-value-page={@page - 1}
+              class="px-3 py-1 rounded border bg-white text-gray-700 hover:bg-gray-100"
+            >
+              Prev
+            </button>
+          <% end %>
+
+          <!-- Page Numbers -->
+          <%= for p <- 1..@total_pages do %>
+            <button
+              phx-click="goto_page"
+              phx-value-page={p}
+              class={
+                "px-3 py-1 rounded border " <>
+                  if(p == @page, do: "bg-blue-600 text-white", else: "bg-white text-gray-700")
+              }
+            >
+              <%= p %>
+            </button>
+          <% end %>
+
+          <!-- Next -->
+          <%= if @page < @total_pages do %>
+            <button
+              phx-click="goto_page"
+              phx-value-page={@page + 1}
+              class="px-3 py-1 rounded border bg-white text-gray-700 hover:bg-gray-100"
+            >
+              Next
+            </button>
+          <% end %>
+        </div>
+      </div>
     </div>
     """
   end

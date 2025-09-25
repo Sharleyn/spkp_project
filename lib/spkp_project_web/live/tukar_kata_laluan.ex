@@ -3,7 +3,8 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, socket
+    |> assign(:role, socket.assigns.current_user.role)}
   end
 
   @impl true
@@ -34,14 +35,13 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
 
-              <h1 class="text-xl font-semibold text-gray-800">Kursus Hub</h1>
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
               <button class="text-gray-600 hover:text-gray-800">Logout</button>
               <div class="flex items-center space-x-2">
-                <span class="text-gray-600">Admin</span>
                 <div class="w-8 h-8 bg-black rounded-full"></div>
               </div>
             </div>

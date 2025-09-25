@@ -6,15 +6,32 @@ defmodule SpkpProjectWeb.KursussLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :kursus, Kursus.list_kursus())}
+    role = socket.assigns.current_user.role
+    result = Kursus.list_kursus_paginated(1, 5)
+
+    socket =
+      socket
+      |> assign(:role, role)
+      |> stream(:kursus, result.data)
+      |> assign(:page, result.page)
+      |> assign(:total_pages, result.total_pages)
+      |> assign(:per_page, result.per_page)
+      |> assign(:query, "")
+      |> assign(:kursuss, nil)
+      |> assign(:kursus_collection, result.data)
+
+    {:ok, socket}
   end
 
   @impl true
   def handle_params(params, uri, socket) do
+    return_to = Map.get(params, "return_to")
+
     {:noreply,
-    socket
-    |> assign(:current_path, URI.parse(uri).path)
-    |> apply_action(socket.assigns.live_action, params)}
+     socket
+     |> assign(:current_path, URI.parse(uri).path)
+     |> assign(:return_to, return_to)
+     |> apply_action(socket.assigns.live_action, params)}
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -52,6 +69,47 @@ defmodule SpkpProjectWeb.KursussLive.Index do
   end
 
   @impl true
+  def handle_event("goto_page", %{"page" => page}, socket) do
+    page = String.to_integer(page)
+
+    results =
+      if socket.assigns.query == "" do
+        Kursus.list_kursus_paginated(page, socket.assigns.per_page)
+      else
+        Kursus.search_kursus(socket.assigns.query, page, socket.assigns.per_page)
+      end
+
+    socket =
+      socket
+      |> stream(:kursus, results.data, reset: true)
+      |> assign(:page, results.page)
+      |> assign(:total_pages, results.total_pages)
+      |> assign(:kursus_collection, results.data)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("search", %{"q" => query}, socket) do
+    results =
+      if query == "" do
+        Kursus.list_kursus_paginated(1, socket.assigns.per_page)
+      else
+        Kursus.search_kursus(query, 1, socket.assigns.per_page)
+      end
+
+    socket =
+      socket
+      |> stream(:kursus, results.data, reset: true)
+      |> assign(:query, query)
+      |> assign(:page, results.page)
+      |> assign(:total_pages, results.total_pages)
+      |> assign(:kursus_collection, results.data)
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="w-full min-h-screen bg-gray-100 flex">
@@ -73,57 +131,75 @@ defmodule SpkpProjectWeb.KursussLive.Index do
               <div class="flex items-center gap-4">
                 <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
               </div>
-
-              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
-
-                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-              Logout
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
               </.link>
-
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
+
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Senarai Kursus</h1>
-
             <p class="text-gray-600">Semak dan urus semua kursus dan penambahan kursus baru</p>
           </div>
-           <.link patch={~p"/admin/kursus/new"}><.button>Kursus Baru</.button></.link>
+
+          <.link patch={
+            if @role == "admin",
+              do: ~p"/admin/kursus/new",
+              else: ~p"/pekerja/kursus/new"
+          }>
+            <.button>Kursus Baru</.button>
+          </.link>
         </div>
+
+        <!-- Search bar -->
+        <div class="flex justify-start px-20">
+          <form phx-change="search" class="w-full">
+            <input
+              type="text"
+              name="q"
+              value={@query}
+              placeholder="Cari kursus..."
+              class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+            />
+          </form>
+        </div>
+
         <!-- Table -->
         <.table
           id="kursus"
           rows={@streams.kursus}
-          row_click={fn {_id, kursuss} -> JS.navigate(~p"/admin/kursus/#{kursuss}") end}
+          row_click={
+            fn {_id, kursuss} ->
+              if @role == "admin" do
+                JS.navigate(~p"/admin/kursus/#{kursuss}")
+              else
+                JS.navigate(~p"/pekerja/kursus/#{kursuss}")
+              end
+            end
+          }
         >
           <:col :let={{_id, kursuss}} label="Nama kursus">{kursuss.nama_kursus}</:col>
-
           <:col :let={{_id, kursuss}} label="Tarikh mula">{kursuss.tarikh_mula}</:col>
-
           <:col :let={{_id, kursuss}} label="Tarikh akhir">{kursuss.tarikh_akhir}</:col>
-
           <:col :let={{_id, kursuss}} label="Status kursus">{kursuss.status_kursus}</:col>
           <:col :let={{_id, kursuss}} label="Kaedah Pembelajaran">{kursuss.kaedah}</:col>
-
           <:col :let={{_id, kursuss}} label="Anjuran">{kursuss.anjuran}</:col>
-
           <:col :let={{_id, kursuss}} label="Kuota">{kursuss.kuota}</:col>
-          <!-- Kolum gambar -->
+
           <:col :let={{_id, kursuss}} label="Gambar Anjuran">
             <div class="flex gap-2">
               <%= if kursuss.gambar_anjuran do %>
-                <img
-                  src={kursuss.gambar_anjuran}
-                  alt="Gambar Anjuran"
-                  class="w-16 h-16 rounded-lg object-cover border"
-                />
+                <img src={kursuss.gambar_anjuran} alt="Gambar Anjuran"
+                     class="w-16 h-16 rounded-lg object-cover border" />
               <% else %>
                 <span class="text-gray-400 text-xs">Tiada anjuran</span>
               <% end %>
@@ -133,11 +209,8 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           <:col :let={{_id, kursuss}} label="Gambar Kursus">
             <div class="flex gap-2">
               <%= if kursuss.gambar_kursus do %>
-                <img
-                  src={kursuss.gambar_kursus}
-                  alt="Gambar Kursus"
-                  class="w-16 h-16 rounded-lg object-cover border"
-                />
+                <img src={kursuss.gambar_kursus} alt="Gambar Kursus"
+                     class="w-16 h-16 rounded-lg object-cover border" />
               <% else %>
                 <span class="text-gray-400 text-xs">Tiada kursus</span>
               <% end %>
@@ -145,8 +218,19 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           </:col>
 
           <:action :let={{_id, kursuss}}>
-            <div class="sr-only"><.link navigate={~p"/admin/kursus/#{kursuss}"}>Show</.link></div>
-             <.link patch={~p"/admin/kursus/#{kursuss}/edit"}>Edit</.link>
+            <div class="sr-only">
+              <.link navigate={
+                if @role == "admin",
+                  do: ~p"/admin/kursus/#{kursuss}",
+                  else: ~p"/pekerja/kursus/#{kursuss}"
+              }>Show</.link>
+            </div>
+
+            <.link patch={
+              if @role == "admin",
+                do: ~p"/admin/kursus/#{kursuss}/edit",
+                else: ~p"/pekerja/kursus/#{kursuss}/edit"
+            }>Edit</.link>
           </:action>
 
           <:action :let={{id, kursuss}}>
@@ -159,11 +243,34 @@ defmodule SpkpProjectWeb.KursussLive.Index do
           </:action>
         </.table>
 
+        <!-- Pagination -->
+        <div class="flex justify-center mt-6 space-x-2">
+          <button phx-click="goto_page" phx-value-page={@page - 1}
+                  class="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50"
+                  disabled={@page <= 1}>Prev</button>
+
+          <%= for p <- 1..@total_pages do %>
+            <button phx-click="goto_page" phx-value-page={p}
+                    class={"px-3 py-1 rounded border " <>
+                      if(p == @page, do: "bg-blue-600 text-white", else: "bg-white text-gray-700")}>
+              <%= p %>
+            </button>
+          <% end %>
+
+          <button phx-click="goto_page" phx-value-page={@page + 1}
+                  class="px-3 py-1 rounded border bg-white text-gray-700 disabled:opacity-50"
+                  disabled={@page >= @total_pages}>Next</button>
+        </div>
+
         <.modal
           :if={@live_action in [:new, :edit]}
           id="kursuss-modal"
           show
-          on_cancel={JS.patch(~p"/admin/kursus")}
+          on_cancel={
+            if @role == "admin",
+              do: JS.patch(@return_to || ~p"/admin/kursus"),
+              else: JS.patch(@return_to || ~p"/pekerja/kursus")
+          }
         >
           <.live_component
             module={SpkpProjectWeb.KursussLive.FormComponent}
@@ -171,7 +278,11 @@ defmodule SpkpProjectWeb.KursussLive.Index do
             title={@page_title}
             action={@live_action}
             kursuss={@kursuss}
-            patch={~p"/admin/kursus"}
+            patch={
+              if @role == "admin",
+                do: @return_to || ~p"/admin/kursus",
+                else: @return_to || ~p"/pekerja/kursus"
+            }
           />
         </.modal>
       </div>

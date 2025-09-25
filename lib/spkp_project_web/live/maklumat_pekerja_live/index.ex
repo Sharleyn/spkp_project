@@ -6,7 +6,15 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :maklumat_pekerja_collection, Accounts.list_maklumat_pekerja())}
+    result = Accounts.list_maklumat_pekerja_paginated(1, 10)
+
+    {:ok,
+     socket
+     |> assign(:maklumat_pekerja_collection, result.data)
+     |> assign(:page, result.page)
+     |> assign(:total_pages, result.total_pages)
+     |> assign(:per_page, result.per_page)
+     |> assign(:role, socket.assigns.current_user.role)}
   end
 
   @impl true
@@ -37,7 +45,7 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
 
   @impl true
   def handle_info({SpkpProjectWeb.MaklumatPekerjaLive.FormComponent, {:saved, maklumat_pekerja}}, socket) do
-    {:noreply, stream_insert(socket, :maklumat_pekerja_collection, maklumat_pekerja)}
+    {:noreply, assign(socket, :maklumat_pekerja_collection, [maklumat_pekerja | socket.assigns.maklumat_pekerja_collection])}
   end
 
   @impl true
@@ -45,15 +53,27 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
     maklumat_pekerja = Accounts.get_maklumat_pekerja!(id)
     {:ok, _} = Accounts.delete_maklumat_pekerja(maklumat_pekerja)
 
-    {:noreply, stream_delete(socket, :maklumat_pekerja_collection, maklumat_pekerja)}
+    {:noreply, assign(socket, :maklumat_pekerja_collection, Enum.reject(socket.assigns.maklumat_pekerja_collection, fn i -> i.id == maklumat_pekerja.id end))}
+  end
+
+  @impl true
+  def handle_event("goto_page", %{"page" => page}, socket) do
+    page = String.to_integer(page)
+    result = Accounts.list_maklumat_pekerja_paginated(page, socket.assigns.per_page)
+
+    {:noreply,
+     socket
+     |> assign(:maklumat_pekerja_collection, result.data)
+     |> assign(:page, result.page)
+     |> assign(:total_pages, result.total_pages)}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-        <div class="w-full min-h-screen bg-gray-100 flex">
+    <div class="w-full min-h-screen bg-gray-100 flex">
       <!-- Sidebar -->
-       <.live_component
+      <.live_component
         module={SpkpProjectWeb.SidebarComponent}
         id="sidebar"
         current_view={@socket.view}
@@ -66,82 +86,74 @@ defmodule SpkpProjectWeb.MaklumatPekerjaLive.Index do
       <div class="flex-1 flex flex-col">
         <.header class="bg-white shadow-sm border-b border-gray-200">
           <div class="flex justify-between items-center px-6 py-4">
-            <div class="flex items-center space-x-4">
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
-              </div>
-
-              <h1 class="text-xl font-semibold text-gray-800">SPKP Admin Dashboard</h1>
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/a3.png"} alt="Logo" class="h-12" />
+              <h1 class="text-xl font-semibold text-gray-800"><%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %></h1>
             </div>
 
             <div class="flex items-center space-x-4">
-              <span class="text-gray-600">admin@gmail.com</span>
-
-                  <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
-              Logout
+              <span class="text-gray-600"><%= @current_user.full_name %></span>
+              <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
+                Logout
               </.link>
-
               <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
             </div>
           </div>
         </.header>
+
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 px-10 py-6">
           <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Senarai Pekerja</h1>
-
-            <p class="text-gray-600">Semak dan urus elaun pekerja</p>
+            <p class="text-gray-600">Semak dan urus maklumat pekerja</p>
           </div>
-           <.link patch={~p"/admin/maklumat_pekerja/new"}><.button>Maklumat Pekerja</.button></.link>
         </div>
 
-    <.table
-      id="maklumat_pekerja"
-      rows={@streams.maklumat_pekerja_collection}
-      row_click={fn {_id, maklumat_pekerja} ->
-        JS.navigate(~p"/admin/maklumat_pekerja/#{maklumat_pekerja}")
-      end}
-    >
-      <:col :let={{_id, maklumat_pekerja}} label="Nama Penuh">{maklumat_pekerja.user.full_name}</:col>
-      <:col :let={{_id, maklumat_pekerja}} label="Emel">{maklumat_pekerja.user.email}</:col>
-      <:col :let={{_id, maklumat_pekerja}} label="No ic">{maklumat_pekerja.no_ic}</:col>
-      <:col :let={{_id, maklumat_pekerja}} label="No tel">{maklumat_pekerja.no_tel}</:col>
-      <:col :let={{_id, maklumat_pekerja}} label="Nama bank">{maklumat_pekerja.nama_bank}</:col>
-      <:col :let={{_id, maklumat_pekerja}} label="No akaun">{maklumat_pekerja.no_akaun}</:col>
-
-      <:action :let={{_id, maklumat_pekerja}}>
-        <div class="sr-only">
-          <.link navigate={~p"/admin/maklumat_pekerja/#{maklumat_pekerja}"}>Show</.link>
-        </div>
-        <.link patch={~p"/admin/maklumat_pekerja/#{maklumat_pekerja}/edit"}>Edit</.link>
-      </:action>
-
-      <:action :let={{id, maklumat_pekerja}}>
-        <.link
-          phx-click={JS.push("delete", value: %{id: maklumat_pekerja.id}) |> hide("##{id}")}
-          data-confirm="Are you sure?"
+        <!-- Table -->
+        <.table
+          id="maklumat_pekerja"
+          rows={@maklumat_pekerja_collection}
+          row_click={fn maklumat -> JS.navigate(~p"/admin/maklumat_pekerja/#{maklumat.id}") end}
         >
-          Delete
-        </.link>
-      </:action>
-    </.table>
+          <:col :let={m} label="Nama Penuh"><%= m.user.full_name %></:col>
+          <:col :let={m} label="Emel"><%= m.user.email %></:col>
+          <:col :let={m} label="No ic"><%= m.no_ic %></:col>
+          <:col :let={m} label="No tel"><%= m.no_tel %></:col>
+          <:col :let={m} label="Nama bank"><%= m.nama_bank %></:col>
+          <:col :let={m} label="No akaun"><%= m.no_akaun %></:col>
+        </.table>
 
-    <.modal
-      :if={@live_action in [:new, :edit]}
-      id="maklumat_pekerja-modal"
-      show
-      on_cancel={JS.patch(~p"/admin/maklumat_pekerja")}
-    >
-      <.live_component
-        module={SpkpProjectWeb.MaklumatPekerjaLive.FormComponent}
-        id={@maklumat_pekerja.id || :new}
-        title={@page_title}
-        action={@live_action}
-        maklumat_pekerja={@maklumat_pekerja}
-        patch={~p"/admin/maklumat_pekerja"}
-      />
-    </.modal>
-    </div>
+        <!-- Pagination -->
+        <div class="flex justify-center mt-4 space-x-2">
+          <!-- Prev -->
+          <%= if @page > 1 do %>
+            <button phx-click="goto_page" phx-value-page={@page - 1} class="px-3 py-1 rounded border bg-white text-gray-700 hover:bg-gray-100">
+              Prev
+            </button>
+          <% end %>
+
+          <!-- Page numbers -->
+          <%= for p <- 1..@total_pages do %>
+            <button
+              phx-click="goto_page"
+              phx-value-page={p}
+              class={
+                "px-3 py-1 rounded border " <>
+                  if(p == @page, do: "bg-blue-600 text-white", else: "bg-white text-gray-700")
+              }
+            >
+              <%= p %>
+            </button>
+          <% end %>
+
+          <!-- Next -->
+          <%= if @page < @total_pages do %>
+            <button phx-click="goto_page" phx-value-page={@page + 1} class="px-3 py-1 rounded border bg-white text-gray-700 hover:bg-gray-100">
+              Next
+            </button>
+          <% end %>
+        </div>
+      </div>
     </div>
     """
   end

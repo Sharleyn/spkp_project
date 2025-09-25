@@ -183,6 +183,18 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
              <div class="flex justify-between items-start">
                 <div class="flex items-center space-x-2">
 
+          <!-- Icon status -->
+              <%= case permohonan.status do %>
+                  <% "Diterima" -> %>
+                    <.icon name="hero-check-circle" class="w-6 h-6 text-green-500" />
+                  <% "Dalam Proses" -> %>
+                    <.icon name="hero-clock" class="w-6 h-6 text-yellow-500" />
+                  <% "Ditolak" -> %>
+                    <.icon name="hero-x-circle" class="w-6 h-6 text-red-500" />
+                  <% _ -> %>
+                    <.icon name="hero-information-circle" class="w-6 h-6 text-gray-400" />
+               <% end %>
+
           <!-- Nama kursus -->
             <h3 class="text-lg font-bold"><%= permohonan.kursus.nama_kursus %></h3>
           </div>
@@ -205,38 +217,85 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
 
         <!-- Butiran Kursus -->
            <div class="mt-4 text-sm text-gray-700 space-y-1">
-             <p><strong>Tarikh Mula:</strong> <%= permohonan.kursus.tarikh_mula %></p>
-             <p><strong>Tarikh Akhir:</strong> <%= permohonan.kursus.tarikh_akhir %></p>
+             <p><strong>Tarikh Mula:</strong> <%= Calendar.strftime(permohonan.kursus.tarikh_mula, "%d-%m-%Y") %></p>
+             <p><strong>Tarikh Akhir:</strong> <%= Calendar.strftime(permohonan.kursus.tarikh_akhir, "%d-%m-%Y") %></p>
              <p><strong>Tempat:</strong> <%= permohonan.kursus.tempat %></p>
              <p><strong>Anjuran:</strong> <%= permohonan.kursus.anjuran %></p>
-         </div>
+           </div>
 
         <!-- Actions -->
            <div class="flex mt-4 gap-2">
-             <%= if permohonan.status == "Diterima" and permohonan.nota_kursus do %>
-               <a href={permohonan.nota_kursus}
-                 class="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600">
-                   📄 Muat Turun Nota
-              </a>
-             <% else %>
-               <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
-                   🚫 Nota Tidak Boleh Dimuat Turun
-              </button>
-             <% end %>
+              <!-- Nota -->
+                 <%= cond do %>
+                   <% permohonan.status != "Diterima" -> %>
+                     <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
+                       🚫 Nota Belum Boleh Dimuat Turun
+                    </button>
 
-             <%= if permohonan.status == "Diterima" and permohonan.jadual_kursus do %>
-               <a href={permohonan.jadual_kursus}
-                 class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600">
-                   🗓️ Muat Turun Jadual
-               </a>
-             <% else %>
-                 <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
-                   🚫 Jadual Tidak Boleh Dimuat Turun
-                 </button>
-             <% end %>
-            </div>
-           </div>
-          <% end %>
+                   <% is_nil(permohonan.kursus.nota_kursus) -> %>
+                      <button disabled class="px-4 py-2 rounded-lg bg-yellow-200 text-yellow-800 cursor-not-allowed">
+                        ⏳ Nota Belum Dimuat Naik
+                      </button>
+
+                   <% true -> %>
+                      <a href={permohonan.kursus.nota_kursus}
+                        class="px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600">
+                         📄 Muat Turun Nota
+                      </a>
+                  <% end %>
+
+              <!-- Jadual -->
+                 <%= cond do %>
+                    <% permohonan.status != "Diterima" -> %>
+                       <button disabled class="px-4 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed">
+                         🚫 Jadual Belum Boleh Dimuat Turun
+                      </button>
+
+                    <% is_nil(permohonan.kursus.jadual_kursus) -> %>
+                       <button disabled class="px-4 py-2 rounded-lg bg-yellow-200 text-yellow-800 cursor-not-allowed">
+                          ⏳ Jadual Belum Dimuat Naik
+                      </button>
+
+                    <% true -> %>
+                       <a href={permohonan.kursus.jadual_kursus}
+                         class="px-4 py-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600">
+                          🗓️ Muat Turun Jadual
+                       </a>
+                    <% end %>
+                 </div>
+
+                 <!-- ✅ Sijil (mesti masih dalam loop) -->
+                     <div class="mt-4">
+                       <%= cond do %>
+                         <% permohonan.status != "Diterima" -> %>
+                         <!-- Selain Diterima (Ditolak / Dalam Proses), jangan tunjuk apa-apa -->
+                         <%= "" %>
+
+                       <% Date.compare(permohonan.kursus.tarikh_akhir, Date.utc_today()) == :gt -> %>
+                         <p class="italic text-gray-500 text-sm font-medium">
+                           <i class="fa fa-hourglass-half text-yellow-500" aria-hidden="true"></i>
+                              Sijil hanya tersedia selepas kursus tamat
+                           </p>
+
+                       <% is_nil(permohonan.certificate) or is_nil(permohonan.certificate.sijil_url) -> %>
+                         <p class="italic text-gray-500 text-sm font-medium">
+                           <i class="fa fa-exclamation-triangle text-red-500" aria-hidden="true"></i>
+                              Sijil Belum Dimuat Naik
+                         </p>
+
+                       <% true -> %>
+                          <a href={permohonan.certificate.sijil_url}
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white font-bold hover:bg-green-700">
+                             <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                               Muat Turun Sijil
+                          </a>
+                      <% end %>
+                    </div>
+
+                 </div>
+               <% end %>
+
+
 
         <!-- Pagination -->
           <div class="flex justify-center mt-6 space-x-1">

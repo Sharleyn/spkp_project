@@ -6,40 +6,51 @@ defmodule SpkpProjectWeb.UserDashboardLive do
 
   @impl true
   def mount(_params, _session, socket) do
-   current_user = socket.assigns.current_user
+    current_user = socket.assigns.current_user
 
-   # ✅ Kursus Tersedia (kira jumlah dengan status aktif / akan datang)
+    # ✅ Kira jumlah Kursus Tersedia (hanya Aktif & Akan Datang) - (CARD KURSUS TERSEDIA)
   available_courses_count =
     from(k in SpkpProject.Kursus.Kursuss,
-      where: k.status_kursus in ^["Aktif", "Akan Datang"])
+      where: k.status_kursus in ["Buka", "Tutup"]
+    )
     |> SpkpProject.Repo.aggregate(:count, :id)
 
-  # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini"
+    # ✅ Ambil 3 kursus terkini untuk paparan "Kursus Terkini" (CARD KURSUS TERKINI)
   available_courses =
     from(k in SpkpProject.Kursus.Kursuss,
-      where: k.status_kursus in ^["Aktif", "Akan Datang"],
+      where: k.status_kursus in ["Buka", "Tutup"],
       order_by: [desc: k.inserted_at],
       limit: 3
     )
     |> SpkpProject.Repo.all()
 
-   socket =
-    socket
-    |> assign(:current_user_name, current_user.full_name)
-    |> assign(:sidebar_open, true)
-    |> assign(:user_menu_open, false)
-    |> assign(:available_courses, available_courses)            # 👉 senarai untuk "Kursus Terkini"
-    |> assign(:available_courses_count, available_courses_count) # 👉 total untuk "Kursus Tersedia"
-    |> assign(:active_applications_count, 3) # (boleh tukar ikut permohonan user)
-    |> assign(:completed_courses_count, 0)   # (boleh tukar ikut DB)
-    |> assign(:recent_applications, [
-      %{name: "Kursus Komputer Asas", date: "2025-01-24", status: "Diterima", status_class: "bg-green-100 text-green-600"},
-      %{name: "Kursus Bahasa Inggeris", date: "2025-02-17", status: "Dalam Proses", status_class: "bg-yellow-100 text-yellow-600"},
-      %{name: "Kursus Kemahiran Digital", date: "2025-02-21", status: "Ditolak", status_class: "bg-red-100 text-red-600"}
-    ])
+    # ✅ Ambil 3 permohonan terkini user (CARD KURSUS PERMOHONAN TERKINI)
+  recent_applications =
+    from(p in SpkpProject.Userpermohonan.Userpermohonan,
+      where: p.user_id == ^current_user.id,
+      join: k in assoc(p, :kursus),
+      preload: [kursus: k],
+      order_by: [desc: p.inserted_at],
+      limit: 3
+    )
+    |> SpkpProject.Repo.all()
 
-  {:ok, socket}
-end
+  # ✅ Statistik permohonan user (jumlah semua + kursus selesai)
+  stats = get_user_dashboard_stats(current_user.id)
+
+    socket =
+      socket
+      |> assign(:current_user_name, current_user.full_name)
+      |> assign(:sidebar_open, true)
+      |> assign(:user_menu_open, false)
+      |> assign(:available_courses, available_courses)            # 👉 senarai untuk "Kursus Terkini"
+      |> assign(:available_courses_count, available_courses_count) # 👉 total untuk "Kursus Tersedia"
+      |> assign(:active_applications_count, stats.total)           # 👉 jumlah semua permohonan user
+      |> assign(:completed_courses_count, stats.completed)         # 👉 kursus selesai
+      |> assign(:recent_applications, recent_applications)
+
+    {:ok, socket}
+  end
 
    # Hook untuk inject current_path dan sidebar_open
     def on_mount(:default, _params, _session, socket) do
@@ -48,6 +59,26 @@ end
        |> assign(:current_path, socket.host_uri.path)
        |> assign_new(:sidebar_open, fn -> true end)  # default sidebar terbuka
   }
+end
+
+def get_user_dashboard_stats(user_id) do
+  # 👉 jumlah semua permohonan user (apa pun statusnya)
+  total =
+    from(p in SpkpProject.Userpermohonan.Userpermohonan,
+      where: p.user_id == ^user_id
+    )
+    |> SpkpProject.Repo.aggregate(:count, :id)
+
+  # 👉 kursus selesai (permohonan diterima + kursus tamat)
+  completed =
+    from(p in SpkpProject.Userpermohonan.Userpermohonan,
+      where: p.user_id == ^user_id and p.status == "Diterima",
+      join: k in assoc(p, :kursus),
+      where: k.tarikh_akhir < ^Date.utc_today()
+    )
+    |> SpkpProject.Repo.aggregate(:count, :id)
+
+  %{total: total, completed: completed}
 end
 
   # 'render' berfungsi sebagai template HTML LiveView
@@ -158,9 +189,9 @@ end
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-orange-100 p-6 rounded-3xl shadow-lg flex items-center justify-between">
 
-                        <!-- Permohonan Aktif -->
+                        <!-- Permohonan Pengguna -->
                             <div>
-                                <p class="text-orange-700 text-sm font-medium">Permohonan Aktif</p>
+                                <p class="text-orange-700 text-sm font-medium">Permohonan Pengguna</p>
                                 <h3 class="text-3xl font-bold mt-1"><%= @active_applications_count %></h3>
                             </div>
                                 <img src={~p"/images/paper.png"} alt="Paper Icon" class="w-8 h-8" />
@@ -211,14 +242,16 @@ end
                             <p class="text-gray-700 font-medium mb-4"> Status Permohonan Kursus Anda </p>
                             <div class="space-y-4">
                                 <%= for app <- @recent_applications do %>
-                                    <div class="flex items-center justify-between p-4 bg-[#C8C4DF] bg-opacity-50 rounded-2xl">
-                                        <div>
-                                            <p class="font-medium"><%= app.name %></p>
-                                            <p class="text-xs text-gray-500">Tarikh Mohon: <%= app.date %></p>
-                                        </div>
-                                        <span class={"text-xs font-semibold px-2 py-1 rounded-full #{app.status_class}"}><%= app.status %></span>
-                                    </div>
-                                <% end %>
+                            <div class="flex items-center justify-between p-4 bg-[#C8C4DF] bg-opacity-50 rounded-2xl">
+                             <div>
+                               <p class="font-medium"><%= app.kursus.nama_kursus %></p>
+                               <p class="text-xs text-gray-500">Tarikh Mohon: <%= Calendar.strftime(app.inserted_at, "%d-%m-%Y") %></p>
+                             </div>
+                                <span class={status_class(app.status)}>
+                                  <%= app.status %>
+                               </span>
+                         </div>
+                       <% end %>
                             </div>
                             <div class="mt-6 text-center">
                                  <.link navigate={~p"/permohonanuser"}
@@ -242,8 +275,10 @@ end
                        <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl shadow hover:shadow-md transition-shadow duration-200">
                        <div>
                          <p class="font-medium text-gray-800"><%= course.nama_kursus %></p>
-                         <p class="text-xs text-gray-500">
-                            <%= course.tarikh_mula %> - <%= course.tarikh_akhir %> &bull; Kuota: <%= course.kuota %>
+                         <p class="text-xs text-gray-500">Tarikh:
+                            <%= Calendar.strftime(course.tarikh_mula, "%d-%m-%Y") %> -
+                            <%= Calendar.strftime(course.tarikh_akhir, "%d-%m-%Y") %>
+                                &bull; Kuota: <%= course.kuota %>
                          </p>
                        </div>
                             <.link navigate={~p"/senaraikursususer"} class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors duration-200">
@@ -300,5 +335,11 @@ end
       base <> " hover:bg-indigo-700 text-gray-300" # tidak aktif
     end
   end
+
+  defp status_class("Diterima"), do: "text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-600"
+  defp status_class("Dalam Proses"), do: "text-xs font-semibold px-2 py-1 rounded-full bg-yellow-100 text-yellow-600"
+  defp status_class("Ditolak"), do: "text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-600"
+  defp status_class(_), do: "text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 text-gray-600"
+
 
 end

@@ -4,26 +4,6 @@ defmodule SpkpProjectWeb.UserSettingsLive do
   alias SpkpProject.Accounts
 
   ## Mount
-  def mount(_params, _session, socket) do
-    user = socket.assigns.current_user
-
-    {:ok,
-     socket
-     |> assign(:email_form, to_form(%{"email" => user.email}, as: "user"))
-     |> assign(:password_form, to_form(%{}, as: "user"))
-     |> assign(
-       :form,
-       to_form(
-         %{
-           "email" => user.email,
-           "password" => "",
-           "password_confirmation" => ""
-         },
-         as: "user"
-       )
-     )}
-  end
-
   def mount(%{"token" => token}, _session, socket) do
     socket =
       case Accounts.update_user_email(socket.assigns.current_user, token) do
@@ -173,21 +153,5 @@ defmodule SpkpProjectWeb.UserSettingsLive do
   ## Handle validate (umum)
   def handle_event("validate", %{"user" => params}, socket) do
     {:noreply, assign(socket, form: to_form(params, as: "user"))}
-  end
-
-  ## Handle save (umum)
-  def handle_event("save", %{"user" => params}, socket) do
-    user = socket.assigns.current_user
-
-    case Accounts.update_user(user, params) do
-      {:ok, _updated_user} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Tetapan berjaya disimpan.")
-         |> push_navigate(to: ~p"/userdashboard")}
-
-      {:error, changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset, as: "user"))}
-    end
   end
 end

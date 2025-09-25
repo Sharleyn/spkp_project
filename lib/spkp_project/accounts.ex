@@ -392,6 +392,29 @@ defmodule SpkpProject.Accounts do
     Repo.all(from m in MaklumatPekerja, preload: [:user])
   end
 
+  def list_maklumat_pekerja_paginated(page \\ 1, per_page \\ 10) do
+    offset = (page - 1) * per_page
+
+    query =
+      from m in MaklumatPekerja,
+        order_by: [desc: m.inserted_at],
+        offset: ^offset,
+        limit: ^per_page,
+        preload: [:user]
+
+    data = Repo.all(query)
+    total_count = Repo.aggregate(MaklumatPekerja, :count)
+
+    %{
+      data: data,
+      page: page,
+      per_page: per_page,
+      total_count: total_count,
+      total_pages: div(total_count + per_page - 1, per_page) # ceil_div
+    }
+  end
+
+
   @doc """
   Gets a single maklumat_pekerja.
 

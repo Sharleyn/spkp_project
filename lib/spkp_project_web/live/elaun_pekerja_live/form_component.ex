@@ -41,6 +41,13 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.FormComponent do
         <.input field={@form[:jumlah_keseluruhan]} type="number" label="Jumlah keseluruhan" step="any" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Elaun pekerja</.button>
+
+          <.link
+            navigate={@patch || ~p"/admin/elaun_pekerja"}
+            class="ml-2 inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+          >
+            Kembali
+          </.link>
         </:actions>
       </.simple_form>
     </div>

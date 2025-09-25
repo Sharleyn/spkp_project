@@ -4,13 +4,15 @@ defmodule SpkpProject.Userpermohonan do
   alias SpkpProject.Repo
   alias SpkpProject.Userpermohonan.Userpermohonan
 
+
   # Senarai permohonan ikut user + pagination
   def list_user_applications(user_id, filter \\ "Semua Keputusan", page \\ 1, per_page \\ 10) do
     query =
       from(p in SpkpProject.Userpermohonan.Userpermohonan,
         where: p.user_id == ^user_id,
         join: k in assoc(p, :kursus),
-        preload: [kursus: k],
+        left_join: cert in assoc(p, :certificate), # join sijil
+        preload: [kursus: k, certificate: cert],   # 👈 wajib preload!
         order_by: [desc: p.inserted_at]
       )
 
@@ -38,7 +40,8 @@ defmodule SpkpProject.Userpermohonan do
       from(p in SpkpProject.Userpermohonan.Userpermohonan,
         where: p.user_id == ^user_id,
         join: k in assoc(p, :kursus),
-        preload: [kursus: k],
+        left_join: cert in assoc(p, :certificate),
+        preload: [kursus: k, certificate: cert],   # ✅
         where: ilike(k.nama_kursus, ^"%#{term}%"),
         order_by: [desc: p.inserted_at]
       )
@@ -108,4 +111,22 @@ defmodule SpkpProject.Userpermohonan do
       permohonan -> Repo.delete(permohonan)
     end
   end
-end
+
+    #JUMLAH PERMOHONAN TERKINI DAN TARIKH TUTUP PERMOHONAN
+  def list_latest_applications_summary(limit \\ 5) do
+
+      query =
+        from p in Userpermohonan,
+          join: k in assoc(p, :kursus),
+          group_by: [k.id, k.nama_kursus, k.tarikh_tutup],
+          select: %{
+            kursus: k.nama_kursus,
+            tarikh_tutup: k.tarikh_tutup,
+            jumlah_permohonan: count(p.id)
+          },
+          order_by: [desc: k.inserted_at],
+          limit: ^limit
+
+      Repo.all(query)
+    end
+  end

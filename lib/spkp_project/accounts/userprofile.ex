@@ -12,6 +12,7 @@ defmodule SpkpProject.Accounts.UserProfile do
     field :district, :string
     field :education, :string
     field :ic_attachment, :string
+    field :tarikh_lahir, :date
 
     belongs_to :user, SpkpProject.Accounts.User
 
@@ -40,11 +41,26 @@ defmodule SpkpProject.Accounts.UserProfile do
     @doc false
   def changeset(user_profile, attrs) do
     user_profile
-    |> cast(attrs, [:user_id, :ic, :age, :gender, :phone_number, :address, :district, :education, :ic_attachment])
-    |> validate_required([:user_id, :ic, :age, :gender, :phone_number, :address, :district, :education])
+    |> cast(attrs, [:user_id, :ic, :age, :gender, :phone_number, :address, :district, :education, :ic_attachment, :tarikh_lahir])
+    |> validate_required([:user_id, :age, :ic, :gender, :phone_number, :address, :district, :education, :tarikh_lahir])
     |> validate_inclusion(:gender, @gender_options)
     |> validate_inclusion(:district, @district_options)
     |> validate_inclusion(:education, @education_options)
     |> unique_constraint(:user_id)
   end
+
+  # ✅ Helper untuk kira umur
+  def kira_umur(nil), do: nil
+  def kira_umur(tarikh_lahir) do
+    today = Date.utc_today()
+    years = today.year - tarikh_lahir.year
+
+    # adjust kalau birthday belum sampai tahun ni
+    if {today.month, today.day} < {tarikh_lahir.month, tarikh_lahir.day} do
+      years - 1
+    else
+      years
+    end
+  end
+
 end

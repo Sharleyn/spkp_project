@@ -8,6 +8,7 @@ defmodule SpkpProject.Kursus do
 
   alias SpkpProject.Kursus.Kursuss
   alias SpkpProject.Kursus.KursusKategori
+  alias SpkpProject.{Repo, Kursus.Kursuss, Userpermohonan.Userpermohonan}
 
   @doc """
   Returns the list of kursus_kategori.
@@ -124,6 +125,55 @@ def list_all_courses do
   |> Repo.all()
 end
 
+def list_kursus_paginated(page \\ 1, per_page \\ 5) do
+  offset = (page - 1) * per_page
+
+  query =
+    from k in Kursuss,
+      order_by: [desc: k.inserted_at],
+      offset: ^offset,
+      limit: ^per_page
+
+  data = Repo.all(query)
+
+  total_count = Repo.aggregate(Kursuss, :count, :id)
+
+  %{
+    data: data,
+    page: page,
+    per_page: per_page,
+    total_count: total_count,
+    total_pages: div(total_count + per_page - 1, per_page)
+  }
+end
+
+def search_kursus(query, page \\ 1, per_page \\ 5) do
+  offset = (page - 1) * per_page
+
+  base_query =
+    from k in Kursuss,
+      where: ilike(k.nama_kursus, ^"%#{query}%"),
+      order_by: [desc: k.inserted_at],
+      offset: ^offset,
+      limit: ^per_page
+
+  data = Repo.all(base_query)
+
+  total_count =
+    from(k in Kursuss, where: ilike(k.nama_kursus, ^"%#{query}%"))
+    |> Repo.aggregate(:count, :id)
+
+  %{
+    data: data,
+    page: page,
+    per_page: per_page,
+    total_count: total_count,
+    total_pages: div(total_count + per_page - 1, per_page)
+  }
+end
+
+
+
 
   @doc """
   Gets a single kursuss.
@@ -204,5 +254,25 @@ end
   """
   def change_kursuss(%Kursuss{} = kursuss, attrs \\ %{}) do
     Kursuss.changeset(kursuss, attrs)
+  end
+
+  def get_available_courses_count do
+    from(k in Kursuss,
+      where: k.status_kursus in ["Buka", "Tutup"]
+    )
+    |> Repo.aggregate(:count, :id)
+  end
+
+  # Statistik jumlah peserta per kursus
+  def statistics do
+    from(k in Kursuss,
+      left_join: p in Userpermohonan, on: p.kursus_id == k.id,
+      group_by: k.id,
+      select: %{
+        nama_kursus: k.nama_kursus,
+        jumlah_peserta: count(p.id)
+      }
+    )
+    |> Repo.all()
   end
 end

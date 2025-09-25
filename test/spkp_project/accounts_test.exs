@@ -62,8 +62,8 @@ defmodule SpkpProject.AccountsTest do
       {:error, changeset} = Accounts.register_user(%{email: "not valid", password: "not valid"})
 
       assert %{
-               email: ["must have the @ sign and no spaces"],
-               password: ["should be at least 12 character(s)"]
+               email: ["Masukkan email anda"],
+               password: ["Masukkan kata laluan"]
              } = errors_on(changeset)
     end
 
@@ -71,7 +71,7 @@ defmodule SpkpProject.AccountsTest do
       too_long = String.duplicate("db", 100)
       {:error, changeset} = Accounts.register_user(%{email: too_long, password: too_long})
       assert "should be at most 160 character(s)" in errors_on(changeset).email
-      assert "should be at most 72 character(s)" in errors_on(changeset).password
+      assert "Masukkan kata laluan" in errors_on(changeset).password
     end
 
     test "validates email uniqueness" do
@@ -97,7 +97,7 @@ defmodule SpkpProject.AccountsTest do
   describe "change_user_registration/2" do
     test "returns a changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
-      assert changeset.required == [:password, :email]
+      assert changeset.required == [:password_confirmation, :full_name, :password, :email]
     end
 
     test "allows fields to be set" do
@@ -107,7 +107,7 @@ defmodule SpkpProject.AccountsTest do
       changeset =
         Accounts.change_user_registration(
           %User{},
-          valid_user_attributes(email: email, password: password)
+          valid_user_attributes(email: email, password: password, password_confirmation: password, full_name: "Test User")
         )
 
       assert changeset.valid?
@@ -138,7 +138,7 @@ defmodule SpkpProject.AccountsTest do
       {:error, changeset} =
         Accounts.apply_user_email(user, valid_user_password(), %{email: "not valid"})
 
-      assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
+      assert %{email: ["Masukkan email anda"]} = errors_on(changeset)
     end
 
     test "validates maximum value for email for security", %{user: user} do
@@ -267,8 +267,8 @@ defmodule SpkpProject.AccountsTest do
         })
 
       assert %{
-               password: ["should be at least 12 character(s)"],
-               password_confirmation: ["does not match password"]
+               password: ["Masukkan kata laluan"],
+               password_confirmation: ["Kata laluan tidak sepadan"]
              } = errors_on(changeset)
     end
 
@@ -278,7 +278,7 @@ defmodule SpkpProject.AccountsTest do
       {:error, changeset} =
         Accounts.update_user_password(user, valid_user_password(), %{password: too_long})
 
-      assert "should be at most 72 character(s)" in errors_on(changeset).password
+      assert "Masukkan kata laluan" in errors_on(changeset).password
     end
 
     test "validates current password", %{user: user} do
@@ -476,15 +476,15 @@ defmodule SpkpProject.AccountsTest do
         })
 
       assert %{
-               password: ["should be at least 12 character(s)"],
-               password_confirmation: ["does not match password"]
+               password: ["Masukkan kata laluan"],
+               password_confirmation: ["Kata laluan tidak sepadan"]
              } = errors_on(changeset)
     end
 
     test "validates maximum values for password for security", %{user: user} do
       too_long = String.duplicate("db", 100)
       {:error, changeset} = Accounts.reset_user_password(user, %{password: too_long})
-      assert "should be at most 72 character(s)" in errors_on(changeset).password
+      assert "Masukkan kata laluan" in errors_on(changeset).password
     end
 
     test "updates the password", %{user: user} do

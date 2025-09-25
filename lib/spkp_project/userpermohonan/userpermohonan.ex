@@ -7,11 +7,12 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
 
   schema "userpermohonan" do
     field :status, :string, default: "Dalam Proses"
-    field :nota_kursus, :string
-    field :jadual_kursus, :string
 
     belongs_to :user, SpkpProject.Accounts.User
     belongs_to :kursus, SpkpProject.Kursus.Kursuss
+
+    # ✅ Tambah association untuk sijil
+    has_one :certificate, SpkpProject.Certificate, foreign_key: :user_permohonan_id
 
     timestamps(type: :utc_datetime)
   end
@@ -19,7 +20,7 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
   @doc false
   def changeset(userpermohonan, attrs) do
     userpermohonan
-    |> cast(attrs, [:user_id, :kursus_id, :status, :nota_kursus, :jadual_kursus])
+    |> cast(attrs, [:user_id, :kursus_id, :status])
     |> validate_required([:user_id, :kursus_id, :status])
   end
 
@@ -47,5 +48,12 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
       _ -> Repo.all(query)
     end
   end
+
+
+    # -------- JUMLAH SEMUA PERMOHONAN --------
+    def total_applications do
+      from(p in __MODULE__, select: count(p.id))
+      |> Repo.one()
+    end
 
 end
