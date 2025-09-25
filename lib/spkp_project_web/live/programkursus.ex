@@ -119,7 +119,7 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
             navigate={~p"/users/log_in"}
             class="flex flex-col items-center text-sm hover:opacity-80"
           >
-            <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-8 mb-1" />
+            <img src={~p"/images/orang awam.png"} alt="Pengguna" class="h-8 w-10 mb-1" />
             <span>Pengguna</span>
           </.link>
           <!-- Admin -->
@@ -127,8 +127,15 @@ defmodule SpkpProjectWeb.ProgramKursusLive do
             navigate={~p"/users/log_in"}
             class="flex flex-col items-center text-sm hover:opacity-80"
           >
-            <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-8 mb-1" /> <span>Admin</span>
+            <img src={~p"/images/admin.png"} alt="Admin" class="h-8 w-10 mb-1" /> <span>Admin</span>
           </.link>
+
+          <!-- Pekerja -->
+            <.link href={~p"/users/log_in"} class="flex flex-col items-center text-sm hover:opacity-80">
+                <img src={~p"/images/user.png"} alt="Pekerja" class="h-8 w-6 mb-1" />
+                  <span>Pekerja</span>
+             </.link>
+
         </div>
       </div>
     </header>
