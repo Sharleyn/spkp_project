@@ -6,8 +6,6 @@ defmodule SpkpProjectWeb.SijilLive.Form do
 
   alias SpkpProject.{Certificate}
   alias SpkpProject.{Repo, Kursus}
-  alias SpkpProject.Userpermohonan.Userpermohonan
-  import Ecto.Query
 
   @impl true
   def mount(_params, _session, socket) do
