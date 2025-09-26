@@ -9,7 +9,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
   # Data slider
   @slides [
-    %{type: :image, src: "/images/logo 1.png"},
+    %{type: :image, src: "/images/spkp.gif"},
     %{
       type: :text,
       title: "VISI",
@@ -66,7 +66,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
   end
 
   # Auto slide scheduling
-  defp schedule_slide, do: Process.send_after(self(), :next_slide, 3000)
+  defp schedule_slide, do: Process.send_after(self(), :next_slide, 5000)
   defp schedule_gallery_slide, do: Process.send_after(self(), :next_gallery, 3000)
 
 
@@ -206,8 +206,8 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
       </div>
 
       <!-- Slider -->
-      <section class="max-w-6xl mx-auto mt-10 px-6 text-center">
-        <div class="h-[320px] flex items-center justify-center">
+      <section class="max-w-6xl mx-auto mt-2 px-6 text-center">
+        <div class="h-[500px] flex items-center justify-center">
           <%= if slide = Enum.at(@slides, @current_index) do %>
             {render_slide(%{slide: slide})}
           <% end %>
@@ -388,38 +388,45 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
   # <!-- Slider untuk LOGO, VISI, MISI -->
     attr :slide, :map, required: true
-    defp render_slide(assigns) do
-     ~H"""
-       <div class="w-full h-[320px] flex items-center justify-center">
-         <%= case @slide do %>
-           <% %{type: :image, src: src} -> %>
-             <img src={src} alt="logo" class="max-h-full max-w-full object-contain" />
+defp render_slide(assigns) do
+  ~H"""
+  <%= case @slide do %>
+    <% %{type: :image, src: src} -> %>
+      <!-- ✅ Untuk GIF/logo -->
+      <div class="w-full h-[500px]  flex items-center justify-center">
+        <img src={src} alt="logo" class="h-full w-auto max-w-[80%] object-contain mx-auto" />
+      </div>
 
-              <% %{type: :text, title: title, body: body} -> %>
-                <div class="flex flex-col justify-center text-center w-full h-full
-                    bg-white bg-opacity-70 rounded-xl p-6 shadow
-                    border border-transparent
-                    transition duration-300 ease-in-out
-                    hover:border-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.7)]">
-               <h2 class="text-xl font-bold mb-4 text-[#09033F]">{title}</h2>
-                <p class="mx-auto max-w-xl text-gray-700">{body}</p>
+    <% %{type: :text, title: title, body: body} -> %>
+      <!-- ✅ Untuk Visi/Misi -->
+      <div class="w-full h-[320px] flex items-center justify-center">
+        <div class="flex flex-col justify-center text-center w-full h-full
+          bg-white bg-opacity-70 rounded-xl p-6 shadow
+          border border-transparent
+          transition duration-300 ease-in-out
+          hover:border-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.7)]">
+          <h2 class="text-xl font-bold mb-4 text-[#09033F]">{title}</h2>
+          <p class="mx-auto max-w-xl text-gray-700">{body}</p>
         </div>
+      </div>
 
-          <% %{type: :list, title: title, items: items} -> %>
-            <div class="flex flex-col justify-center w-full h-full
-                    bg-white bg-opacity-70 rounded-xl p-6 shadow
-                    border border-transparent
-                    transition duration-300 ease-in-out
-                    hover:border-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.7)]">
-              <h2 class="text-xl font-bold mb-4 text-center text-[#09033F]">{title}</h2>
-               <ul class="list-disc list-inside space-y-1 text-left mx-auto max-w-xl text-gray-700">
+    <% %{type: :list, title: title, items: items} -> %>
+      <!-- ✅ Untuk senarai (contoh nilai/nilai tambah) -->
+      <div class="w-full h-[320px] flex items-center justify-center">
+        <div class="flex flex-col justify-center w-full h-full
+          bg-white bg-opacity-70 rounded-xl p-6 shadow
+          border border-transparent
+          transition duration-300 ease-in-out
+          hover:border-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.7)]">
+          <h2 class="text-xl font-bold mb-4 text-center text-[#09033F]">{title}</h2>
+          <ul class="list-disc list-inside space-y-1 text-left mx-auto max-w-xl text-gray-700">
             <%= for item <- items do %>
               <li>{item}</li>
             <% end %>
           </ul>
         </div>
-      <% end %>
-    </div>
+      </div>
+  <% end %>
     """
   end
 end
