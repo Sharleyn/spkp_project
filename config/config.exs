@@ -11,6 +11,9 @@ config :spkp_project,
   ecto_repos: [SpkpProject.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+  config :spkp_project, SpkpProject.Mailer,
+  adapter: Swoosh.Adapters.Local
+
 # Configures the endpoint
 config :spkp_project, SpkpProjectWeb.Endpoint,
   url: [host: "localhost"],

@@ -153,4 +153,19 @@ defmodule SpkpProject.Userpermohonan do
           total_pages: div(total_entries + per_page - 1, per_page)
         }
       end
+
+      def update_application_status(permohonan, new_status) do
+        permohonan
+        |> Userpermohonan.changeset(%{status: new_status})
+        |> Repo.update()
+        |> case do
+          {:ok, updated} ->
+            updated = Repo.preload(updated, [:user, :kursus])
+            SpkpProject.Notifications.send_permohonan_status(updated.user, updated)
+            {:ok, updated}
+
+          error -> error
+        end
+      end
+
     end

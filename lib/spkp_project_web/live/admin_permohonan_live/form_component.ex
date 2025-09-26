@@ -1,7 +1,7 @@
 defmodule SpkpProjectWeb.PermohonanLive.FormComponent do
   use SpkpProjectWeb, :live_component
   alias SpkpProject.Userpermohonan.Userpermohonan
-  alias SpkpProject.Repo
+  alias SpkpProject.{Repo, Mailer, Email}
 
   @impl true
   def update(%{permohonan: permohonan} = assigns, socket) do
@@ -69,17 +69,37 @@ defmodule SpkpProjectWeb.PermohonanLive.FormComponent do
   defp save_permohonan(socket, :edit, params) do
     case Repo.update(Userpermohonan.changeset(socket.assigns.permohonan, params)) do
       {:ok, permohonan} ->
+        # ✅ Hantar email ikut status
+        send_status_email(permohonan)
+
         notify_parent({:saved, permohonan})
 
         {:noreply,
          socket
-         |> put_flash(:info, "Permohonan berjaya dikemaskini")
+         |> put_flash(:info, "Permohonan berjaya dikemaskini & email dihantar")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
+
+  # ⬇️ Fungsi ini hanya urus email, tidak guna socket/params
+  defp send_status_email(%Userpermohonan{status: "Diterima"} = permohonan) do
+    permohonan
+    |> Repo.preload([:user, :kursus])
+    |> Email.permohonan_diterima()
+    |> Mailer.deliver()
+  end
+
+  defp send_status_email(%Userpermohonan{status: "Ditolak"} = permohonan) do
+    permohonan
+    |> Repo.preload([:user, :kursus])
+    |> Email.permohonan_ditolak()
+    |> Mailer.deliver()
+  end
+
+  defp send_status_email(_), do: :ok
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end

@@ -19,7 +19,7 @@ defmodule SpkpProject.MixProject do
   def application do
     [
       mod: {SpkpProject.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :finch]
     ]
   end
 

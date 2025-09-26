@@ -19,3 +19,12 @@ config :logger, level: :info
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
+config :spkp_project, SpkpProject.Mailer,
+  adapter: Swoosh.Adapters.SMTP,
+  relay: "smtp.gmail.com",
+  username: "EMAIL_KAMU@gmail.com",
+  password: "APLIKASI_PASSWORD",  # guna App Password Gmail
+  ssl: true,
+  tls: :always,
+  auth: :always,
+  port: 587
