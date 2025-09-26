@@ -377,6 +377,12 @@ defmodule SpkpProject.Accounts do
     end
   end
 
+  def count_users_by_role(role) do
+    import Ecto.Query
+    from(u in SpkpProject.Accounts.User, where: u.role == ^role)
+    |> SpkpProject.Repo.aggregate(:count, :id)
+  end
+
   alias SpkpProject.Accounts.MaklumatPekerja
 
   @doc """

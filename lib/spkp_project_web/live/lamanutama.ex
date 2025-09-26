@@ -1,6 +1,9 @@
 defmodule SpkpProjectWeb.LamanUtamaLive do
   use SpkpProjectWeb, :live_view
 
+  alias SpkpProject.Accounts
+  alias SpkpProject.Kursus
+
   # Tambahkan ini
   on_mount {SpkpProjectWeb.UserAuth, :mount_current_user}
 
@@ -46,12 +49,19 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
       schedule_gallery_slide()
     end
 
+    bil_pelatih = Accounts.count_users_by_role("user")
+    bil_program = Kursus.count_program()
+    bil_jurusan = Kursus.count_kategori()
+
     {:ok,
      socket
      |> assign(:slides, @slides)
      |> assign(:current_index, 0)
      |> assign(:gallery, @gallery)
      |> assign(:gallery_index, 0)
+     |> assign(:bil_pelatih, bil_pelatih)
+     |> assign(:bil_program, bil_program)
+     |> assign(:bil_jurusan, bil_jurusan)
      |> assign_new(:current_user, fn -> nil end)}
   end
 
@@ -274,7 +284,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
                 alt="Bilangan Pelatih"
                 class="h-18 w-18 mb-2 mx-auto"
               />
-              <div class="text-4xl font-bold">250</div>
+              <div class="text-4xl font-bold"><%= @bil_pelatih %></div>
 
               <div class="text-gray-600">Bilangan Pelatih</div>
             </div>
@@ -285,16 +295,19 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
                 alt="Bilangan Program"
                 class="h-18 w-18 mb-2 mx-auto"
               />
-              <div class="text-4xl font-bold">25</div>
+
+              <div class="text-4xl font-bold"><%= @bil_program %></div>
 
               <div class="text-gray-600">Bilangan Program</div>
             </div>
 
             <div>
               <img src={~p"/images/icon jurusan.png"} alt="Jurusan Ditawarkan" class="h-18 w-18 mb-2 mx-auto"/>
-              <div class="text-4xl font-bold">10</div>
 
-              <div class="text-gray-600">Jurusan Ditawarkan</div>
+              <div class="text-4xl font-bold"><%= @bil_jurusan %></div>
+
+              <div class="text-gray-600">Kursus Ditawarkan</div>
+
             </div>
           </div>
         </div>
