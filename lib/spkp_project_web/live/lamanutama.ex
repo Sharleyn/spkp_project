@@ -286,7 +286,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
               />
               <div class="text-4xl font-bold"><%= @bil_pelatih %></div>
 
-              <div class="text-gray-600">Bilangan Pelatih</div>
+              <div class="text-gray-800 font-medium">Bilangan Pelatih</div>
             </div>
 
             <div>
@@ -298,7 +298,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
               <div class="text-4xl font-bold"><%= @bil_program %></div>
 
-              <div class="text-gray-600">Bilangan Program</div>
+              <div class="text-gray-800 font-medium">Bilangan Program</div>
             </div>
 
             <div>
@@ -306,7 +306,7 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
 
               <div class="text-4xl font-bold"><%= @bil_jurusan %></div>
 
-              <div class="text-gray-600">Kursus Ditawarkan</div>
+              <div class="text-gray-800 font-medium">Kursus Ditawarkan</div>
 
             </div>
           </div>
@@ -348,14 +348,14 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
             <div class="flex items-center gap-4">
               <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6" />
               <p class="text-sm">
-                Alamat: Block G. 2ND Floor, Lot 9, Lintas Jaya Uptownship Penampang, 88200 Sabah
+                Alamat Pejabat: Block G. 2ND Floor, Lot 9, Lintas Jaya <br/> Uptownship Penampang, 88200 Sabah
               </p>
             </div>
 
             <!-- Telefon & Faks -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/fax.png"} alt="Telefon & Faks" class="h-6 w-6" />
-              <p class="text-sm">No. Tel: 011-3371 7129<br />Faks: 088 729717</p>
+              <p class="text-sm">No. Tel: 011-3371 7129 <br/> Faks: 088 729717</p>
             </div>
 
             <!-- Email -->
