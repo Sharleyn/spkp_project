@@ -7,7 +7,6 @@ defmodule SpkpProjectWeb.SijilLive.Form do
   alias SpkpProject.{Certificate}
   alias SpkpProject.{Repo, Kursus}
   alias SpkpProject.Userpermohonan.Userpermohonan
-  import Ecto.Query
 
   @impl true
   def mount(_params, _session, socket) do
@@ -42,6 +41,17 @@ defmodule SpkpProjectWeb.SijilLive.Form do
      |> assign(:page_title, "Kemaskini Sijil Kursus")
      |> assign(:sijil, sijil)
      |> assign(:form, to_form(changeset))}
+  end
+
+  def handle_params(%{"user_permohonan_id" => id}, _uri, socket) do
+    user_permohonan =
+      Repo.get!(Userpermohonan, String.to_integer(id))
+      |> Repo.preload(:user)
+
+    {:noreply,
+     socket
+     |> assign(:user_permohonan, user_permohonan)
+     |> assign(:user_permohonan_id, user_permohonan.id)}
   end
 
   def handle_params(_params, _uri, socket) do
@@ -150,28 +160,32 @@ defmodule SpkpProjectWeb.SijilLive.Form do
   end
 
   defp create_sijil(socket, params) do
-    case params do
-      %{"sijil_url" => sijil_url} when is_binary(sijil_url) ->
-        trimmed = String.trim(sijil_url)
-        if byte_size(trimmed) > 0 do
-          case Repo.insert(Certificate.changeset(%Certificate{}, %{sijil_url: trimmed})) do
-            {:ok, _cert} ->
-              {:noreply,
-               socket
-               |> put_flash(:info, "Sijil dimuat naik.")
-               |> push_navigate(to: ~p"/admin/sijil/new")
-               |> assign(:sijil, %Certificate{})
-               |> assign(:form, to_form(Certificate.changeset(%Certificate{}, %{})))}
+    case socket.assigns[:user_permohonan] do
+      nil ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Ralat: Tiada user_permohonan diberikan.")
+         |> assign(:form, to_form(Certificate.changeset(%Certificate{}, params)))}
 
-            {:error, %Ecto.Changeset{} = changeset} ->
-              {:noreply, assign(socket, :form, to_form(changeset))}
-          end
-        else
-          {:noreply, socket |> put_flash(:error, "Sila muat naik fail PDF dahulu.")}
+      user_permohonan ->
+        attrs =
+          params
+          |> Map.put("user_permohonan_id", user_permohonan.id)
+          |> Map.put("user_id", user_permohonan.user_id)
+          |> Map.put("kursus_id", user_permohonan.kursus_id)
+          |> Map.put_new("issued_at", Date.utc_today())
+          |> Map.put_new("nama_sijil", "Sijil Kursus")
+
+        case SpkpProject.Sijil.create_sijil(attrs) do
+          {:ok, _cert} ->
+            {:noreply,
+             socket
+             |> put_flash(:info, "Sijil dimuat naik.")
+             |> push_navigate(to: ~p"/admin/sijil/new")}
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            {:noreply, assign(socket, :form, to_form(changeset))}
         end
-
-      _ ->
-        {:noreply, socket |> put_flash(:error, "Sila muat naik fail PDF dahulu.")}
     end
   end
 

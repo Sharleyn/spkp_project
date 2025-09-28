@@ -117,9 +117,9 @@ defmodule SpkpProjectWeb.PesertaKursusLive.Show do
                       </td>
 
                       <td class="px-6 py-4 text-sm text-gray-500">
-              <.link navigate={~p"/admin/sijil/new?user_permohonan_id=#{p.id}"} class="text-blue-600 hover:underline">
-                Upload Sijil
-              </.link>
+                       <.link navigate={~p"/admin/sijil/new?user_permohonan_id=#{p.id}"} class="text-blue-600 hover:underline">
+                         Upload Sijil
+                       </.link>
             </td>
 
                     </tr>
