@@ -291,7 +291,6 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                           </a>
                       <% end %>
                     </div>
-
                  </div>
                <% end %>
 
