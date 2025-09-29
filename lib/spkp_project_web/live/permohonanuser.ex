@@ -149,7 +149,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
             <div class="bg-gray-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
               <h2 class="text-l font-semibold text-gray-600">Tarik Diri</h2>
                 <p class="text-2xl font-bold text-gray-900"><%= @stats.tarik_diri %></p>
-                  <img src={~p"/images/ditolak.png"} alt="Tarik Diri Icon" class="w-8 h-8" />
+                  <.icon name="hero-x-circle" class="w-8 h-8 text-gray-500" />
             </div>
         </div>
 
