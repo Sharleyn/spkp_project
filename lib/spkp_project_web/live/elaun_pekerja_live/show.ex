@@ -117,6 +117,7 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.Show do
             action={@live_action}
             elaun_pekerja={@elaun_pekerja}
             patch={~p"/admin/elaun_pekerja/#{@elaun_pekerja}"}
+            role={@role}
           />
         </.modal>
       </div>

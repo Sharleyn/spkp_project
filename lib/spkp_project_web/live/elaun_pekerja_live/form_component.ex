@@ -2,6 +2,7 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.FormComponent do
   use SpkpProjectWeb, :live_component
 
   alias SpkpProject.Elaun
+  import Phoenix.LiveView
 
   @impl true
   def render(assigns) do
@@ -33,12 +34,20 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.FormComponent do
           label="Status Permohonan"
           prompt="-- Pilih status --"
           options={[
-            {"Menunggu Kelulusan", "Menunggu Kelulusan"},
-            {"Diterima", "Diterima"},
-            {"Ditolak", "Ditolak"}
+            {"Menunggu Kelulusan", "submitted"},
+            {"Diterima", "diterima"},
+            {"Ditolak", "ditolak"}
           ]}
         />
         <.input field={@form[:jumlah_keseluruhan]} type="number" label="Jumlah keseluruhan" step="any" />
+
+        <%= if @role == "admin" and String.downcase(Phoenix.HTML.Form.input_value(@form, :status_permohonan) || "") == "diterima" do %>
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700">Muat Naik Resit</label>
+            <.live_file_input upload={@uploads.resit} />
+          </div>
+        <% end %>
+
         <:actions>
           <.button phx-disable-with="Saving...">Save Elaun pekerja</.button>
 
@@ -59,6 +68,12 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign_new(:role, fn -> "pekerja" end)
+     |> allow_upload(:resit,
+     accept: ~w(.pdf .jpg .png),
+     max_entries: 1,
+     max_file_size: 5_000_000
+     )
      |> assign_new(:form, fn ->
        to_form(Elaun.change_elaun_pekerja(elaun_pekerja))
      end)}
@@ -75,6 +90,22 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.FormComponent do
   end
 
   defp save_elaun_pekerja(socket, :edit, elaun_pekerja_params) do
+    # Ambil fail upload kalau ada
+    uploaded_files =
+      consume_uploaded_entries(socket, :resit, fn %{path: path}, _entry ->
+        filename = Path.basename(path)
+        dest = Path.join(["uploads", filename])
+        File.cp!(path, dest)   # salin file
+        {:ok, filename}
+      end)
+
+    # Kalau ada fail baru, masukkan ke params
+    elaun_pekerja_params =
+      case uploaded_files do
+        [file | _] -> Map.put(elaun_pekerja_params, "resit", file)
+        _ -> elaun_pekerja_params
+      end
+
     case Elaun.update_elaun_pekerja(socket.assigns.elaun_pekerja, elaun_pekerja_params) do
       {:ok, elaun_pekerja} ->
         notify_parent({:saved, elaun_pekerja})
@@ -88,6 +119,7 @@ defmodule SpkpProjectWeb.ElaunPekerjaLive.FormComponent do
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
+
 
   defp save_elaun_pekerja(socket, :new, elaun_pekerja_params) do
     case Elaun.create_elaun_pekerja(elaun_pekerja_params) do

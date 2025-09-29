@@ -194,7 +194,7 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
           <!-- butang kembali bawah table -->
           <div class="mt-4">
             <.link navigate={dashboard_path(@role)} class="bg-gray-600 text-white px-4 py-2 rounded">
-              ← Kembali
+              Kembali ke Dashboard
             </.link>
           </div>
         </div>
