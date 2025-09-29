@@ -37,7 +37,8 @@ defmodule SpkpProjectWeb.PermohonanLive.FormComponent do
           options={[
             {"Dalam Proses", "Dalam Proses"},
             {"Diterima", "Diterima"},
-            {"Ditolak", "Ditolak"}
+            {"Ditolak", "Ditolak"},
+            {"Tarik Diri", "Tarik Diri"}
           ]}
         />
 

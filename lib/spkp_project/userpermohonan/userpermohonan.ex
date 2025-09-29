@@ -22,6 +22,7 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
     userpermohonan
     |> cast(attrs, [:user_id, :kursus_id, :status])
     |> validate_required([:user_id, :kursus_id, :status])
+    |> validate_inclusion(:status, ["Dalam Proses", "Diterima", "Ditolak", "Tarik Diri"])
   end
 
    # -------- CREATE PERMOHONAN --------
@@ -45,6 +46,7 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
       "Diterima" -> query |> where([p], p.status == "Diterima") |> Repo.all()
       "Dalam Proses" -> query |> where([p], p.status == "Dalam Proses") |> Repo.all()
       "Ditolak" -> query |> where([p], p.status == "Ditolak") |> Repo.all()
+      "Tarik Diri" -> query |> where([p], p.status == "Tarik Diri") |> Repo.all()
       _ -> Repo.all(query)
     end
   end
@@ -53,6 +55,12 @@ defmodule SpkpProject.Userpermohonan.Userpermohonan do
     def total_applications do
       from(p in __MODULE__, select: count(p.id))
       |> Repo.one()
+    end
+
+    def update_status(permohonan, status) do
+      permohonan
+      |> Ecto.Changeset.change(%{status: status})
+      |> Repo.update()
     end
 
 end
