@@ -393,8 +393,8 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
       <%= case @slide do %>
          <% %{type: :image, src: src} -> %>
           <!-- ✅ Untuk GIF/logo -->
-           <div class="w-full h-[500px]  flex items-center justify-center">
-            <img src={src} alt="logo" class="h-full w-auto max-w-[80%] object-contain mx-auto" />
+           <div class="w-full h-[500px] flex items-center justify-center">
+            <img src={src} alt="spkp" class="h-full w-auto max-w-[160%] object-contain mx-auto" />
            </div>
 
          <% %{type: :text, title: title, body: body} -> %>
