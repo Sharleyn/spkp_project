@@ -1,6 +1,9 @@
 defmodule SpkpProjectWeb.MengenaiKamiLive do
   use SpkpProjectWeb, :live_view
 
+  # ⬅️ tambah ini
+  import SpkpProjectWeb.MengenaiKamiHTML
+
   def mount(_params, _session, socket) do
     {:ok, socket}
   end
@@ -24,6 +27,7 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
     </head>
 
     <div class="font-sans">
+    <div id="app" class="flex flex-col min-h-screen font-sans">
       <!-- Header -->
       <header class="transparent">
         <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
@@ -40,6 +44,7 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
               <img src={~p"/images/logo 6.png"} alt="Logo 6" class="h-16" />
             </div>
           </div>
+
           <!-- Ikon kanan -->
           <div class="flex space-x-6">
 
@@ -69,8 +74,9 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
           </div>
         </div>
       </header>
+
       <!-- Table menu bawah header -->
-    <!-- Bar navigasi -->
+      <!-- Bar navigasi -->
       <div class="bg-[#09033F] shadow py-2">
         <div class="max-w-7xl mx-auto flex space-x-2">
           <a
@@ -104,25 +110,25 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
         <!-- Navigation Tabs -->
         <div class="flex flex-wrap border-b border-gray-300 mb-6">
           <button
-            class="tab-link active px-4 py-2 text-sm font-semibold text-gray-700 hover:text-[#09033F]"
+            class="tab-link active px-4 py-2 text-base font-semibold text-gray-700 hover:text-[#09033F]"
             data-tab="latar"
           >
             Latar Belakang
           </button>
           <button
-            class="tab-link px-4 py-2 text-sm font-semibold text-gray-700 hover:text-[#09033F]"
+            class="tab-link px-4 py-2 text-base font-semibold text-gray-700 hover:text-[#09033F]"
             data-tab="carta"
           >
             Carta Organisasi
           </button>
           <button
-            class="tab-link px-4 py-2 text-sm font-semibold text-gray-700 hover:text-[#09033F]"
+            class="tab-link px-4 py-2 text-base font-semibold text-gray-700 hover:text-[#09033F]"
             data-tab="visi"
           >
             Visi & Misi
           </button>
           <button
-            class="tab-link px-4 py-2 text-sm font-semibold text-gray-700 hover:text-[#09033F]"
+            class="tab-link px-4 py-2 text-base font-semibold text-gray-700 hover:text-[#09033F]"
             data-tab="objektif"
           >
             Objektif
@@ -130,28 +136,21 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
         </div>
 
         <!-- Tab Content -->
-        <div id="latar" class="tab-content">
-          <h2 class="text-xl font-bold mb-4">Latar Belakang</h2>
-
-          <p>
-            Berdaftar sebagai Sharif Perchaya Sdn. Bhd., beroperasi dari Kota Kinabalu, Sabah.<br />
-            Terlibat dalam pelaksanaan kursus rekabentuk grafik (Adobe Illustrator, Photoshop) untuk Jabatan Pembangunan Sumber Manusia, Negeri Sabah — dijalankan oleh entiti dikenali sebagai Sharif Perchaya Enterprise/Sdn. Bhd.
-          </p>
+        <!-- LATAR BELAKANG -->
+        <div id="latar" class="tab-content mx-auto mt-8">
+          <.latar_belakang />
         </div>
 
+        <!-- CARTA ORGANISASI -->
         <div id="carta" class="tab-content hidden">
           <h2 class="text-2xl flex justify-center font-bold mb-4">Carta Organisasi</h2>
-
           <img src={~p"/images/organisasi.png"} alt="Carta Organisasi" class="flex justify-center w-full">
-
         </div>
 
+        <!-- VISI -->
         <div id="visi" class="tab-content hidden">
-
-          <!-- VISI -->
           <div class="bg-sky-50 rounded-lg p-20 mb-6">
             <h3 class="text-center text-xl font-bold mb-12">VISI</h3>
-
             <p>
               Menjadi sebuah organisasi terunggul dan bestari dalam menawarkan perkhidmatan di Negeri Sabah yang dikendalikan sepenuhnya oleh anak muda.
             </p>
@@ -160,7 +159,6 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
           <!-- MISI -->
           <div class="bg-sky-50 rounded-lg p-14">
             <h3 class="text-center text-xl font-bold mb-12">MISI</h3>
-
             <ul class="list-disc list-inside space-y-1">
               <li>Menjadi penyedia khidmat yang terbaik dan disenangi oleh pelanggan</li>
 
@@ -175,12 +173,20 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
           </div>
         </div>
 
+        <!-- OBJEKTIF -->
         <div id="objektif" class="tab-content hidden">
-          <h2 class="text-xl font-bold mb-4">Objektif</h2>
+          <h2 class="text-2xl font-bold mb-4">Objektif</h2>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Memberi perkhidmatan berkualiti tinggi dalam setiap bidang operasi syarikat demi memenuhi keperluan pelanggan.</li>
 
-          <p>
-            Objektif syarikat adalah untuk memberi perkhidmatan terbaik kepada pelanggan dan membina hubungan yang berkekalan.
-          </p>
+            <li>Membina hubungan yang berkekalan dan dipercayai dengan pelanggan, rakan kongsi, serta komuniti setempat.</li>
+
+            <li>Mengembangkan perniagaan secara mampan dengan mengutamakan inovasi, keberkesanan kos, dan kepuasan pelanggan.</li>
+
+            <li>Melahirkan peluang pekerjaan dan membangunkan bakat anak muda tempatan khususnya di Sabah.</li>
+
+            <li>Menyumbang kepada pembangunan masyarakat melalui aktiviti korporat yang berteraskan nilai keprihatinan dan tanggungjawab sosial.</li>
+          </ul>
         </div>
 
         <!-- CSS untuk Tab -->
@@ -217,52 +223,51 @@ defmodule SpkpProjectWeb.MengenaiKamiLive do
       </div>
 
       <!-- Footer -->
-      <section id="hubungi">
-        <footer class="bg-[#09033F] text-white mt-10 py-2 text-center">
-          <p class="text-sm font-bold">SHARIF PERCHAYA SDN. BHD.</p>
-
-          <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
-            <div class="flex items-center justify-between gap-6">
-
-              <!-- Alamat -->
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6" />
-                <p class="text-sm">
-                  Alamat: Block G. 2ND Floor, Lot 9, Lintas Jaya Uptownship Penampang, 88200 Sabah
-                </p>
-              </div>
-
-              <!-- Telefon & Faks -->
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/fax.png"} alt="Telefon & Faks" class="h-6 w-6" />
-                <p class="text-sm">No. Tel: 011-3371 7129<br /> Faks: 088 729717</p>
-              </div>
-
-              <!-- Email -->
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/email.png"} alt="Email" class="h-6 w-6" />
-                <p class="text-sm">Email: sharifperchaya@gmail.com</p>
-              </div>
-
-              <!-- FB -->
-              <div class="flex items-center gap-4">
-                <img src={~p"/images/fb.png"} alt="Facebook" class="h-6 w-6" />
-                <p class="text-sm">Sharif Perchaya Sdn Bhd</p>
-              </div>
+      <footer class="bg-[#09033F] text-white py-2 mt-auto text-center">
+        <p class="text-sm font-bold">SHARIF PERCHAYA SDN. BHD.</p>
+        <div class="bg-[#09033F] text-white px-16 py-2 space-y-3 mx-auto text-left">
+          <div class="flex items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6" />
+              <p class="text-sm">Alamat: Block G. 2ND Floor, Lot 9, Lintas Jaya Uptownship Penampang, 88200 Sabah</p>
             </div>
-
-            <!-- Waktu Operasi -->
-            <p class="text-sm text-center font-bold">MASA OPERASI</p>
-
-            <div class="bg-[#09033F] flex items-star text-white max-w-xl mx-auto mt-4 text-left gap-2">
-              <img src={~p"/images/clock.png"} alt="Waktu Operasi" class="h-6 w-6" />
-              <p class="text-sm">
-                Hari Bekerja: Isnin - Jumaat | 8:00 A.M. – 5:00 P.M. | Cuti: Sabtu, Ahad, Cuti Umum
-              </p>
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/fax.png"} alt="Telefon & Faks" class="h-6 w-6" />
+              <p class="text-sm">No. Tel: 011-3371 7129<br /> Faks: 088 729717</p>
+            </div>
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/email.png"} alt="Email" class="h-6 w-6" />
+              <p class="text-sm">Email: sharifperchaya@gmail.com</p>
+            </div>
+            <div class="flex items-center gap-4">
+              <img src={~p"/images/fb.png"} alt="Facebook" class="h-6 w-6" />
+              <p class="text-sm">Sharif Perchaya Sdn Bhd</p>
             </div>
           </div>
-        </footer>
-      </section>
+          <p class="text-sm text-center font-bold">MASA OPERASI</p>
+          <div class="bg-[#09033F] flex items-star text-white max-w-xl mx-auto mt-4 text-left gap-2">
+            <img src={~p"/images/clock.png"} alt="Waktu Operasi" class="h-6 w-6" />
+            <p class="text-sm">Hari Bekerja: Isnin - Jumaat | 8:00 A.M. – 5:00 P.M. | Cuti: Sabtu, Ahad, Cuti Umum</p>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Tab Script -->
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          document.querySelectorAll(".tab-link").forEach(button => {
+            button.addEventListener("click", () => {
+              const tabID = button.getAttribute("data-tab");
+              document.querySelectorAll(".tab-link").forEach(btn => btn.classList.remove("active"));
+              document.querySelectorAll(".tab-content").forEach(content => content.classList.add("hidden"));
+              button.classList.add("active");
+              document.getElementById(tabID).classList.remove("hidden");
+            });
+          });
+        });
+      </script>
+
+    </div>
     </div>
     """
   end
