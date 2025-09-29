@@ -20,12 +20,12 @@ defmodule SpkpProjectWeb.PesertaKursusLive.Show do
       Repo.get!(Kursuss, String.to_integer(id))
       |> Repo.preload(:kursus_kategori)
 
-    peserta =
-      from(p in Userpermohonan,
-        where: p.kursus_id == ^kursus.id and p.status == "Diterima",
-        preload: [:user]
-      )
-      |> Repo.all()
+      peserta =
+        from(p in Userpermohonan,
+          where: p.kursus_id == ^kursus.id and p.status == "Diterima",
+          preload: [:user, :certificate]
+        )
+        |> Repo.all()
 
     # kategori_id boleh datang sebagai query param; fallback ke kursus.kursus_kategori_id
     kategori_id =
@@ -115,6 +115,13 @@ defmodule SpkpProjectWeb.PesertaKursusLive.Show do
                       <td class="px-6 py-4 text-sm text-gray-500">
                         <%= Calendar.strftime(p.inserted_at, "%d-%m-%Y") %>
                       </td>
+
+                      <td class="px-6 py-4 text-sm text-gray-500">
+                       <.link navigate={~p"/admin/sijil/new?user_permohonan_id=#{p.id}"} class="text-blue-600 hover:underline">
+                         Upload Sijil
+                       </.link>
+            </td>
+
                     </tr>
                   <% end %>
                 <% end %>

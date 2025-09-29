@@ -17,7 +17,7 @@ defmodule SpkpProject.Certificate do
   @doc false
   def changeset(certificate, attrs) do
     certificate
-    |> cast(attrs, [:sijil_url, :nama_sijil, :issued_at, :user_id, :kursus_id])
-    |> validate_required([:sijil_url, :nama_sijil, :issued_at, :user_id, :kursus_id])
+    |> cast(attrs, [:sijil_url, :nama_sijil, :issued_at, :user_id, :kursus_id, :user_permohonan_id])
+    |> validate_required([:sijil_url])
   end
 end

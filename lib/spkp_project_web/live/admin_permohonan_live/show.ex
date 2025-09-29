@@ -28,6 +28,37 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
      |> assign(:page_title, page_title(socket.assigns.live_action))}
   end
 
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    permohonan = Repo.get!(Userpermohonan, id)
+
+    case Repo.delete(permohonan) do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Permohonan berjaya dipadam")
+         |> push_navigate(to: back_path(socket.assigns.role))}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Gagal padam permohonan")}
+    end
+  end
+
+  def handle_event("tarik_diri", %{"id" => id}, socket) do
+    permohonan = Repo.get!(Userpermohonan, id)
+
+    case Userpermohonan.update_status(permohonan, "Tarik Diri") do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Peserta berjaya ditandakan sebagai Tarik Diri")
+         |> push_patch(to: socket.assigns.current_path)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Gagal kemaskini status")}
+    end
+  end
+
   defp page_title(:show), do: "Maklumat Permohonan"
   defp page_title(:edit), do: "Edit Permohonan"
 
@@ -130,20 +161,32 @@ defmodule SpkpProjectWeb.PermohonanLive.Show do
 
               <!-- Hanya admin boleh edit/padam -->
               <%= if @role == "admin" do %>
-                <.link patch={~p"/admin/permohonan/#{@permohonan.id}/show/edit"} class="bg-blue-600 text-white px-4 py-2 rounded">
-                  Edit
-                </.link>
-                <button
-                  phx-click="delete"
-                  phx-value-id={@permohonan.id}
-                  class="bg-red-600 text-white px-4 py-2 rounded"
-                  data-confirm="Adakah anda pasti mahu padam permohonan ini?">
-                  Delete
-                </button>
-              <% end %>
-            </div>
-          </div>
-        </div>
+                 <!-- Edit -->
+                    <.link patch={~p"/admin/permohonan/#{@permohonan.id}/show/edit"} class="bg-blue-600 text-white px-4 py-2 rounded">
+                       Edit
+                    </.link>
+
+                 <!-- Tarik Diri -->
+                     <button
+                        phx-click="tarik_diri"
+                        phx-value-id={@permohonan.id}
+                        class="bg-yellow-600 text-white px-4 py-2 rounded"
+                        data-confirm="Adakah anda pasti mahu tandakan peserta ini sebagai Tarik Diri?">
+                        Tarik Diri
+                     </button>
+
+                 <!-- Padam -->
+                     <button
+                        phx-click="delete"
+                        phx-value-id={@permohonan.id}
+                        class="bg-red-600 text-white px-4 py-2 rounded"
+                        data-confirm="Adakah anda pasti mahu padam permohonan ini?">
+                        Padam
+                     </button>
+                 <% end %>
+               </div>
+             </div>
+           </div>
 
         <!-- Modal untuk edit -->
         <%= if @live_action == :edit and @role == "admin" do %>

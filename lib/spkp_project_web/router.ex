@@ -56,6 +56,10 @@ defmodule SpkpProjectWeb.Router do
   scope "/admin", SpkpProjectWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    # route sijil
+  live "/sijil/new", SijilLive.Form, :new
+  live "/sijil/:id/edit", SijilLive.Form, :edit
+
     # ✅ Admin only (pekerja tak boleh buka)
     live_session :require_admin,
       on_mount: [
