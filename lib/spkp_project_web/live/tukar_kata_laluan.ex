@@ -1,16 +1,43 @@
 defmodule SpkpProjectWeb.TukarKataLaluanLive do
   use SpkpProjectWeb, :live_view
+  alias SpkpProject.Accounts
 
   @impl true
   def mount(_params, _session, socket) do
+    changeset = Accounts.change_user_password(socket.assigns.current_user)
+
     {:ok,
      socket
-     |> assign(:role, socket.assigns.current_user.role)}
+     |> assign(:role, socket.assigns.current_user.role)
+     |> assign(:current_path, "/tukarkatalaluan")
+     |> assign(:form, to_form(changeset))}
+  end
+
+
+  @impl true
+  def handle_event("validate", %{"user" => params}, socket) do
+    changeset =
+      socket.assigns.current_user
+      |> Accounts.change_user_password(params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, :form, to_form(changeset))}
   end
 
   @impl true
-  def handle_params(_params, uri, socket) do
-    {:noreply, assign(socket, :current_path, URI.parse(uri).path)}
+  def handle_event("save", %{"user" => %{"current_password" => current_password} = user_params}, socket) do
+    user = socket.assigns.current_user
+
+    case Accounts.update_user_password(user, current_password, user_params) do
+      {:ok, _user} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Kata laluan berjaya ditukar. Sila log masuk semula.")
+         |> redirect(to: ~p"/users/log_in")}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, :form, to_form(changeset))}
+    end
   end
 
   @impl true
@@ -37,7 +64,6 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
                 <%= if @role == "admin", do: "SPKP Admin Dashboard", else: "SPKP Pekerja Dashboard" %>
               </h1>
             </div>
-
             <div class="flex items-center space-x-4">
               <span class="text-gray-600"><%= @current_user.full_name %></span>
               <.link href={~p"/users/log_out"} method="delete" class="text-gray-600 hover:text-gray-800">
@@ -49,59 +75,38 @@ defmodule SpkpProjectWeb.TukarKataLaluanLive do
 
         <!-- Main Content Area -->
         <div class="flex-1 bg-gray-100 p-6">
-          <!-- Breadcrumb and Title -->
-          <div class="mb-6">
-            <div class="flex items-center space-x-2 mb-2">
-              <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-              </svg>
-              <h2 class="text-3xl font-semibold text-gray-800">Dashboard Admin Kursus</h2>
-            </div>
-            <div class="text-sm text-gray-500">Tetapan admin</div>
-          </div>
-
-          <!-- Tukar Kata Laluan Section -->
           <div class="bg-white rounded-lg shadow-sm border p-8 max-w-2xl mx-auto">
             <h3 class="text-3xl font-semibold text-gray-800 text-center mb-8">Tukar Kata Laluan</h3>
-            <!-- Form Fields -->
-            <form class="space-y-6">
-              <div>
-                <label class="block text-xl font-semibold text-gray-800 mb-2">Kata Laluan Lama</label>
-                <input
-                  type="text"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Masukkan kata laluan lama"
-                />
-              </div>
 
-              <div>
-                <label class="block text-xl font-semibold text-gray-800 mb-2">Kata Laluan Baru</label>
-                <input
-                  type="text"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Masukkan kata laluan baru"
-                />
-              </div>
+            <.simple_form
+              for={@form}
+              id="password-form"
+              phx-submit="save"
+              phx-change="validate"
+            >
+              <.input
+                field={@form[:current_password]}
+                type="password"
+                label="Kata Laluan Lama"
+                required
+              />
+              <.input
+                field={@form[:password]}
+                type="password"
+                label="Kata Laluan Baru"
+                required
+              />
+              <.input
+                field={@form[:password_confirmation]}
+                type="password"
+                label="Sahkan Kata Laluan Baru"
+                required
+              />
+              <:actions>
+                <.button phx-disable-with="Menyimpan...">Simpan</.button>
+              </:actions>
+            </.simple_form>
 
-              <div>
-                <label class="block text-xl font-semibold text-gray-800 mb-2">Sahkan Kata Laluan Baru</label>
-                <input
-                  type="text"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Masukkan kata laluan baru"
-                />
-              </div>
-
-              <!-- Save Button -->
-              <div class="flex justify-center pt-4">
-                <button
-                  type="submit"
-                  class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200"
-                >
-                  Simpan
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </div>
