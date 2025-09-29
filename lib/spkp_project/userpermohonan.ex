@@ -161,4 +161,33 @@ defmodule SpkpProject.Userpermohonan do
           total_pages: div(total_entries + per_page - 1, per_page)
         }
       end
+
+      # 🔍 Carian + Pagination untuk admin
+    def search_permohonan_paginated(search \\ "", page \\ 1, per_page \\ 5) do
+      query =
+        from p in Userpermohonan,
+          join: u in assoc(p, :user),
+          join: k in assoc(p, :kursus),
+          where:
+            ilike(u.full_name, ^"%#{search}%") or
+            ilike(k.nama_kursus, ^"%#{search}%"),
+          order_by: [desc: p.inserted_at],
+          preload: [user: u, kursus: k]
+
+      total_entries = Repo.aggregate(query, :count, :id)
+
+      entries =
+        query
+        |> limit(^per_page)
+        |> offset(^((page - 1) * per_page))
+        |> Repo.all()
+
+      %{
+        entries: entries,
+        page: page,
+        per_page: per_page,
+        total_entries: total_entries,
+        total_pages: div(total_entries + per_page - 1, per_page)
+      }
+    end
     end
