@@ -21,6 +21,7 @@ defmodule SpkpProject.Userpermohonan do
         "Diterima" -> from p in query, where: p.status == "Diterima"
         "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
         "Ditolak" -> from p in query, where: p.status == "Ditolak"
+        "Tarik Diri" -> from p in query, where: p.status == "Tarik Diri"
         _ -> query
       end
 
@@ -51,6 +52,7 @@ defmodule SpkpProject.Userpermohonan do
         "Diterima" -> from p in query, where: p.status == "Diterima"
         "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
         "Ditolak" -> from p in query, where: p.status == "Ditolak"
+        "Tarik Diri" -> from p in query, where: p.status == "Tarik Diri"
         _ -> query
       end
 
