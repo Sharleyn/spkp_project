@@ -2,9 +2,6 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
   use SpkpProjectWeb, :live_view
   import Ecto.Query, warn: false
 
-  alias SpkpProject.Userpermohonan.Userpermohonan
-  alias SpkpProject.Repo
-
   @impl true
   def mount(_params, _session, socket) do
     role = socket.assigns.current_user.role
@@ -14,33 +11,23 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
      |> assign(:role, role)
      |> assign(:page, 1)       # default page
      |> assign(:per_page, 5)  # bilangan rekod setiap page
+     |> assign(:search, "")   # 🔍 search default kosong
      |> load_permohonan()}
   end
 
   defp load_permohonan(socket) do
-    page = socket.assigns.page
-    per_page = socket.assigns.per_page
-
-    query =
-      from p in Userpermohonan,
-        order_by: [desc: p.inserted_at],
-        preload: [:user, :kursus]
-
-    total_entries = Repo.aggregate(query, :count, :id)
-
-    entries =
-      query
-      |> limit(^per_page)
-      |> offset(^((page - 1) * per_page))
-      |> Repo.all()
-
-    total_pages = div(total_entries + per_page - 1, per_page)
+    %{entries: entries, total_pages: total_pages, total_entries: total_entries} =
+      SpkpProject.Userpermohonan.search_permohonan_paginated(
+        socket.assigns.search,
+        socket.assigns.page,
+        socket.assigns.per_page
+      )
 
     socket
     |> assign(:permohonan, entries)
     |> assign(:pagination, %{
-      page: page,
-      per_page: per_page,
+      page: socket.assigns.page,
+      per_page: socket.assigns.per_page,
       total_entries: total_entries,
       total_pages: total_pages
     })
@@ -59,6 +46,15 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
     {:noreply,
      socket
      |> assign(:page, String.to_integer(page))
+     |> load_permohonan()}
+  end
+
+  @impl true
+  def handle_event("search", %{"search" => search}, socket) do
+    {:noreply,
+     socket
+     |> assign(:search, search)
+     |> assign(:page, 1)
      |> load_permohonan()}
   end
 
@@ -106,6 +102,23 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
 
         <!-- Wrapper table -->
         <div class="px-10 w-full">
+
+        <!-- 🔍 Search bar -->
+          <div class="flex justify-start mb-4">
+            <form phx-submit="search" class="flex space-x-2">
+              <input
+                type="text"
+                name="search"
+                value={@search}
+                placeholder="Cari nama atau kursus..."
+                class="border rounded px-3 py-2 w-64"
+              />
+              <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                Cari
+              </button>
+            </form>
+          </div>
+
           <table class="w-full border border-gray-300 rounded-lg shadow-lg text-center">
             <thead>
               <tr class="bg-blue-900 text-white">
@@ -194,7 +207,7 @@ defmodule SpkpProjectWeb.PermohonanLive.Index do
           <!-- butang kembali bawah table -->
           <div class="mt-4">
             <.link navigate={dashboard_path(@role)} class="bg-gray-600 text-white px-4 py-2 rounded">
-              ← Kembali
+              Kembali ke Dashboard
             </.link>
           </div>
         </div>

@@ -89,40 +89,58 @@ def render(assigns) do
       <% else %>
         <h1 class="text-2xl font-bold mb-4">Senarai Pengguna</h1>
 
-        <table class="min-w-full border border-gray-300">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="px-4 py-2">Nama</th>
-              <th class="px-4 py-2">Email</th>
-              <th class="px-4 py-2">Role</th>
-              <th class="px-4 py-2">Tindakan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <%= for user <- @users do %>
-              <tr>
-                <td class="border px-4 py-2"><%= user.full_name %></td>
-                <td class="border px-4 py-2"><%= user.email %></td>
-                <td class="border px-4 py-2">
-                  <span class={
-                    case user.role do
-                      "admin" -> "text-red-600 font-bold"
-                      "pekerja" -> "text-green-600"
-                      _ -> "text-gray-700"
-                    end
-                  }>
-                    <%= user.role %>
-                  </span>
-                </td>
-                <td class="border px-4 py-2">
-                  <.link patch={~p"/admin/assignstaff/#{user.id}/edit"} class="text-blue-600 hover:underline">
-                    Tukar Role
-                  </.link>
-                </td>
+        <!-- ✅ Table -->
+        <div class="w-full">
+          <table class="w-full border border-gray-300 rounded-lg shadow-lg text-center">
+            <thead>
+              <tr class="bg-blue-900 text-white">
+                <th class="px-4 py-3">Nama</th>
+                <th class="px-4 py-3">Email</th>
+                <th class="px-4 py-3">Role</th>
+                <th class="px-4 py-3">Tindakan</th>
               </tr>
-            <% end %>
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              <%= for user <- @users do %>
+                <tr class="border-b cursor-pointer transition duration-200 ease-in-out hover:scale-[1.01] hover:shadow-md hover:bg-gray-100">
+                  <!-- Nama -->
+                  <td class="px-4 py-3">
+                    <%= user.full_name %>
+                  </td>
+
+                  <!-- Email -->
+                  <td class="px-4 py-3">
+                    <%= user.email %>
+                  </td>
+
+                  <!-- Role -->
+                  <td class="px-4 py-3">
+                    <span class={
+                      case user.role do
+                        "admin" -> "text-red-600 font-bold"
+                        "pekerja" -> "text-green-600"
+                        _ -> "text-gray-700"
+                      end
+                    }>
+                      <%= user.role %>
+                    </span>
+                  </td>
+
+                  <!-- Tindakan -->
+                  <td class="px-4 py-3 space-x-3">
+                    <.link
+                      patch={~p"/admin/assignstaff/#{user.id}/edit"}
+                      class="text-blue-600 font-medium hover:underline"
+                    >
+                      Tukar Role
+                    </.link>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
       <% end %>
     </main>
   </div>

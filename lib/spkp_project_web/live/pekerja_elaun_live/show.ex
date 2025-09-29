@@ -205,6 +205,15 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
             </.link>
           </div>
 
+            <div class="mt-8">
+              <h3 class="text-xl font-bold text-black mb-4">Resit Bayaran</h3>
+              <%= if @elaun.resit do %>
+              <img src={"/uploads/#{@elaun.resit}"} class="max-w-sm border rounded" />
+              <% else %>
+                <p class="text-gray-500 italic">Tiada resit dimuat naik.</p>
+              <% end %>
+            </div>
+
           <!-- Modal: Item form (shown when live_action == :new_item or :edit_item) -->
           <%= if @modal_item_action in [:new, :edit] do %>
             <.live_component
@@ -214,6 +223,7 @@ defmodule SpkpProjectWeb.PekerjaElaunLive.Show do
               elaun={@elaun}
               action={@modal_item_action}
               modal={true}
+              role={@role}
             />
           <% end %>
         </div>
