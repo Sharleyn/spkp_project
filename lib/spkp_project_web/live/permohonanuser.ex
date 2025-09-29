@@ -15,9 +15,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
       {apps, has_more} =
         Userpermohonan.list_user_applications(current_user.id, filter, page, per_page)
 
-      stats = Userpermohonan.get_user_stats(socket.assigns.current_user.id)
-      {:noreply, assign(socket, applications: apps, has_more: has_more, stats: stats)}
-
+      stats = Userpermohonan.get_user_stats(current_user.id)
 
       {:ok,
        socket
@@ -122,7 +120,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
              <p class="text-gray-500 mb-6">Temui kursus yang sesuai untuk meningkatkan kemahiran anda</p>
 
           <!-- Statistik -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
 
             <div class="bg-sky-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
               <h2 class="text-l font-semibold text-gray-600">Jumlah Permohonan</h2>
@@ -147,6 +145,12 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                 <p class="text-2xl font-bold text-gray-900"><%= @stats.ditolak %></p>
                   <img src={~p"/images/ditolak.png"} alt="Ditolak Icon" class="w-8 h-8" />
             </div>
+
+            <div class="bg-gray-50 p-6 rounded-lg shadow flex flex-col items-center justify-center h-30">
+              <h2 class="text-l font-semibold text-gray-600">Tarik Diri</h2>
+                <p class="text-2xl font-bold text-gray-900"><%= @stats.tarik_diri %></p>
+                  <img src={~p"/images/ditolak.png"} alt="Tarik Diri Icon" class="w-8 h-8" />
+            </div>
         </div>
 
           <!-- Search + Filter -->
@@ -169,6 +173,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                      <option value="Diterima" selected={@filter == "Diterima"}>Diterima</option>
                      <option value="Dalam Proses" selected={@filter == "Dalam Proses"}>Dalam Proses</option>
                      <option value="Ditolak" selected={@filter == "Ditolak"}>Ditolak</option>
+                     <option value="Tarik Diri" selected={@filter == "Tarik Diri"}>Tarik Diri</option>
                </select>
              </form>
            </div>
@@ -191,6 +196,8 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
                     <.icon name="hero-clock" class="w-6 h-6 text-yellow-500" />
                   <% "Ditolak" -> %>
                     <.icon name="hero-x-circle" class="w-6 h-6 text-red-500" />
+                  <% "Tarik Diri" -> %>
+                    <.icon name="hero-x-circle" class="w-6 h-6 text-gray-500" />
                   <% _ -> %>
                     <.icon name="hero-information-circle" class="w-6 h-6 text-gray-400" />
                <% end %>
@@ -204,6 +211,7 @@ defmodule SpkpProjectWeb.PermohonanUserLive do
               "Diterima" -> "px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold"
               "Dalam Proses" -> "px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold"
               "Ditolak" -> "px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-semibold"
+              "Tarik Diri" -> "px-3 py-1 rounded-full bg-gray-100 text-Gray-700 text-sm font-semibold"
                  _ -> "px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-semibold"
              end}>
               <%= permohonan.status %>
@@ -440,6 +448,7 @@ def list_user_applications(user_id, filter \\ "Semua Keputusan", page \\ 1, per_
       "Diterima" -> from p in query, where: p.status == "Diterima"
       "Dalam Proses" -> from p in query, where: p.status == "Dalam Proses"
       "Ditolak" -> from p in query, where: p.status == "Ditolak"
+      "Tarik Diri" -> from p in query, where: p.status == "Tarik Diri"
       _ -> query
     end
 

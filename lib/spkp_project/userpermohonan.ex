@@ -96,11 +96,17 @@ defmodule SpkpProject.Userpermohonan do
       |> where([p], p.status == "Dalam Proses")
       |> Repo.aggregate(:count, :id)
 
+    tarik_diri =
+      query
+      |> where([p], p.status == "Tarik Diri")
+      |> Repo.aggregate(:count, :id)
+
     %{
       total: all,
       diterima: diterima,
       ditolak: ditolak,
-      dalam_proses: dalam_proses
+      dalam_proses: dalam_proses,
+      tarik_diri: tarik_diri
     }
   end
 
