@@ -1,12 +1,15 @@
 defmodule SpkpProjectWeb.LamanUtamaLive do
   use SpkpProjectWeb, :live_view
 
+  alias SpkpProject.Accounts
+  alias SpkpProject.Kursus
+
   # Tambahkan ini
   on_mount {SpkpProjectWeb.UserAuth, :mount_current_user}
 
   # Data slider
   @slides [
-    %{type: :image, src: "/images/logo 1.png"},
+    %{type: :image, src: "/images/spkp.gif"},
     %{
       type: :text,
       title: "VISI",
@@ -46,17 +49,24 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
       schedule_gallery_slide()
     end
 
+    bil_pelatih = Accounts.count_users_by_role("user")
+    bil_program = Kursus.count_program()
+    bil_jurusan = Kursus.count_kategori()
+
     {:ok,
      socket
      |> assign(:slides, @slides)
      |> assign(:current_index, 0)
      |> assign(:gallery, @gallery)
      |> assign(:gallery_index, 0)
+     |> assign(:bil_pelatih, bil_pelatih)
+     |> assign(:bil_program, bil_program)
+     |> assign(:bil_jurusan, bil_jurusan)
      |> assign_new(:current_user, fn -> nil end)}
   end
 
   # Auto slide scheduling
-  defp schedule_slide, do: Process.send_after(self(), :next_slide, 3000)
+  defp schedule_slide, do: Process.send_after(self(), :next_slide, 5000)
   defp schedule_gallery_slide, do: Process.send_after(self(), :next_gallery, 3000)
 
 
@@ -196,8 +206,8 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
       </div>
 
       <!-- Slider -->
-      <section class="max-w-6xl mx-auto mt-10 px-6 text-center">
-        <div class="h-[320px] flex items-center justify-center">
+      <section class="max-w-6xl mx-auto mt-2 px-6 text-center">
+        <div class="h-[500px] flex items-center justify-center">
           <%= if slide = Enum.at(@slides, @current_index) do %>
             {render_slide(%{slide: slide})}
           <% end %>
@@ -274,9 +284,9 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
                 alt="Bilangan Pelatih"
                 class="h-18 w-18 mb-2 mx-auto"
               />
-              <div class="text-4xl font-bold">250</div>
+              <div class="text-4xl font-bold"><%= @bil_pelatih %></div>
 
-              <div class="text-gray-600">Bilangan Pelatih</div>
+              <div class="text-gray-800 font-medium">Bilangan Pelatih</div>
             </div>
 
             <div>
@@ -285,16 +295,19 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
                 alt="Bilangan Program"
                 class="h-18 w-18 mb-2 mx-auto"
               />
-              <div class="text-4xl font-bold">25</div>
 
-              <div class="text-gray-600">Bilangan Program</div>
+              <div class="text-4xl font-bold"><%= @bil_program %></div>
+
+              <div class="text-gray-800 font-medium">Bilangan Program</div>
             </div>
 
             <div>
               <img src={~p"/images/icon jurusan.png"} alt="Jurusan Ditawarkan" class="h-18 w-18 mb-2 mx-auto"/>
-              <div class="text-4xl font-bold">10</div>
 
-              <div class="text-gray-600">Jurusan Ditawarkan</div>
+              <div class="text-4xl font-bold"><%= @bil_jurusan %></div>
+
+              <div class="text-gray-800 font-medium">Kursus Ditawarkan</div>
+
             </div>
           </div>
         </div>
@@ -335,14 +348,14 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
             <div class="flex items-center gap-4">
               <img src={~p"/images/office.png"} alt="Alamat" class="h-6 w-6" />
               <p class="text-sm">
-                Alamat: Block G. 2ND Floor, Lot 9, Lintas Jaya Uptownship Penampang, 88200 Sabah
+                Alamat Pejabat: Block G. 2ND Floor, Lot 9, Lintas Jaya <br/> Uptownship Penampang, 88200 Sabah
               </p>
             </div>
 
             <!-- Telefon & Faks -->
             <div class="flex items-center gap-4">
               <img src={~p"/images/fax.png"} alt="Telefon & Faks" class="h-6 w-6" />
-              <p class="text-sm">No. Tel: 011-3371 7129<br />Faks: 088 729717</p>
+              <p class="text-sm">No. Tel: 011-3371 7129 <br/> Faks: 088 729717</p>
             </div>
 
             <!-- Email -->
@@ -374,30 +387,46 @@ defmodule SpkpProjectWeb.LamanUtamaLive do
   end
 
   # <!-- Slider untuk LOGO, VISI, MISI -->
-  defp render_slide(assigns) do
+    attr :slide, :map, required: true
+    defp render_slide(assigns) do
     ~H"""
-    <div class="w-full h-[320px] flex items-center justify-center bg-white bg-opacity-50 rounded-lg p-6">
       <%= case @slide do %>
-        <% %{type: :image, src: src} -> %>
-          <img src={src} alt="logo" class="max-h-full max-w-full object-contain" />
-        <% %{type: :text, title: title, body: body} -> %>
-          <div class="flex flex-col justify-center text-center w-full h-full">
-            <h2 class="text-xl font-bold mb-4">{title}</h2>
+         <% %{type: :image, src: src} -> %>
+          <!-- ✅ Untuk GIF/logo -->
+           <div class="w-full h-[500px] flex items-center justify-center">
+            <img src={src} alt="spkp" class="h-full w-auto max-w-[160%] object-contain mx-auto" />
+           </div>
 
-            <p class="mx-auto max-w-xl">{body}</p>
-          </div>
-        <% %{type: :list, title: title, items: items} -> %>
-          <div class="flex flex-col justify-center w-full h-full">
-            <h2 class="text-xl font-bold mb-4 text-center">{title}</h2>
+         <% %{type: :text, title: title, body: body} -> %>
+          <!-- ✅ Untuk Visi/Misi -->
+           <div class="w-full h-[320px] flex items-center justify-center">
+             <div class="flex flex-col justify-center text-center w-full h-full
+               bg-white bg-opacity-70 rounded-xl p-6 shadow
+               border border-transparent
+               transition duration-300 ease-in-out
+               hover:border-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.7)]">
+               <h2 class="text-xl font-bold mb-4 text-[#09033F]">{title}</h2>
+               <p class="mx-auto max-w-xl text-gray-700">{body}</p>
+             </div>
+           </div>
 
-            <ul class="list-disc list-inside space-y-1 text-left mx-auto max-w-xl">
-              <%= for item <- items do %>
+         <% %{type: :list, title: title, items: items} -> %>
+           <!-- ✅ Untuk senarai (contoh nilai/nilai tambah) -->
+             <div class="w-full h-[320px] flex items-center justify-center">
+               <div class="flex flex-col justify-center w-full h-full
+                 bg-white bg-opacity-70 rounded-xl p-6 shadow
+                 border border-transparent
+                 transition duration-300 ease-in-out
+                 hover:border-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.7)]">
+              <h2 class="text-xl font-bold mb-4 text-center text-[#09033F]">{title}</h2>
+                <ul class="list-disc list-inside space-y-1 text-left mx-auto max-w-xl text-gray-700">
+               <%= for item <- items do %>
                 <li>{item}</li>
-              <% end %>
-            </ul>
-          </div>
+            <% end %>
+          </ul>
+         </div>
+       </div>
       <% end %>
-    </div>
     """
   end
 end

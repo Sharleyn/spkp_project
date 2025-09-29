@@ -299,4 +299,17 @@ end
     )
     |> Repo.all()
   end
+
+  def count_program do
+    import Ecto.Query
+
+    from(k in SpkpProject.Kursus.Kursuss)  # ✅ guna schema sebenar
+    |> SpkpProject.Repo.aggregate(:count, :id)
+  end
+
+  def count_kategori do
+    import Ecto.Query
+    from(c in SpkpProject.Kursus.KursusKategori) # <-- table kategori kamu
+    |> SpkpProject.Repo.aggregate(:count, :id)
+  end
 end
